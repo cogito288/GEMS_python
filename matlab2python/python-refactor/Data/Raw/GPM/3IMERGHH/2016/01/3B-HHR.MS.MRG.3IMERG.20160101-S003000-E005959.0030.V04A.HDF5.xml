@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="/data/S4paGran2HTML.xsl"?>
+<S4PAGranuleMetaDataFile>
+  <CollectionMetaData>
+    <ShortName>GPM_3IMERGHH</ShortName>
+    <VersionID>04</VersionID>
+    <URL xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGHH.04/GPM_3IMERGHH_04_dif.xml" xlink:show="new" xlink:actuate="onRequest" xlink:title="Click to view GPM_3IMERGHH collection">http://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGHH.04/GPM_3IMERGHH_04_dif.xml</URL>
+  </CollectionMetaData>
+  <DataGranule>
+    <GranuleID>3B-HHR.MS.MRG.3IMERG.20160101-S003000-E005959.0030.V04A.HDF5</GranuleID>
+    <LocalGranuleID>3B-HHR.MS.MRG.3IMERG.20160101-S003000-E005959.0030.V04A.HDF5</LocalGranuleID>
+    <Format>HDF-5</Format>
+    <CheckSum>
+      <CheckSumType>sha1</CheckSumType>
+      <CheckSumValue>3422462114</CheckSumValue>
+    </CheckSum>
+    <SizeBytesDataGranule>3428015</SizeBytesDataGranule>
+    <InsertDateTime>2017-03-28 14:42:06</InsertDateTime>
+    <ProductionDateTime>2017-03-27T12:54:26.000Z</ProductionDateTime>
+  </DataGranule>
+  <RangeDateTime>
+    <RangeEndingDate>2016-01-01</RangeEndingDate>
+    <RangeEndingTime>00:59:59.999</RangeEndingTime>
+    <RangeBeginningDate>2016-01-01</RangeBeginningDate>
+    <RangeBeginningTime>00:30:00.000</RangeBeginningTime>
+  </RangeDateTime>
+  <SpatialDomainContainer>
+    <HorizontalSpatialDomainContainer>
+      <BoundingRectangle>
+        <WestBoundingCoordinate>-180.0</WestBoundingCoordinate>
+        <NorthBoundingCoordinate>90.0</NorthBoundingCoordinate>
+        <EastBoundingCoordinate>180.0</EastBoundingCoordinate>
+        <SouthBoundingCoordinate>-90.0</SouthBoundingCoordinate>
+      </BoundingRectangle>
+    </HorizontalSpatialDomainContainer>
+  </SpatialDomainContainer>
+  <Platform>
+    <PlatformShortName>MULTI</PlatformShortName>
+    <Instrument>
+      <InstrumentShortName>MERGED</InstrumentShortName>
+    </Instrument>
+  </Platform>
+  <PSAs>
+    <PSA>
+      <PSAName>DOI</PSAName>
+      <PSAValue>10.5067/GPM/IMERG/3B-HH/04</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Algorithm ID</PSAName>
+      <PSAValue>3IMERGHH</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Algorithm Version</PSAName>
+      <PSAValue>3IMERGH_1.0</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Granule Number</PSAName>
+      <PSAValue/>
+    </PSA>
+    <PSA>
+      <PSAName>Number Of Grids</PSAName>
+      <PSAValue>1</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Granule Start</PSAName>
+      <PSAValue/>
+    </PSA>
+    <PSA>
+      <PSAName>Time Interval</PSAName>
+      <PSAValue>HALF_HOUR</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Processing System</PSAName>
+      <PSAValue>PPS</PSAValue>
+    </PSA>
+    <PSA>
+      <PSAName>Missing Data</PSAName>
+      <PSAValue/>
+    </PSA>
+    <PSA>
+      <PSAName>Empty Granule</PSAName>
+      <PSAValue>NOT_EMPTY</PSAValue>
+    </PSA>
+  </PSAs>
+</S4PAGranuleMetaDataFile>
