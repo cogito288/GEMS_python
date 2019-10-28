@@ -87,8 +87,11 @@ def loadmat(path, keys=[]):
     return arr
 
 def savemat(dirname, fname, data):
-    hdf5storage.write(data, dirname, fname, matlab_compatible=True)
-"""
+    if not isinstance(data, dict):
+        hdf5storage.write(data, dirname, fname, matlab_compatible=True)
+    else:
+        filename = os.path.join(dirname, fname)
+        hdf5storage.writes(data, filename=filename, matlab_compatible=True)
 
 def datenum(datestr):
     # matlab datenum

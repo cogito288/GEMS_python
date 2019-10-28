@@ -1,3 +1,4 @@
+##################### Start of File ##################### clear all;  clc
 import os
 import sys
 project_path = '/home/cogito/Desktop/GEMS_python/matlab2python/python-refactor'
@@ -10,6 +11,7 @@ import numpy as np
 from scipy.interploate import griddata
 import time
 import pandas as pd
+import glob
 
 #% path_data = '//10.72.26.56/irisnas5/Data/';
 #% addpath(genpath('/share/irisnas5/Data/matlab_func/'))
@@ -41,7 +43,7 @@ aa[:,20]=unq_scode
 
 #% doy1
 aa1=aa
-aa1[:,[0,2:3])=1
+aa1[:,[0,2:3]]=1
 ndata_doy1=[]
 for CST in range(8, 15+1):
     aa1_temp = aa1
@@ -59,34 +61,30 @@ scode_char = temp_tbl.columns[3:] #temp_tbl.Properties.VariableNames(4:end)';
 scode_num = [float(x[1:5]) for x in scode_char] # map(lambda x:
 aa2[:,20] = scode_num
 
-temp_tbl
-temp=table2array(temp_tbl(:,[2,4:end]));
-for CST=8:15
-    aa2_temp = aa2;
-    aa2_temp(:,5)=CST;
+temp = temp_tbl[list(temp_tbl.columns[1])+list(temp_tbl.columns[3:])].values #temp=table2array(temp_tbl(:,[2,4:]))
+for CST in range(8, 15+1):
+    aa2_temp = aa2
+    aa2_temp[:,4]=CST
     
-    temp2 = temp(temp(:,1)==CST,2:end);
-    temp2 = temp2';
+    temp2 = temp[temp[:,0]==CST,1:]
+    temp2 = temp2
     
-    if isempty(temp2)==0
-        aa2_temp(:,6:20)=temp2;
-    end
-    
-    ndata_doy262 = [ndata_doy262; aa2_temp];
-end
+    if np.all(temp2==0): #isempty(temp2)==0
+        aa2_temp[:,5:20]=temp2
 
-ndata_1 = ndata(ndata(:,1)<262,:);
-ndata_2 = ndata(ndata(:,1)>262,:);
-ndata = [ndata_doy1; ndata_1; ndata_doy262; ndata_2];
+    ndata_doy262 = np.concatenate((ndata_doy262, aa2_temp), axis=0)
 
-% temp = csvread([path_data,'Station_CN/temp262.csv'],1);
+ndata_1 = ndata[ndata[:,0]<262,:]
+ndata_2 = ndata[ndata[:,0]>262,:]
+ndata = np.concatenate((ndata_doy1, ndata_1, ndata_doy262, ndata_2), axis=0)
 
-list16=dir('stn_code_data_rm_*2016*');
-list16={list16.name}';
-ndata = importdata(list16{1});
-for k=2:length(list16)
-    load(list16{k})
-    ndata=[ndata;stn_CN];
-end
-save([path_data,'Station_CN/stn_code_data/stn_code_data_rm_outlier_',num2str(yr)],'ndata','header_ndata','-v7.3')
+# temp = csvread([path_data,'Station_CN/temp262.csv'],1)
 
+list16=glob.glob('stn_code_data_rm_*2016*')
+ndata = pd.read_csv(list16[0])
+for k in range(1, len(list16)):
+    matlab.loadmat(list16[k])
+    ndata=np.concatenate((ndata,stn_CN), axis=0)
+
+matlab.savemat(os.path.join(path_data,'Station_CN/stn_code_data'), f'stn_code_data_rm_outlier_{yr}.mat', {'ndata':ndata,'header_ndata':header_ndata})
+##################### End of File ##################### 
