@@ -2,6 +2,93 @@ from datetime import date
 import numpy as np
 from scipy.spatial import Delaunay
 import h5py
+import hdf5storage
+
+"""
+def csvwrite_with_headers(path, data, header):
+	#% This function functions like the build in MATLAB function csvwrite but
+	#% allows a row of headers to be easily inserted
+	#%
+	#% known limitations
+	#% 	The same limitation that apply to the data structure that exist with
+	#%   csvwrite apply in this function, notably:
+	#%       m must not be a cell array
+	#%
+	#% Inputs
+	#%
+	#%   filename    - Output filename
+	#%   m           - array of data
+	#%   headers     - a cell array of strings containing the column headers.
+	#%                 The length must be the same as the number of columns in m.
+	#%   r           - row offset of the data (optional parameter)
+	#%   c           - column offset of the data (optional parameter)
+	#%
+	#%
+	#% Outputs
+	#%   None
+	#%% initial checks on the inputs
+	#if ~ischar(filename)
+    #	error('FILENAME must be a string');
+	#end
+
+	#% the r and c inputs are optional and need to be filled in if they are
+	#% missing
+	#if nargin < 4
+    #	r = 0;
+	#end
+	# if nargin < 5
+    #	c = 0;
+	#end
+
+	#if ~iscellstr(headers)
+    #	error('Header must be cell array of strings')
+	#end
+
+	if len(header) != data.shape[1]:	#if length(headers) ~= size(m,2)
+		raise ValueError('number of header entries must match the number of columns in the data')
+	#%% write the header string to the file
+	#%turn the headers into a single comma seperated string if it is a cell
+	#%array,
+	header_string = headers[0]
+	for col in headers[1:]:
+		header_string += ',{}'.format(col)
+	#%if the data has an offset shifting it right then blank commas must
+	#%be inserted to match
+	if r>0:
+    	for i in range(r):
+        header_string = [',',header_string];
+    end
+end
+
+%write the string to a file
+fid = fopen(filename,'w');
+fprintf(fid,'%s\r\n',header_string);
+fclose(fid);
+
+%% write the append the data to the file
+
+%
+% Call dlmwrite with a comma as the delimiter
+%
+dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
+
+def loadmat(path, keys=[]):
+    # corresponds to load
+    arr = None
+    with h5py.File(path, 'r') as f:
+        if keys: # not empty
+            arr = dict()
+            for key in keys:
+                data = f.get(key)
+                data = np.array(data)
+                arr[key] = data
+        else: # if key(datasetname) is empty
+            arr = f
+    return arr
+
+def savemat(dirname, fname, data):
+    hdf5storage.write(data, dirname, fname, matlab_compatible=True)
+"""
 
 def datenum(datestr):
     # matlab datenum
@@ -52,9 +139,24 @@ def h5read(filename, datasetname):
         data = f.get(datasetname)[:]
     return data
 
+def get_files_endswith(dirname, pattern):
+    # Simple dir 
+    # e.g. dir('*.tif')
+    # Here, pattern: ".tif"
+    files = []
+    for file in os.listdir(dirname):
+        if os.endswith(pattern):
+            files.append(file)
+    return files
+    
+
+
 def dir(dirname, pattern):
     # Not same .. 
     #     list_gpm = matlab.dir(str(yr), '.HDF5')  # list_gpm = dir([num2str(yr),'/*/*.HDF5']);
+
+    
+    """
     # https://wikidocs.net/39
     full_fname_list = []
     try:
@@ -67,6 +169,7 @@ def dir(dirname, pattern):
     except PermissionError:
         pass
     return full_fname_list
+    """
 
 def permute(arr, axes):
     if (arr.ndim) == len(axes):
@@ -75,6 +178,3 @@ def permute(arr, axes):
         return np.transpose(arr[:, :, None], axes)
     else:
         return None # should be raise error
-    
-    
-def load(path, )
