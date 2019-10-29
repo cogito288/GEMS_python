@@ -1,29 +1,32 @@
 ### Package Import
-import os
-import scipy.io as sio
-from scipy.spatial import Delaunay
-import time
-
 import sys
-project_path = '/home/cogito/Uncertainty/matlab2python/python-refactor'
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 
-from Code.utils.matlab import *
-from Code.utils.helpers import *
+from Code.utils import matlab
+#from Code.utils import helpers
+
+import scipy.io as sio
+import numpy as np
+import glob
+import time
+from scipy.spatial import Delaunay
 
 ### Setting path
-# path_data = '/share/irisnas6/Data/GOCI_AOD/01mat/GOCI/';
-# path = '/share/irisnas6/Data/GOCI_AOD/01mat/GOCI_filtered/';
-data_path = os.path.join(project_path, 'Data', 'Prepreossed_raw', 'GOCI_AOD') 
-goci_path = os.path.join(project_path, 'Data', 'Prepreossed_raw', 'GOCI_filtered')
+data_path = os.path.join(project_path, 'Data') 
+goci_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_filtered')
 korea_path = os.path.join(project_path, 'Data', 'Station', 'AirQuality_Korea')
-#os.chdir(data_path)
 
-grid_goci = sio.loadmat(os.path.join(data_path, 'grid', 'grid_korea.mat'))
-grid_kor = sio.loadmat(os.path.join(data_path, 'grid', 'grid_goci.mat'))
+### Setting period
+YEARS = [2016] #, 2018, 2019
 
-grid_goci = list(zip(lon_goci.flatten(), lat_goci.flatten()))
-grid_kor = list(zip(lon_kor.flatten(), lat_kor.flatten()))
+lat_kor, lon_kor = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_korea.mat'), keys=['lat_kor', 'lon_kor'])
+lat_goci, lon_goci = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_goci.mat'), keys=['lat_goci', 'lon_goci'])
+
+grid_goci = np.vstack((lon_goci.T.flatten(), lat_goci.T.flatten())).T
+grid_kor = np.vstack((lon_kor.T.flatten(), lat_kor.T.flatten())).T
 
 """
 ### Find surrounding pixels using delaunay triangulation
@@ -51,7 +54,9 @@ for i in range(matlab.length(I)):
     k[i] = surrPx[i, d_surr[i, :]==min(d_surr[i, :])]
 sio.savemat(os.path.join(data_path, 'grid_goci_surrPx.mat', mdict={'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k}))
 """
-surrPx = sio.loadmat(os.path.join(data_path, 'grid', 'grid_goci_surrPx.mat'))
+
+d_surr, invDsq, k, surrPx = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_goci_surrPx.mat'), keys=['d_surr', 'invDsq', 'k', 'surrPx'])
+
 def do_masking(GOCI):
     # global var: surrPX, k, invDsq, lon_kor
     mask = GOCI[k]
@@ -68,31 +73,33 @@ def do_masking(GOCI):
 avgtime = []
 YEARS = range(2017, 2019+1)
 for yr in YEARS:
-    list_AOD = get_file_lists(os.path.join(goci_path, 'AOD', str(yr)), ".mat")
-    list_AE = get_file_lists(os.path.join(goci_path, 'AE', str(yr)), ".mat")    
-    list_FMF = get_file_lists(os.path.join(goci_path, 'FMF', str(yr)), ".mat")
-    list_SSA = get_file_lists(os.path.join(goci_path, 'SSA', str(yr)), ".mat")
+    list_AOD = glob.glob(os.path.join(goci_path, 'AOD', str(yr), "*.mat"))
+    list_AE = glob.glob(os.path.join(goci_path, 'AE', str(yr), "*.mat")) 
+    list_FMF = glob.glob(os.path.join(goci_path, 'FMF', str(yr), "*.mat"))
+    list_SSA = glob.glob(os.path.join(goci_path, 'SSA', str(yr), "*.mat"))
+    list_AOD = [os.path.basename(f) for f in list_AOD]
+    list_AE = [os.path.basename(f) for f in list_AE]
+    list_FMF = [os.path.basename(f) for f in list_FMF]
+    list_SSA = [os.path.basename(f) for f in list_SSA]
     
     for j in range(len(list_AOD)):
         tStart = time.time()
-        GOCI_aod = sio.loadmat(os.path.join(goci_path, 'AOD', str(yr), list_AOD[j]))
-        GOCI_ae = sio.loadmat(os.path.join(goci_path, 'AE', str(yr), list_AE[j]))
-        GOCI_fmf = sio.loadmat(os.path.join(goci_path, 'FMF', str(yr), list_FMF[j]))
-        GOCI_ssa = sio.loadmat(os.path.join(goci_path, 'SSA', str(yr), list_SSA[j]))
+        GOCI_aod = matlab.loadmat(os.path.join(goci_path, 'AOD', str(yr), list_AOD[j]))
+        GOCI_ae = matlab.loadmat(os.path.join(goci_path, 'AE', str(yr), list_AE[j]))
+        GOCI_fmf = matlab.loadmat(os.path.join(goci_path, 'FMF', str(yr), list_FMF[j]))
+        GOCI_ssa = matlab.loadmat(os.path.join(goci_path, 'SSA', str(yr), list_SSA[j]))
         
         GOCI_aod = do_masking(GOCI_aod)
         GOCI_ae = do_masking(GOCI_ae)
         GOCI_ssa = do_masking(GOCI_ssa)
         
-        sio.savemat(os.path.join(goci_path, 'GOCI', 'AOD', str(yr), f'kor_{list_AOD[j]}.mat'), mdict={'GOCI_aod':GOCI_aod})
-        sio.savemat(os.path.join(goci_path, 'GOCI', 'AE', str(yr), f'kor_{list_AE[j]}.mat'), mdict={'GOCI_AE':GOCI_ae})
-        sio.savemat(os.path.join(goci_path, 'GOCI', 'FMF', str(yr), f'kor_{list_FMF[j]}.mat'), mdict={'GOCI_FMF':GOCI_fmf})
-        sio.savemat(os.path.join(goci_path, 'GOCI', 'SSA', str(yr), f'kor_{list_SSA[j]}.mat'), mdict={'GOCI_SSA':GOCI_ssa})
-        
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AOD', str(yr), f'kor_{list_AOD[j]}.mat'), {'GOCI_aod':GOCI_aod})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AE', str(yr), f'kor_{list_AE[j]}.mat'), {'GOCI_AE':GOCI_ae})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'FMF', str(yr), f'kor_{list_FMF[j]}.mat'), {'GOCI_FMF':GOCI_fmf})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'SSA', str(yr), f'kor_{list_SSA[j]}.mat'), {'GOCI_SSA':GOCI_ssa})
         print (list_AOD[j])
         tEnd = time.time()
         avgtime.append(tEnd-tStart)
     print (yr)
-
 avgtime = np.nanmean(avgtime)
 print (avgtime)

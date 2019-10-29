@@ -1,7 +1,7 @@
 ### Package Import
 import sys
 import os
-base_dir = os.environ['PWD'] # os.environ['GEMS_HOME']
+base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 
@@ -14,7 +14,7 @@ import glob
 
 ### Setting path
 raw_data_path = os.path.join(project_path, 'Data', 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(project_path, 'Data', 'Prepreossed_raw', 'GOCI_AOD')
+write_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_AOD')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
@@ -28,21 +28,21 @@ def save_GOCI_datasets(path, yr, filename):
                data={'GOCI_aod':GOCI_aod})
     matlab.savemat(dirname=os.path.join(path, 'FMF', str(yr)),
                fname=f'GOCI_FMF_{filename}',
-               data={'GOCI_FMF':GOCI_fmf})
+               data={'GOCI_fmf':GOCI_fmf})
     matlab.savemat(dirname=os.path.join(path, 'SSA', str(yr)),
                fname=f'GOCI_SSA_{filename}',
-               data={'GOCI_SSA':GOCI_ssa})
+               data={'GOCI_ssa':GOCI_ssa})
     matlab.savemat(dirname=os.path.join(path, 'AE', str(yr)),
                fname=f'GOCI_AE_{filename}',
                data={'GOCI_ae':GOCI_ae})
     matlab.savemat(dirname=os.path.join(path, 'Type', str(yr)),
                fname=f'GOCI_Type_{filename}',
-               data={'GOCI_Type':GOCI_type})
+               data={'GOCI_type':GOCI_type})
     matlab.savemat(dirname=os.path.join(path, 'No_of_Used_500m_Pixels_for_One_6km_Product_Pixel', str(yr)),
                fname=f'GOCI_num_used_pixels_{filename}',
                data={'GOCI_num_used_pixels':GOCI_num_used_pixels})
     matlab.savemat(dirname=os.path.join(path, 'NDVI', str(yr)),
-               fname=f'GOCI_num_used_pixels_{filename}',
+               fname=f'GOCI_NDVI_{filename}',
                data={'GOCI_ndvi':GOCI_ndvi})
     matlab.savemat(dirname=os.path.join(path, 'DAI', str(yr)),
                fname=f'GOCI_DAI_{filename}',
@@ -52,6 +52,8 @@ def save_GOCI_datasets(path, yr, filename):
 for yr in YEARS:
     doy_000 = matlab.datenum(f'{yr}0000')
 
+    days = 366 if (yr%4)==0 else 365
+    
     num_utc = 8
     all_list_doy = np.tile(range(1,days+1),(num_utc,1))
     all_list_utc = np.tile(range(num_utc),(1,days))
@@ -98,13 +100,12 @@ for yr in YEARS:
             
             # Save
             fname_temp = f'{yr}_{list_doy[k]:03d}_{list_utc[k]:02d}.mat'
-            save_GOCI_datasets(writh_path, yr, fname_temp)
+            save_GOCI_datasets(write_path, yr, fname_temp)
             print (fname_temp)
         print (mm)
         
     
     for doy, utc in all_date[isNotDateExist, :]:
-        fname_temp = f'{yr}_{doy:03d}_{utc:02d}.mat'
         GOCI_aod = np.full([473, 463], np.nan)
         GOCI_fmf = np.full([473, 463], np.nan)
         GOCI_ssa = np.full([473, 463], np.nan)
