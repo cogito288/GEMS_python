@@ -5,7 +5,7 @@ Convert matlab code to python code in GEMS project.
 ## Setting
 1. 
 ```
-$ git clone https://github.com/cogito288/GEMS_python.git
+git clone https://github.com/cogito288/GEMS_python.git
 ```
 
 2. 
