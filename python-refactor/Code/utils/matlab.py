@@ -8,8 +8,6 @@ import gdal
 import os
 from pyhdf.SD import SD, SDC ### HDF4 
 
-
-
 """
 def csvwrite_with_headers(path, data, header):
 	#% This function functions like the build in MATLAB function csvwrite but
@@ -88,6 +86,17 @@ def hdfread(path, dataset): # HDF4
 
 def loadmat(path, keys=[]):
     # corresponds to load
+    data = sio.loadmat(path)
+    new_data = []
+    if keys:
+        for key in keys:
+            new_data.append(data[key])
+        return new_data
+    else:
+        return data
+    """
+    # Since we save hdf as scipy mat, we should using scipy.io.loadmat
+    # Otherwise, we should change loadmat and savemat both to use h5py or hdf5storage
     arr = None
     with h5py.File(path, 'r') as f:
         if keys: # not empty
@@ -99,6 +108,7 @@ def loadmat(path, keys=[]):
         else: # if key(datasetname) is empty
             arr = f
     return arr
+    """
 
 ####### Debugging #########
 def check_make_dir(directory):
