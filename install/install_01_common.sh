@@ -18,10 +18,10 @@ sudo apt-get install cmake
 
 GEMS_HOME="/home/sehyun/GEMS_python"
 # bash_profile에 PATH를 추가해줍니다.
-echo "export GEMS_HOME=$GEMS_HOME" >> ~/.bash_profile
-echo "export PATH=$PATH:$GEMS_HOME" >> ~/.bash_profile
+echo "export GEMS_HOME=$GEMS_HOME" >> ~/.bashrc
+echo "export PATH=$PATH:$GEMS_HOME" >> ~/.bashrc
 
 echo "Root directory is $GEMS_HOME"
-source ~/.bash_profile
+source ~/.bashrc
 # 끝!
 echo "Done!"

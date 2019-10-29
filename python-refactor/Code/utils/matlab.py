@@ -1,8 +1,14 @@
 from datetime import date
 import numpy as np
 from scipy.spatial import Delaunay
+import scipy.io as sio
 import h5py
 import hdf5storage
+import gdal
+import os
+from pyhdf.SD import SD, SDC ### HDF4 
+
+
 
 """
 def csvwrite_with_headers(path, data, header):
@@ -72,6 +78,14 @@ fclose(fid);
 %
 dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
 """
+
+def hdfread(path, dataset): # HDF4
+    result = None
+    hdf_file =  SD(path, SDC.READ)
+    sds_obj = hdf_file.select(dataset)
+    result = sds_obj.get()
+    return result
+
 def loadmat(path, keys=[]):
     # corresponds to load
     arr = None
@@ -86,12 +100,30 @@ def loadmat(path, keys=[]):
             arr = f
     return arr
 
+####### Debugging #########
+def check_make_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+###########################
+
 def savemat(dirname, fname, data):
+    ### Description
+    # Matlab: default < 2 GB. More than 2 GB: 7.3v 
+    # scipy.io.savemat can save maximally 4 GB.
+    ### Input:
+    # dirname: directory name for hdf5storage
+    # fname: filename
+    # data: dictionary
+    check_make_dir(dirname) # debugging
+    sio.savemat(os.path.join(dirname, fname), mdict=data)
+    """
+    For matlab 7.3 mat saving
     if not isinstance(data, dict):
         hdf5storage.write(data, dirname, fname, matlab_compatible=True)
     else:
         filename = os.path.join(dirname, fname)
         hdf5storage.writes(data, filename=filename, matlab_compatible=True)
+    """
 
 def datenum(datestr):
     # matlab datenum
