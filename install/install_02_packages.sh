@@ -1,5 +1,6 @@
 #! /bin/bash
 
+source ~/.bash_profile
 INSTALL_DIR=$GEMS_HOME/install
 
 # Install eccodes
