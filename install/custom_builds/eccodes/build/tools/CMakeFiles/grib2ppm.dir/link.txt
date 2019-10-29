@@ -1,0 +1,1 @@
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib2ppm.dir/grib2ppm.c.o  -o ../bin/grib2ppm -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 

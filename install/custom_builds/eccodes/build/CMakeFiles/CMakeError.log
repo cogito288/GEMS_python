@@ -1,0 +1,129 @@
+Determining if the funopen exist failed with the following output:
+Change Dir: /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_82909/fast"
+/usr/bin/make -f CMakeFiles/cmTC_82909.dir/build.make CMakeFiles/cmTC_82909.dir/build
+make[1]: Entering directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_82909.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -pipe  -fPIE   -o CMakeFiles/cmTC_82909.dir/CheckSymbolExists.c.o   -c /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c: In function ‘main’:
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: ‘funopen’ undeclared (first use in this function); did you mean ‘fdopen’?
+   return ((int*)(&funopen))[argc];
+                   ^~~~~~~
+                   fdopen
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+CMakeFiles/cmTC_82909.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_82909.dir/CheckSymbolExists.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_82909.dir/CheckSymbolExists.c.o] Error 1
+make[1]: Leaving directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_82909/fast' failed
+make: *** [cmTC_82909/fast] Error 2
+
+File /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdio.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef funopen
+  return ((int*)(&funopen))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Performing C SOURCE FILE Test IEEE_BE failed with the following output:
+Change Dir: /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_70bea/fast"
+/usr/bin/make -f CMakeFiles/cmTC_70bea.dir/build.make CMakeFiles/cmTC_70bea.dir/build
+make[1]: Entering directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_70bea.dir/src.c.o
+/usr/bin/cc   -pipe -DIEEE_BE -fPIE   -o CMakeFiles/cmTC_70bea.dir/src.c.o   -c /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_70bea
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_70bea.dir/link.txt --verbose=1
+/usr/bin/cc  -pipe -DIEEE_BE      -Wl,--disable-new-dtags  CMakeFiles/cmTC_70bea.dir/src.c.o  -o cmTC_70bea 
+make[1]: Leaving directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+
+Return value: 1
+Source file was:
+int compare(unsigned char* a,unsigned char* b) {
+         while(*a != 0) if (*(b++)!=*(a++)) return 1;
+         return 0;
+       }
+       int main(int argc,char** argv) {
+         unsigned char dc[]={0x30,0x61,0xDE,0x80,0x93,0x67,0xCC,0xD9,0};
+         double da=1.23456789e-75;
+         unsigned char* ca;
+
+         unsigned char fc[]={0x05,0x83,0x48,0x22,0};
+         float fa=1.23456789e-35;
+
+         if (sizeof(double)!=8) return 1;
+
+         ca=(unsigned char*)&da;
+         if (compare(dc,ca)) return 1;
+
+         if (sizeof(float)!=4) return 1;
+
+         ca=(unsigned char*)&fa;
+         if (compare(fc,ca)) return 1;
+
+         return 0;
+       }
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_87878/fast"
+/usr/bin/make -f CMakeFiles/cmTC_87878.dir/build.make CMakeFiles/cmTC_87878.dir/build
+make[1]: Entering directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_87878.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -pipe  -fPIE   -o CMakeFiles/cmTC_87878.dir/CheckSymbolExists.c.o   -c /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_87878
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87878.dir/link.txt --verbose=1
+/usr/bin/cc  -pipe       -Wl,--disable-new-dtags  CMakeFiles/cmTC_87878.dir/CheckSymbolExists.c.o  -o cmTC_87878 
+CMakeFiles/cmTC_87878.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_87878.dir/build.make:97: recipe for target 'cmTC_87878' failed
+make[1]: *** [cmTC_87878] Error 1
+make[1]: Leaving directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_87878/fast' failed
+make: *** [cmTC_87878/fast] Error 2
+
+File /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0cb18/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0cb18.dir/build.make CMakeFiles/cmTC_0cb18.dir/build
+make[1]: Entering directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0cb18.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -pipe -DCHECK_FUNCTION_EXISTS=pthread_create -fPIE   -o CMakeFiles/cmTC_0cb18.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_0cb18
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0cb18.dir/link.txt --verbose=1
+/usr/bin/cc  -pipe -DCHECK_FUNCTION_EXISTS=pthread_create      -Wl,--disable-new-dtags  CMakeFiles/cmTC_0cb18.dir/CheckFunctionExists.c.o  -o cmTC_0cb18 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_0cb18.dir/build.make:97: recipe for target 'cmTC_0cb18' failed
+make[1]: *** [cmTC_0cb18] Error 1
+make[1]: Leaving directory '/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_0cb18/fast' failed
+make: *** [cmTC_0cb18/fast] Error 2
+
+

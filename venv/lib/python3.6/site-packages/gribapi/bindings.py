@@ -1,0 +1,57 @@
+#
+# Copyright 2017-2019 European Centre for Medium-Range Weather Forecasts (ECMWF).
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Authors:
+#   Alessandro Amici - B-Open - https://bopen.eu
+#
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import logging
+import pkgutil
+import os
+
+import cffi
+
+__version__ = '0.9.3'
+
+LOG = logging.getLogger(__name__)
+
+try:
+    from ._bindings import ffi, lib
+except ModuleNotFoundError:
+    ffi = cffi.FFI()
+    ffi.cdef(
+        pkgutil.get_data(__name__, 'grib_api.h').decode('utf-8') +
+        pkgutil.get_data(__name__, 'eccodes.h').decode('utf-8')
+    )
+
+    LIBNAMES = ['eccodes', 'libeccodes.so', 'libeccodes']
+
+    if os.environ.get('ECCODES_DIR'):
+        LIBNAMES.insert(0, os.path.join(os.environ['ECCODES_DIR'], 'lib/libeccodes.so'))
+
+    for libname in LIBNAMES:
+        try:
+            lib = ffi.dlopen(libname)
+            LOG.info("ecCodes library found using name '%s'.", libname)
+            break
+        except OSError:
+            # lazy exception
+            lib = None
+            LOG.info("ecCodes library not found using name '%s'.", libname)
+
+# default encoding for ecCodes strings
+ENC = 'ascii'

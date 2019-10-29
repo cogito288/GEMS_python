@@ -1,0 +1,1 @@
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_grib_clone.dir/grib_clone.c.o  -o c_grib_clone -Wl,-rpath,/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 

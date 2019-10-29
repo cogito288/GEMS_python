@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgrib_tools.a  CMakeFiles/grib_tools.dir/grib_tools.c.o CMakeFiles/grib_tools.dir/grib_options.c.o
+/usr/bin/ranlib libgrib_tools.a

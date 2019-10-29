@@ -1,0 +1,1 @@
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_bufr_read_temp.dir/bufr_read_temp.c.o  -o c_bufr_read_temp -Wl,-rpath,/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 
