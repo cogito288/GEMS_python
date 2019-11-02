@@ -4,21 +4,20 @@ import os
 base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
-
 from Code.utils import matlab
-#from Code.utils import helpers
 
 import scipy.io as sio
 import numpy as np
 import glob
 
 ### Setting path
-data_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_AOD') 
-write_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_filtered')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+data_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD') 
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
-MONTHS = range(1, 12+1)
+MONTHS = range(1, 3+1)
 
 for yr in YEARS:
     if yr%4==0:
@@ -36,7 +35,7 @@ for yr in YEARS:
         nan_filter = np.zeros((473, 463, 8, 4))
         data = np.full([473, 463, 8], np.nan)
 
-        for m in range(1, 8+1):
+        for m in range(1, 2+1):# range(1, 8+1)
             mat = matlab.loadmat(os.path.join(data_path, 'AOD', str(yr), f'{list_aod[8*k-8+m]}'))
             GOCI_aod = mat['GOCI_aod']
             del mat

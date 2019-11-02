@@ -4,22 +4,23 @@ import os
 base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
-
 from Code.utils import matlab
-#from Code.utils import helpers
 
 import scipy.io as sio
 import numpy as np
 import glob
 
 ### Setting path
-raw_data_path = os.path.join(project_path, 'Data', 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_AOD')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
-MONTHS = range(1, 12+1)
+MONTHS = range(1, 3+1)
 
+
+print (f"Start of {__file__}")
 
 def save_GOCI_datasets(path, yr, filename):
     ### Be careful to use. First, You have to define GOCI_aod, GOCI_fmf, ... 
@@ -115,5 +116,7 @@ for yr in YEARS:
         GOCI_ndvi = np.full([473, 463], np.nan)
         GOCI_dai = np.full([473, 463], np.nan)
         fname_temp = f'{yr}_{doy:03d}_{utc:02d}.mat'
-        save_GOCI_datasets(writh_path, yr, fname_temp)
+        save_GOCI_datasets(write_path, yr, fname_temp)
     print (yr)
+
+print (f"End of {__file__}")

@@ -4,42 +4,39 @@ import os
 base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
-
 from Code.utils import matlab
-#from Code.utils import helpers
 
 import scipy.io as sio
 import numpy as np
 import glob
 import time
-from scipy.spatial import Delaunay
 
 ### Setting path
-data_path = os.path.join(project_path, 'Data') 
-goci_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_filtered')
-korea_path = os.path.join(project_path, 'Data', 'Station', 'AirQuality_Korea')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+goci_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered') 
+korea_path = os.path.join(data_base_dir, 'Station', 'AirQuality_Korea')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
 
-lat_kor, lon_kor = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_korea.mat'), keys=['lat_kor', 'lon_kor'])
-lat_goci, lon_goci = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_goci.mat'), keys=['lat_goci', 'lon_goci'])
+lat_kor, lon_kor = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_korea.mat'), keys=['lat_kor', 'lon_kor'])
+lat_goci, lon_goci = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci.mat'), keys=['lat_goci', 'lon_goci'])
 
 grid_goci = np.vstack((lon_goci.T.flatten(), lat_goci.T.flatten())).T
 grid_kor = np.vstack((lon_kor.T.flatten(), lat_kor.T.flatten())).T
 
-"""
+
 ### Find surrounding pixels using delaunay triangulation
 DT = matlab.delaunayTriangulation(grid_goci)
 ti = DT.find_simplex(grid_kor)
-triPx = DT[ti, :]
+triPx = DT.simplices[ti, :]
 triPx_UL = np.min(triPx, axis=1)
 I, J = matlab.ind2sub(lon_goci.shape, triPx_UL)
-surrPx = np.zeros(mathlab.length(I), 4)
-surrPx[:, 1] = matlab.sub2ind(lon_goci.shape, I, J) # Upper Left
-surrPx[:, 2] = matlab.sub2ind(lon_goci.shape, I, J+1) # Upper Right
-surrPx[:, 3] = matlab.sub2ind(lon_goci.shape, I+1, J) # Lower Left
-surrPx[:, 4] = matlab.sub2ind(lon_goci.shape, I+1, J+1) # Lower Right
+surrPx = np.zeros((len(I), 4))
+surrPx[:, 0] = matlab.sub2ind(lon_goci.shape, I, J) # Upper Left
+surrPx[:, 1] = matlab.sub2ind(lon_goci.shape, I, J+1) # Upper Right
+surrPx[:, 2] = matlab.sub2ind(lon_goci.shape, I+1, J) # Lower Left
+surrPx[:, 3] = matlab.sub2ind(lon_goci.shape, I+1, J+1) # Lower Right
 
 lon_surr = lon_goci[surrPx]
 lat_surr = lat_goci[surrPx]
@@ -52,10 +49,9 @@ inDsq = 1./np.power(d_surr)
 k = np.zeros(matlab.length(I), 1)
 for i in range(matlab.length(I)):
     k[i] = surrPx[i, d_surr[i, :]==min(d_surr[i, :])]
-sio.savemat(os.path.join(data_path, 'grid_goci_surrPx.mat', mdict={'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k}))
-"""
+matlab.savemat(data_base_dir, 'grid_goci_surrPx.mat', mdict={'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
 
-d_surr, invDsq, k, surrPx = matlab.loadmat(os.path.join(data_path, 'grid', 'grid_goci_surrPx.mat'), keys=['d_surr', 'invDsq', 'k', 'surrPx'])
+d_surr, invDsq, k, surrPx = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci_surrPx.mat'), keys=['d_surr', 'invDsq', 'k', 'surrPx'])
 
 def do_masking(GOCI):
     # global var: surrPX, k, invDsq, lon_kor
@@ -71,7 +67,7 @@ def do_masking(GOCI):
     return GOCI
 
 avgtime = []
-YEARS = range(2017, 2019+1)
+YEARS = [2016] # YEARS = range(2016, 2019+1)
 for yr in YEARS:
     list_AOD = glob.glob(os.path.join(goci_path, 'AOD', str(yr), "*.mat"))
     list_AE = glob.glob(os.path.join(goci_path, 'AE', str(yr), "*.mat")) 

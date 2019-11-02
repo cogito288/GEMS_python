@@ -161,6 +161,7 @@ def delaunayTriangulation(points):
     N = points.ndim # The dimensions of points
     options = 'Qt Qbb Qc' if N <= 3 else 'Qt Qbb Qc Qx' # Set the QHull options
     DT = Delaunay(points, qhull_options = options)
+    
     tri = DT.simplices
     keep = np.ones(len(tri), dtype = bool)
     for i, t in enumerate(tri):
@@ -168,13 +169,27 @@ def delaunayTriangulation(points):
             keep[i] = False # Point is coplanar, we don't want to keep it
     tri = tri[keep]
     DT.simplices = tri
+    
     return DT
-
+"""
 def ind2sub(siz, IND):
     return np.unravel_index(IND, siz)
 
 def sub2ind(siz, dim1, dim2):
     return np.ravel_multi_index(siz, (dim1, dim2))
+"""
+def ind2sub(array_shape, ind):
+    if len(array_shape) != 2:
+        raise NotImplementedError
+    rows = (ind.astype('int') / array_shape[1])
+    cols = (ind.astype('int') % array_shape[1]) # or numpy.mod(ind.astype('int'), array_shape[1])
+    return (rows, cols)
+
+def sub2ind(array_shape, rows, cols):
+    if len(array_shape) != 2:
+        raise NotImplementedError
+    return rows*array_shape[1] + cols
+
 
 def length(arr):
     return max(arr.shape)
@@ -194,8 +209,6 @@ def get_files_endswith(dirname, pattern):
             files.append(file)
     return files
     
-
-
 def dir(dirname, pattern):
     # Not same .. 
     #     list_gpm = matlab.dir(str(yr), '.HDF5')  # list_gpm = dir([num2str(yr),'/*/*.HDF5']);
@@ -223,3 +236,4 @@ def permute(arr, axes):
         return np.transpose(arr[:, :, None], axes)
     else:
         return None # should be raise error
+    

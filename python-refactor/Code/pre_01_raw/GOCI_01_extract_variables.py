@@ -4,17 +4,16 @@ import os
 base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
-
 from Code.utils import matlab
-#from Code.utils import helpers
 
 import scipy.io as sio
 import numpy as np
 import glob
 
 ### Setting path
-raw_data_path = os.path.join(project_path, 'Data', 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(project_path, 'Data', 'Preprocessed_raw', 'GOCI_AOD')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
