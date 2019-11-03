@@ -191,7 +191,12 @@ def sub2ind(array_shape, rows, cols):
     return (rows*array_shape[1] + cols).astype(int)
 
 def length(arr):
-    return max(arr.shape)
+    if isinstance(arr, np.ndarray):
+        return max(arr.shape)
+    elif isinstance(arr, list):
+        return len(arr)
+    else:
+        raise NotImplementedError
 
 def repmat(arr, change_size):
     if len(change_size)==2:

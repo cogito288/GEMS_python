@@ -80,7 +80,9 @@ ogrinfo --version
 sudo apt-get install libgdal-dev -y
 export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
-pip3 install --global-option=build_ext --global-option="-I/usr/include/gdal/" GDAL==2.0.1
+pip3 install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
 
+
+sudo apt install python-gdal -y
 ############################### Install pyhdf
 pip3 install pyhdf
