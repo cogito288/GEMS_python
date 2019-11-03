@@ -11,12 +11,14 @@ import numpy as np
 import glob
 import time
 import h5py 
+import pygrib
 
 ### Setting path
 data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 rdaps_path = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
-path = '/share/irisnas2/Data/Aerosol/RDAPS/';
-path_data = '/share/irisnas2/Data/Aerosol/00_raw_data/RDAPS/';
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+#path = '/share/irisnas2/Data/Aerosol/RDAPS/';
+#path_data = '/share/irisnas2/Data/Aerosol/00_raw_data/RDAPS/';
 #run('/share/irisnas3/Data/drought/GLDAS/nctoolbox-1.1.3/nctoolbox-1.1.3/setup_nctoolbox.m');
 
 ### Setting period
@@ -32,32 +34,49 @@ for yr in YEARS:
     rdaps = np.full((419,491,18), np.nan) 
     
     for i, fname in enumerate(list_char):
+        rdaps_data = pygrib.open(os.path.join(curr_path, fname))
         
-        rdaps_data = ncdataset(list(i,:));
-        % var = rdaps_data.variables;
-        rdaps(:,:,1) = squeeze(rdaps_data.netcdf.findVariable('Temperature_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,2) = squeeze(rdaps_data.netcdf.findVariable('Dew-point_temperature_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,3) = squeeze(rdaps_data.netcdf.findVariable('Relative_humidity_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,4) = squeeze(rdaps_data.netcdf.findVariable('u-component_of_wind_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,5) = squeeze(rdaps_data.netcdf.findVariable('v-component_of_wind_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,6) = squeeze(rdaps_data.netcdf.findVariable('Maximum_wind_speed_height_above_ground_3_Hour_Maximum').read().copyToNDJavaArray());
-        rdaps(:,:,7) = squeeze(rdaps_data.netcdf.findVariable('Pressure_surface').read().copyToNDJavaArray());
-        rdaps(:,:,8) = squeeze(rdaps_data.netcdf.findVariable('Planetary_boundary_layer_height_UnknownLevelType-220').read().copyToNDJavaArray());
-        rdaps(:,:,9) = squeeze(rdaps_data.netcdf.findVariable('Visibility_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,10) = squeeze(rdaps_data.netcdf.findVariable('Temperature_surface').read().copyToNDJavaArray());
-        rdaps(:,:,11) = squeeze(rdaps_data.netcdf.findVariable('Maximum_temperature_height_above_ground_3_Hour_Maximum').read().copyToNDJavaArray());
-        rdaps(:,:,12) = squeeze(rdaps_data.netcdf.findVariable('Minimum_temperature_height_above_ground_3_Hour_Minimum').read().copyToNDJavaArray());
-        rdaps(:,:,13) = squeeze(rdaps_data.netcdf.findVariable('Total_precipitation_surface_3_Hour_Accumulation').read().copyToNDJavaArray());
-        rdaps(:,:,14) = squeeze(rdaps_data.netcdf.findVariable('Frictional_velocity_height_above_ground').read().copyToNDJavaArray());
-        rdaps(:,:,15) = squeeze(rdaps_data.netcdf.findVariable('Convective_available_potential_energy_surface_layer_3_Hour_Maximum').read().copyToNDJavaArray());
-        rdaps(:,:,16) = squeeze(rdaps_data.netcdf.findVariable('Surface_roughness_surface').read().copyToNDJavaArray());
-        rdaps(:,:,17) = squeeze(rdaps_data.netcdf.findVariable('Latent_heat_net_flux_surface_3_Hour_Average').read().copyToNDJavaArray());
-        rdaps(:,:,18) = squeeze(rdaps_data.netcdf.findVariable('Specific_humidity_height_above_ground').read().copyToNDJavaArray());
+        data = rdaps_data.select(name='Temperature', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,0] = np.squeeze(data)
+        data = rdaps_data.select(name='Dew point temperature', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,1] = np.squeeze(data)
+        data = rdaps_data.select(name='Relative humidity', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,2] = np.squeeze(data)
+        data = rdaps_data.select(name='10 metre U wind component', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,3] = np.squeeze(data)
+        data = rdaps_data.select(name='10 metre V wind component', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,4] = np.squeeze(data)
+        data = rdaps_data.select(name='Maximum wind speed', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,5] = np.squeeze(data)
+        data = rdaps_data.select(name='Surface pressure')[0].values
+        rdaps[:,:,6] = np.squeeze(data)
+        data = rdaps_data.select(name='Planetary boundary layer height')[0].values
+        rdaps[:,:,7] = np.squeeze(data)
+        data = rdaps_data.select(name='Visibility', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,8] = np.squeeze(data)
+        data = rdaps_data.select(name='Temperature', typeOfLevel='surface')[0].values
+        rdaps[:,:,9] = np.squeeze(data)
+        data = rdaps_data.select(name='Maximum temperature', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,10] = np.squeeze(data)
+        data = rdaps_data.select(name='Minimum temperature', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,11] = np.squeeze(data)
+        data = rdaps_data.select(parameterName='Total precipitation')[0].values
+        rdaps[:,:,12] = np.squeeze(data)
+        data = rdaps_data.select(name='Frictional velocity', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,13] = np.squeeze(data)
+        data = rdaps_data.select(name='Convective available potential energy')[0].values
+        rdaps[:,:,14] = np.squeeze(data)
+        data = rdaps_data.select(name='Surface roughness', typeOfLevel='surface')[0].values
+        rdaps[:,:,15] = np.squeeze(data)
+        data = rdaps_data.select(name='Latent heat net flux', typeOfLevel='surface')[0].values
+        rdaps[:,:,16] = np.squeeze(data)
+        data = rdaps_data.select(name='Specific humidity', typeOfLevel='heightAboveGround')[0].values
+        rdaps[:,:,17] = np.squeeze(data)
         
-        doy = list_dnum(i)-doy_000;
-%         fname = ['RDAPS_',num2str(yr),'_',num2str(doy,'%03i'),'_',list(i,30:31),'.mat'];
-        fname = ['RDAPS_',num2str(yr),'_',num2str(doy,'%03i'),'_',list(i,30:31),'_006.mat'];
-        save([path,num2str(yr),'/',fname], 'rdaps');
-        disp(fname)
-    end
-end
+
+        doy = list_dnum[i]-doy_000;
+        fname = f'RDAPS_{yr}_{doy:03d}_{fname[29:31]}.mat'
+        #fname = f'RDAPS_{yr}_{doy:03d}_{fname[29:31]}_006.mat'
+        matlab.savemat(os.path.join(write_path, str(yr)), fname, {'rdaps':rdaps})
+        print (fname)
+    print (yr)
