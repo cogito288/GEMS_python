@@ -49,10 +49,10 @@
 
 /* Needed for finding per package config files */
 
-#define ECCODES_INSTALL_DIR       "/home/sehyun/GEMS_python/install/source/eccodes"
-#define ECCODES_INSTALL_BIN_DIR   "/home/sehyun/GEMS_python/install/source/eccodes/bin"
-#define ECCODES_INSTALL_LIB_DIR   "/home/sehyun/GEMS_python/install/source/eccodes/lib"
-#define ECCODES_INSTALL_DATA_DIR  "/home/sehyun/GEMS_python/install/source/eccodes/share/eccodes"
+#define ECCODES_INSTALL_DIR       "/home/sehyun/source/eccodes"
+#define ECCODES_INSTALL_BIN_DIR   "/home/sehyun/source/eccodes/bin"
+#define ECCODES_INSTALL_LIB_DIR   "/home/sehyun/source/eccodes/lib"
+#define ECCODES_INSTALL_DATA_DIR  "/home/sehyun/source/eccodes/share/eccodes"
 
 #define ECCODES_DEVELOPER_SRC_DIR "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source"
 #define ECCODES_DEVELOPER_BIN_DIR "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build"

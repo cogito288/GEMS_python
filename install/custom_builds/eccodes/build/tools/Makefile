@@ -205,6 +205,21 @@ codes_bufr_filter/fast:
 .PHONY : codes_bufr_filter/fast
 
 # Convenience name for target.
+tools/CMakeFiles/grib_to_netcdf.dir/rule:
+	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f CMakeFiles/Makefile2 tools/CMakeFiles/grib_to_netcdf.dir/rule
+.PHONY : tools/CMakeFiles/grib_to_netcdf.dir/rule
+
+# Convenience name for target.
+grib_to_netcdf: tools/CMakeFiles/grib_to_netcdf.dir/rule
+
+.PHONY : grib_to_netcdf
+
+# fast build rule for target.
+grib_to_netcdf/fast:
+	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f tools/CMakeFiles/grib_to_netcdf.dir/build.make tools/CMakeFiles/grib_to_netcdf.dir/build
+.PHONY : grib_to_netcdf/fast
+
+# Convenience name for target.
 tools/CMakeFiles/codes_parser.dir/rule:
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f CMakeFiles/Makefile2 tools/CMakeFiles/codes_parser.dir/rule
 .PHONY : tools/CMakeFiles/codes_parser.dir/rule
@@ -1431,6 +1446,33 @@ grib_set.c.s:
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f tools/CMakeFiles/grib_set.dir/build.make tools/CMakeFiles/grib_set.dir/grib_set.c.s
 .PHONY : grib_set.c.s
 
+grib_to_netcdf.o: grib_to_netcdf.c.o
+
+.PHONY : grib_to_netcdf.o
+
+# target to build an object file
+grib_to_netcdf.c.o:
+	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f tools/CMakeFiles/grib_to_netcdf.dir/build.make tools/CMakeFiles/grib_to_netcdf.dir/grib_to_netcdf.c.o
+.PHONY : grib_to_netcdf.c.o
+
+grib_to_netcdf.i: grib_to_netcdf.c.i
+
+.PHONY : grib_to_netcdf.i
+
+# target to preprocess a source file
+grib_to_netcdf.c.i:
+	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f tools/CMakeFiles/grib_to_netcdf.dir/build.make tools/CMakeFiles/grib_to_netcdf.dir/grib_to_netcdf.c.i
+.PHONY : grib_to_netcdf.c.i
+
+grib_to_netcdf.s: grib_to_netcdf.c.s
+
+.PHONY : grib_to_netcdf.s
+
+# target to generate assembly for a file
+grib_to_netcdf.c.s:
+	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build && $(MAKE) -f tools/CMakeFiles/grib_to_netcdf.dir/build.make tools/CMakeFiles/grib_to_netcdf.dir/grib_to_netcdf.c.s
+.PHONY : grib_to_netcdf.c.s
+
 grib_tools.o: grib_tools.c.o
 
 .PHONY : grib_tools.o
@@ -1793,6 +1835,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... codes_bufr_filter"
+	@echo "... grib_to_netcdf"
 	@echo "... package"
 	@echo "... codes_parser"
 	@echo "... grib_copy"
@@ -1908,6 +1951,9 @@ help:
 	@echo "... grib_set.o"
 	@echo "... grib_set.i"
 	@echo "... grib_set.s"
+	@echo "... grib_to_netcdf.o"
+	@echo "... grib_to_netcdf.i"
+	@echo "... grib_to_netcdf.s"
 	@echo "... grib_tools.o"
 	@echo "... grib_tools.i"
 	@echo "... grib_tools.s"

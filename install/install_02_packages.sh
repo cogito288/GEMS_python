@@ -14,12 +14,27 @@ mkdir -p custom_builds/eccodes; cd custom_builds/eccodes
 wget https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.14.1-Source.tar.gz?api=v2
 tar -xzf eccodes-2.14.1-Source.tar.gz?api=v2
 mkdir build ; cd build
-mkdir -p $INSTALL_DIR/source/eccodes
-cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/source/eccodes $INSTALL_DIR/custom_builds/eccodes/eccodes-2.14.1-Source/
+cmake \
+-DCMAKE_INSTALL_PREFIX=~/source/eccodes \
+-ENABLE_NETCDF=ON \
+-ENABLE_JPG=OFF \
+-ENABLE_PNG=OFF \
+-ENABLE_PYTHON=ON \
+-ENABLE_FORTRAN=OFF \
+ ../eccodes-2.14.1-Source/
+make
+ctest
+make install
+
 # NetCDF is not installed
 # ????? Binary file is writtend into -- Build files have been written to: /home/sehyun/custom_builds/eccodes/build
 # nano ~/.bashrc
-# export ECCODES_DEFINITION_PATH=/home/sehyun/custom_builds/eccodes/build/share/eccodes/definitions
+
+ECCODES_DIR=~/source/eccodes
+ECCODES_DEFINITION_PATH=~/source/eccodes/share/eccodes/definitions
+echo "export ECCODES_DEFINITION_PATH=$ECCODES_DEFINITION_PATH" >> ~/.bashrc # https://gist.github.com/emmanuelnk/406eee50c388f4f73dcdff521f2aa7b2
+echo "export ECCODES_DIR=$ECCODES_DIR" >> ~/.bashrc # https://confluence.ecmwf.int//display/ECC/ecCodes+installation
+
 
 echo "Creating virtualenv"
 cd $GEMS_HOME
@@ -27,9 +42,23 @@ cd $GEMS_HOME
 source venv/bin/activate
 
 #deactivate
+#echo "Installing pip eccodes-python"
+# https://confluence.ecmwf.int//display/ECC/ecCodes+installation
+#pip3 install --install-option="--prefix=$ECCODES_DIR" eccodes-python 
 
-echo "Installing pip eccodes-python"
-pip3 install eccodes-python
+############################### pygrib
+source $GEMS_HOME/venv/bin/activate
+sudo apt-get install libgeos-3.6.2 libgeos-dev
+pip install numpy matplotlib 
+pip install https://github.com/matplotlib/basemap/archive/master.zip
+cd $INSTALL_DIR/custom_builds
+git clone https://github.com/jswhit/pygrib
+cd pygrib
+cp $INSTALL_DIR/pygrib_setup.cfg.template setup.cfg
+sudo rm -rf .git
+zip -r ../pygrib.zip *
+cd ..
+pip3 install pygrib.zip
 
 
 ################################ # pyhdf for HDF4     
@@ -55,7 +84,3 @@ pip3 install --global-option=build_ext --global-option="-I/usr/include/gdal/" GD
 
 ############################### Install pyhdf
 pip3 install pyhdf
-
-
-
-

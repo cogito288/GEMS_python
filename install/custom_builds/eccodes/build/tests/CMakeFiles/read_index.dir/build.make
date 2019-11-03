@@ -92,6 +92,7 @@ tests/read_index: tests/CMakeFiles/read_index.dir/read_index.c.o
 tests/read_index: tests/CMakeFiles/read_index.dir/build.make
 tests/read_index: lib/libeccodes.so
 tests/read_index: /usr/lib/x86_64-linux-gnu/libm.so
+tests/read_index: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/read_index: tests/CMakeFiles/read_index.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable read_index"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/read_index

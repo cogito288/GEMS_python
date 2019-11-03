@@ -93,6 +93,7 @@ bin/gts_dump: tools/CMakeFiles/gts_dump.dir/build.make
 bin/gts_dump: tools/libgrib_tools.a
 bin/gts_dump: lib/libeccodes.so
 bin/gts_dump: /usr/lib/x86_64-linux-gnu/libm.so
+bin/gts_dump: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/gts_dump: tools/CMakeFiles/gts_dump.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/gts_dump"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/gts_dump

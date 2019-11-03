@@ -92,6 +92,7 @@ tests/read_any: tests/CMakeFiles/read_any.dir/read_any.c.o
 tests/read_any: tests/CMakeFiles/read_any.dir/build.make
 tests/read_any: lib/libeccodes.so
 tests/read_any: /usr/lib/x86_64-linux-gnu/libm.so
+tests/read_any: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/read_any: tests/CMakeFiles/read_any.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable read_any"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/read_any

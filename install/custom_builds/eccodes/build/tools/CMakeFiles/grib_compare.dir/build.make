@@ -93,6 +93,7 @@ bin/grib_compare: tools/CMakeFiles/grib_compare.dir/build.make
 bin/grib_compare: tools/libgrib_tools.a
 bin/grib_compare: lib/libeccodes.so
 bin/grib_compare: /usr/lib/x86_64-linux-gnu/libm.so
+bin/grib_compare: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/grib_compare: tools/CMakeFiles/grib_compare.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/grib_compare"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/grib_compare

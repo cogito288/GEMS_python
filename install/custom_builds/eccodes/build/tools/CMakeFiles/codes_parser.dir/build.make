@@ -93,6 +93,7 @@ bin/codes_parser: tools/CMakeFiles/codes_parser.dir/build.make
 bin/codes_parser: tools/libgrib_tools.a
 bin/codes_parser: lib/libeccodes.so
 bin/codes_parser: /usr/lib/x86_64-linux-gnu/libm.so
+bin/codes_parser: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/codes_parser: tools/CMakeFiles/codes_parser.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/codes_parser"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/codes_parser

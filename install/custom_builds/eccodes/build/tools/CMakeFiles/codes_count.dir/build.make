@@ -93,6 +93,7 @@ bin/codes_count: tools/CMakeFiles/codes_count.dir/build.make
 bin/codes_count: tools/libgrib_tools.a
 bin/codes_count: lib/libeccodes.so
 bin/codes_count: /usr/lib/x86_64-linux-gnu/libm.so
+bin/codes_count: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/codes_count: tools/CMakeFiles/codes_count.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/codes_count"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/codes_count

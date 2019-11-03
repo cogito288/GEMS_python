@@ -20,7 +20,6 @@ omi_path = os.path.join(data_base_dir, 'Raw', 'OMI')
 YEARS = [2016] #, 2018, 2019
 
 
-
 def create_L3(year, read_path, flist, write_path, fname, data_type):
     print (f"Creating {fname}")
     doy_000 = matlab.datenum(f'{year}0000')

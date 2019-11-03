@@ -92,6 +92,7 @@ tests/bufr_get_element: tests/CMakeFiles/bufr_get_element.dir/bufr_get_element.c
 tests/bufr_get_element: tests/CMakeFiles/bufr_get_element.dir/build.make
 tests/bufr_get_element: lib/libeccodes.so
 tests/bufr_get_element: /usr/lib/x86_64-linux-gnu/libm.so
+tests/bufr_get_element: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/bufr_get_element: tests/CMakeFiles/bufr_get_element.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable bufr_get_element"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/bufr_get_element

@@ -92,6 +92,7 @@ tests/grib_ecc-386: tests/CMakeFiles/grib_ecc-386.dir/grib_ecc-386.c.o
 tests/grib_ecc-386: tests/CMakeFiles/grib_ecc-386.dir/build.make
 tests/grib_ecc-386: lib/libeccodes.so
 tests/grib_ecc-386: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_ecc-386: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_ecc-386: tests/CMakeFiles/grib_ecc-386.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_ecc-386"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_ecc-386

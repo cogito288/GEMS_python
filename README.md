@@ -19,7 +19,11 @@ chmod +x install_01_common.sh
 source install_01_common.sh
 ```
 
-4. 
+4-1. You should modify grib_api_dir in install/pygrib_setup.cfg.template to indicate eccodes build.
+Generally, if everything is okay in install_02_packages.sh after installing eccodes, it will be installed in your $HOME/source/eccodes.
+e.g. grib_api_dir = /home/sehyun/source/eccodes
+
+4-2.
 ```bash
 chmod +x install_02_packages.sh
 source install_02_packages.sh

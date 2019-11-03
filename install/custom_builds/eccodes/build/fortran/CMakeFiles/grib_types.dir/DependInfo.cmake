@@ -23,6 +23,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran"
   "fortran"
   "/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include"
+  "/usr/include/openjpeg-2.1"
   )
 set(CMAKE_DEPENDS_CHECK_Fortran
   "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran/grib_types.f90" "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/CMakeFiles/grib_types.dir/grib_types.f90.o"
@@ -43,6 +44,7 @@ set(CMAKE_Fortran_TARGET_INCLUDE_PATH
   "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran"
   "fortran"
   "/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include"
+  "/usr/include/openjpeg-2.1"
   )
 
 # Targets to which this target links.

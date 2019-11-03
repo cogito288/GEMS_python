@@ -92,6 +92,7 @@ tests/julian: tests/CMakeFiles/julian.dir/julian.c.o
 tests/julian: tests/CMakeFiles/julian.dir/build.make
 tests/julian: lib/libeccodes.so
 tests/julian: /usr/lib/x86_64-linux-gnu/libm.so
+tests/julian: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/julian: tests/CMakeFiles/julian.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable julian"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/julian

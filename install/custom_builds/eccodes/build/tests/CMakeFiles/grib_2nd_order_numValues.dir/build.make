@@ -92,6 +92,7 @@ tests/grib_2nd_order_numValues: tests/CMakeFiles/grib_2nd_order_numValues.dir/gr
 tests/grib_2nd_order_numValues: tests/CMakeFiles/grib_2nd_order_numValues.dir/build.make
 tests/grib_2nd_order_numValues: lib/libeccodes.so
 tests/grib_2nd_order_numValues: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_2nd_order_numValues: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_2nd_order_numValues: tests/CMakeFiles/grib_2nd_order_numValues.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_2nd_order_numValues"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_2nd_order_numValues

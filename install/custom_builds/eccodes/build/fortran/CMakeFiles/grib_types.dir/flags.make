@@ -7,11 +7,11 @@ C_FLAGS =  -pipe -pedantic -O2 -g -DNDEBUG -fPIE
 
 C_DEFINES = -DHAVE_ECCODES_CONFIG_H
 
-C_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include 
+C_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include -I/usr/include/openjpeg-2.1 
 
 Fortran_FLAGS = -O2 -g -DNDEBUG -Jmodules -fPIE  
 
 Fortran_DEFINES = -DHAVE_ECCODES_CONFIG_H
 
-Fortran_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include 
+Fortran_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include -I/usr/include/openjpeg-2.1 
 

@@ -93,6 +93,7 @@ bin/grib2ppm: tools/CMakeFiles/grib2ppm.dir/build.make
 bin/grib2ppm: tools/libgrib_tools.a
 bin/grib2ppm: lib/libeccodes.so
 bin/grib2ppm: /usr/lib/x86_64-linux-gnu/libm.so
+bin/grib2ppm: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/grib2ppm: tools/CMakeFiles/grib2ppm.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/grib2ppm"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/grib2ppm

@@ -1,1 +1,1 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_bufr_missing.dir/bufr_missing.c.o  -o c_bufr_missing -Wl,-rpath,/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_bufr_missing.dir/bufr_missing.c.o  -o c_bufr_missing -Wl,-rpath,/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 

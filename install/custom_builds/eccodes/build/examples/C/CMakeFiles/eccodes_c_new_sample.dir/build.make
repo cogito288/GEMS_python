@@ -92,6 +92,7 @@ examples/C/eccodes_c_new_sample: examples/C/CMakeFiles/eccodes_c_new_sample.dir/
 examples/C/eccodes_c_new_sample: examples/C/CMakeFiles/eccodes_c_new_sample.dir/build.make
 examples/C/eccodes_c_new_sample: lib/libeccodes.so
 examples/C/eccodes_c_new_sample: /usr/lib/x86_64-linux-gnu/libm.so
+examples/C/eccodes_c_new_sample: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/C/eccodes_c_new_sample: examples/C/CMakeFiles/eccodes_c_new_sample.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable eccodes_c_new_sample"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C && /usr/bin/cmake -E remove EXE_FILENAME-NOTFOUND

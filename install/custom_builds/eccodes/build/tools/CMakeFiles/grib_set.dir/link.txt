@@ -1,1 +1,1 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib_set.dir/grib_set.c.o  -o ../bin/grib_set -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib_set.dir/grib_set.c.o  -o ../bin/grib_set -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 

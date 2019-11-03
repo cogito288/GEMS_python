@@ -1,1 +1,1 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/gts_ls.dir/gts_ls.c.o  -o ../bin/gts_ls -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/gts_ls.dir/gts_ls.c.o  -o ../bin/gts_ls -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 

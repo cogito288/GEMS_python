@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget eccodes codes_info codes_count codes_split_file grib_histogram grib_filter grib_ls grib_dump grib_merge grib2ppm grib_set grib_get grib_get_data grib_copy grib_compare codes_parser grib_index_build bufr_ls bufr_dump bufr_set bufr_get bufr_copy bufr_compare gts_get gts_compare gts_copy gts_dump gts_filter gts_ls metar_dump metar_ls metar_compare metar_get metar_filter metar_copy grib_count bufr_count gts_count codes_bufr_filter eccodes_f90 tigge_check)
+foreach(_expectedTarget eccodes codes_info codes_count codes_split_file grib_histogram grib_filter grib_ls grib_dump grib_merge grib2ppm grib_set grib_get grib_get_data grib_copy grib_compare codes_parser grib_index_build bufr_ls bufr_dump bufr_set bufr_get bufr_copy bufr_compare gts_get gts_compare gts_copy gts_dump gts_filter gts_ls metar_dump metar_ls metar_compare metar_get metar_filter metar_copy grib_count bufr_count gts_count grib_to_netcdf codes_bufr_filter eccodes_f90 tigge_check)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -46,7 +46,7 @@ add_library(eccodes SHARED IMPORTED)
 
 set_target_properties(eccodes PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src;/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules;/home/sehyun/GEMS_python/install/custom_builds/eccodes/build;/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src;/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src"
-  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libm.so;-lpthread"
+  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libopenjp2.so;-lpthread"
 )
 
 # Create imported target codes_info
@@ -159,6 +159,9 @@ add_executable(bufr_count IMPORTED)
 
 # Create imported target gts_count
 add_executable(gts_count IMPORTED)
+
+# Create imported target grib_to_netcdf
+add_executable(grib_to_netcdf IMPORTED)
 
 # Create imported target codes_bufr_filter
 add_executable(codes_bufr_filter IMPORTED)
@@ -401,6 +404,12 @@ set_target_properties(bufr_count PROPERTIES
 set_property(TARGET gts_count APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
 set_target_properties(gts_count PROPERTIES
   IMPORTED_LOCATION_RELWITHDEBINFO "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/gts_count"
+  )
+
+# Import target "grib_to_netcdf" for configuration "RelWithDebInfo"
+set_property(TARGET grib_to_netcdf APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
+set_target_properties(grib_to_netcdf PROPERTIES
+  IMPORTED_LOCATION_RELWITHDEBINFO "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/grib_to_netcdf"
   )
 
 # Import target "codes_bufr_filter" for configuration "RelWithDebInfo"

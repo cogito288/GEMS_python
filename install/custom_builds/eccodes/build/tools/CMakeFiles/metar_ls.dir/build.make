@@ -93,6 +93,7 @@ bin/metar_ls: tools/CMakeFiles/metar_ls.dir/build.make
 bin/metar_ls: tools/libgrib_tools.a
 bin/metar_ls: lib/libeccodes.so
 bin/metar_ls: /usr/lib/x86_64-linux-gnu/libm.so
+bin/metar_ls: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/metar_ls: tools/CMakeFiles/metar_ls.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/metar_ls"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/metar_ls

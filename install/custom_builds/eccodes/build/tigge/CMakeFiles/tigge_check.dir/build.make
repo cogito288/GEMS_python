@@ -93,6 +93,7 @@ bin/tigge_check: tigge/CMakeFiles/tigge_check.dir/build.make
 bin/tigge_check: lib/libeccodes.so
 bin/tigge_check: tigge/libtigge_tools.a
 bin/tigge_check: /usr/lib/x86_64-linux-gnu/libm.so
+bin/tigge_check: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/tigge_check: tigge/CMakeFiles/tigge_check.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/tigge_check"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tigge && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/tigge_check

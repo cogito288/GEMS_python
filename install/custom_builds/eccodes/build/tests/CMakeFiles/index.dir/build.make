@@ -92,6 +92,7 @@ tests/index: tests/CMakeFiles/index.dir/index.c.o
 tests/index: tests/CMakeFiles/index.dir/build.make
 tests/index: lib/libeccodes.so
 tests/index: /usr/lib/x86_64-linux-gnu/libm.so
+tests/index: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/index: tests/CMakeFiles/index.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable index"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/index

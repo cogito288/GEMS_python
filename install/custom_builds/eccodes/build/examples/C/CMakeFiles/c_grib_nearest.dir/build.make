@@ -92,6 +92,7 @@ examples/C/c_grib_nearest: examples/C/CMakeFiles/c_grib_nearest.dir/grib_nearest
 examples/C/c_grib_nearest: examples/C/CMakeFiles/c_grib_nearest.dir/build.make
 examples/C/c_grib_nearest: lib/libeccodes.so
 examples/C/c_grib_nearest: /usr/lib/x86_64-linux-gnu/libm.so
+examples/C/c_grib_nearest: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/C/c_grib_nearest: examples/C/CMakeFiles/c_grib_nearest.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable c_grib_nearest"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C/c_grib_nearest

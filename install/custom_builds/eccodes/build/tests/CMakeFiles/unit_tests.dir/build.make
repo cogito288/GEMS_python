@@ -92,6 +92,7 @@ tests/unit_tests: tests/CMakeFiles/unit_tests.dir/unit_tests.c.o
 tests/unit_tests: tests/CMakeFiles/unit_tests.dir/build.make
 tests/unit_tests: lib/libeccodes.so
 tests/unit_tests: /usr/lib/x86_64-linux-gnu/libm.so
+tests/unit_tests: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/unit_tests: tests/CMakeFiles/unit_tests.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable unit_tests"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/unit_tests

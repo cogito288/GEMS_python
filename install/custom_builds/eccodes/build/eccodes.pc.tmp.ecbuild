@@ -16,19 +16,19 @@ FC=/usr/bin/gfortran
 
 libs=-Wl,-rpath,$<TARGET_LINKER_FILE_DIR:eccodes> $<TARGET_LINKER_FILE:eccodes>
 
-libs_private=-l/usr/lib/x86_64-linux-gnu/libm.so -lpthread
+libs_private=-l/usr/lib/x86_64-linux-gnu/libm.so -l/usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread
 
-cflags=-I${includedir} -I${fmoddir} -I/home/sehyun/GEMS_python/install/source/eccodes/include
+cflags=-I${includedir} -I${fmoddir} -I/home/sehyun/source/eccodes/include
 
 ### Features:
 
 HAVE_MEMFS=0
-HAVE_JPEG=0
+HAVE_JPEG=1
 HAVE_LIBJASPER=0
-HAVE_LIBOPENJPEG=0
+HAVE_LIBOPENJPEG=1
 HAVE_ECCODES_THREADS=0
 HAVE_ECCODES_OMP_THREADS=0
-HAVE_NETCDF=0
+HAVE_NETCDF=1
 HAVE_PYTHON=0
 HAVE_FORTRAN=1
 HAVE_PNG=0

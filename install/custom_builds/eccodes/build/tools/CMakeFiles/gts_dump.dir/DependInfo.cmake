@@ -21,6 +21,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "src"
   "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/tools"
   "/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include"
+  "/usr/include/openjpeg-2.1"
   )
 
 # Targets to which this target links.

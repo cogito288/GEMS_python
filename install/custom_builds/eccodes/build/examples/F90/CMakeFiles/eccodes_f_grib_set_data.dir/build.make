@@ -93,6 +93,7 @@ examples/F90/eccodes_f_grib_set_data: examples/F90/CMakeFiles/eccodes_f_grib_set
 examples/F90/eccodes_f_grib_set_data: lib/libeccodes_f90.so
 examples/F90/eccodes_f_grib_set_data: lib/libeccodes.so
 examples/F90/eccodes_f_grib_set_data: /usr/lib/x86_64-linux-gnu/libm.so
+examples/F90/eccodes_f_grib_set_data: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/F90/eccodes_f_grib_set_data: examples/F90/CMakeFiles/eccodes_f_grib_set_data.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking Fortran executable eccodes_f_grib_set_data"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/F90 && /usr/bin/cmake -E remove EXE_FILENAME-NOTFOUND

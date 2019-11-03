@@ -658,6 +658,19 @@ codes_bufr_filter/fast:
 .PHONY : codes_bufr_filter/fast
 
 #=============================================================================
+# Target rules for targets named grib_to_netcdf
+
+# Build rule for target.
+grib_to_netcdf: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 grib_to_netcdf
+.PHONY : grib_to_netcdf
+
+# fast build rule for target.
+grib_to_netcdf/fast:
+	$(MAKE) -f tools/CMakeFiles/grib_to_netcdf.dir/build.make tools/CMakeFiles/grib_to_netcdf.dir/build
+.PHONY : grib_to_netcdf/fast
+
+#=============================================================================
 # Target rules for targets named codes_parser
 
 # Build rule for target.
@@ -2190,6 +2203,7 @@ help:
 	@echo "... eccodes"
 	@echo "... eccodes_templates"
 	@echo "... codes_bufr_filter"
+	@echo "... grib_to_netcdf"
 	@echo "... codes_parser"
 	@echo "... grib_copy"
 	@echo "... grib_get"

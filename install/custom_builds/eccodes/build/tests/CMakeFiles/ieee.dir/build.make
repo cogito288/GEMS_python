@@ -92,6 +92,7 @@ tests/ieee: tests/CMakeFiles/ieee.dir/ieee.c.o
 tests/ieee: tests/CMakeFiles/ieee.dir/build.make
 tests/ieee: lib/libeccodes.so
 tests/ieee: /usr/lib/x86_64-linux-gnu/libm.so
+tests/ieee: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/ieee: tests/CMakeFiles/ieee.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ieee"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/ieee

@@ -92,6 +92,7 @@ tests/gauss_sub: tests/CMakeFiles/gauss_sub.dir/gauss_sub.c.o
 tests/gauss_sub: tests/CMakeFiles/gauss_sub.dir/build.make
 tests/gauss_sub: lib/libeccodes.so
 tests/gauss_sub: /usr/lib/x86_64-linux-gnu/libm.so
+tests/gauss_sub: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/gauss_sub: tests/CMakeFiles/gauss_sub.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable gauss_sub"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/gauss_sub

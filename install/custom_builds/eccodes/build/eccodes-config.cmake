@@ -67,7 +67,7 @@ endif()
 ### handle third-party dependencies
 if(DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT)
   set(ECCODES_LIBRARIES         "eccodes;eccodes_f90")
-  set(ECCODES_TPLS              "Python;NumPy;CMath" )
+  set(ECCODES_TPLS              "Python;NumPy;CMath;OpenJPEG" )
 
   include(${CMAKE_CURRENT_LIST_FILE}.tpls OPTIONAL)
 endif()
@@ -92,7 +92,7 @@ if( DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT )
 endif()
 
 ### export features and check requirements
-set(eccodes_FEATURES "TESTS;EXAMPLES;JPG;PYTHON;FORTRAN;INSTALL_ECCODES_DEFINITIONS;INSTALL_ECCODES_SAMPLES")
+set(eccodes_FEATURES "TESTS;EXAMPLES;JPG;NETCDF;PYTHON;FORTRAN;INSTALL_ECCODES_DEFINITIONS;INSTALL_ECCODES_SAMPLES")
 if(DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT)
   set(ECCODES_FEATURES ${eccodes_FEATURES})
 endif()

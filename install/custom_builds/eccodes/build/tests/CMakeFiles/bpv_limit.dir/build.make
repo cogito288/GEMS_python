@@ -92,6 +92,7 @@ tests/bpv_limit: tests/CMakeFiles/bpv_limit.dir/bpv_limit.c.o
 tests/bpv_limit: tests/CMakeFiles/bpv_limit.dir/build.make
 tests/bpv_limit: lib/libeccodes.so
 tests/bpv_limit: /usr/lib/x86_64-linux-gnu/libm.so
+tests/bpv_limit: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/bpv_limit: tests/CMakeFiles/bpv_limit.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable bpv_limit"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/bpv_limit

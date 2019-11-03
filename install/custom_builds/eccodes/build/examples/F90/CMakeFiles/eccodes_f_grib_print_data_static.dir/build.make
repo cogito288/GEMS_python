@@ -93,6 +93,7 @@ examples/F90/eccodes_f_grib_print_data_static: examples/F90/CMakeFiles/eccodes_f
 examples/F90/eccodes_f_grib_print_data_static: lib/libeccodes_f90.so
 examples/F90/eccodes_f_grib_print_data_static: lib/libeccodes.so
 examples/F90/eccodes_f_grib_print_data_static: /usr/lib/x86_64-linux-gnu/libm.so
+examples/F90/eccodes_f_grib_print_data_static: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/F90/eccodes_f_grib_print_data_static: examples/F90/CMakeFiles/eccodes_f_grib_print_data_static.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking Fortran executable eccodes_f_grib_print_data_static"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/F90 && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/F90/eccodes_f_grib_print_data_static

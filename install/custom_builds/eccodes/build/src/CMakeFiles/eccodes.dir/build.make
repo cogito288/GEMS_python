@@ -9737,6 +9737,7 @@ lib/libeccodes.so: src/CMakeFiles/eccodes.dir/grib_yacc.c.o
 lib/libeccodes.so: src/CMakeFiles/eccodes.dir/grib_lex.c.o
 lib/libeccodes.so: src/CMakeFiles/eccodes.dir/build.make
 lib/libeccodes.so: /usr/lib/x86_64-linux-gnu/libm.so
+lib/libeccodes.so: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 lib/libeccodes.so: src/CMakeFiles/eccodes.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_373) "Linking C shared library ../lib/libeccodes.so"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib/libeccodes.so

@@ -5,28 +5,30 @@ cd $GEMS_HOME
 #/usr/bin/python3 -m virtualenv venv
 source venv/bin/activate
 
-#INSTALL_DIR=$GEMS_HOME/install
-#cd $INSTALL_DIR
+INSTALL_DIR=$GEMS_HOME/install
+cd $INSTALL_DIR
 
-#cd $GEMS_HOME/install
-#deactivate
-#echo "Installing pip eccodes-python"
-#pip install eccodes-python
+#ECCODES_DEFINITION_PATH=$INSTALL_DIR/custom_builds/eccodes/build/share/eccodes/definitions
+#echo "export ECCODES_DEFINITION_PATH=$ECCODES_DEFINITION_PATH" >> ~/.bashrc
+#source ~/.bashrc
 
-# pyhdf for HDF4
-#sudo apt-get install build-essential python3-dev python3-numpy libhdf4-dev -y
-#cd $INSTALL_DIR/custom_builds
-#git clone https://github.com/fhs/pyhdf.git
 
-sudo apt-get install python3.6-dev
-sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-sudo apt-get update
-sudo apt-get install gdal-bin
-# To verify the installation, you can run
-ogrinfo --version
+########################## Install pygrib
+# https://gist.github.com/emmanuelnk/406eee50c388f4f73dcdff521f2aa7b2
+#sudo apt-get install libgeos-3.6.2 libgeos-dev
 
-sudo apt-get install libgdal-dev
-export CPLUS_INCLUDE_PATH=/usr/include/gdal
-export C_INCLUDE_PATH=/usr/include/gdal
-pip3 install GDAL
+source $GEMS_HOME/venv/bin/activate
+#pip3 install numpy matplotlib tokenizer
+#pip3 install https://github.com/matplotlib/basemap/archive/master.zip
 
+
+cd $INSTALL_DIR/custom_builds
+git clone https://github.com/jswhit/pygrib
+cd pygrib
+cp $INSTALL_DIR/pygrib_setup.cfg.template setup.cfg
+sudo rm -rf .git
+zip -r ../pygrib.zip *
+cd ..
+pip3 install pygrib.zip
+
+cd $INSTALL_DIR

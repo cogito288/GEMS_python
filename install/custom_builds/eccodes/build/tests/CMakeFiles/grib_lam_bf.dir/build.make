@@ -92,6 +92,7 @@ tests/grib_lam_bf: tests/CMakeFiles/grib_lam_bf.dir/grib_lam_bf.c.o
 tests/grib_lam_bf: tests/CMakeFiles/grib_lam_bf.dir/build.make
 tests/grib_lam_bf: lib/libeccodes.so
 tests/grib_lam_bf: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_lam_bf: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_lam_bf: tests/CMakeFiles/grib_lam_bf.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_lam_bf"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_lam_bf

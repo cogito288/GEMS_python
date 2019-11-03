@@ -92,6 +92,7 @@ tests/grib_util_set_spec: tests/CMakeFiles/grib_util_set_spec.dir/grib_util_set_
 tests/grib_util_set_spec: tests/CMakeFiles/grib_util_set_spec.dir/build.make
 tests/grib_util_set_spec: lib/libeccodes.so
 tests/grib_util_set_spec: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_util_set_spec: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_util_set_spec: tests/CMakeFiles/grib_util_set_spec.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_util_set_spec"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_util_set_spec

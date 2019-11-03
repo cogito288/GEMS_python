@@ -1,0 +1,26 @@
+eccodes_t_definitions 4 0.995052
+eccodes_t_grib_calendar 4 0.0958443
+eccodes_t_unit_tests 4 0.113682
+eccodes_t_md5 4 0.0247442
+eccodes_t_grib_uerra 4 0.65557
+eccodes_t_grib_2nd_order_numValues 4 0.0085035
+eccodes_t_grib_ecc-136 4 0.111768
+eccodes_t_grib_ecc-967 4 0.027704
+eccodes_t_julian 4 0.62481
+eccodes_t_bufr_dump_samples 4 0.138303
+eccodes_t_bufr_json_samples 4 0.122775
+eccodes_t_bufr_ecc-359 4 0.007348
+eccodes_t_bufr_ecc-517 4 0.053648
+eccodes_t_bufr_rdbSubTypes 4 0.021586
+eccodes_t_grib_efas 4 0.53119
+eccodes_t_grib_sh_imag 4 0.00483674
+eccodes_c_grib_multi 4 0.000534773
+eccodes_c_grib_set_data 4 0.0123492
+eccodes_c_large_grib1 4 0.151951
+eccodes_c_grib_sections_copy 4 0.0482752
+eccodes_c_get_product_kind_samples 4 0.00588626
+eccodes_c_new_sample 4 0.0110675
+eccodes_f_grib_set_pv 4 0.00449675
+eccodes_f_grib_set_data 4 0.004875
+eccodes_f_grib_ecc-671 4 0.00526696
+---

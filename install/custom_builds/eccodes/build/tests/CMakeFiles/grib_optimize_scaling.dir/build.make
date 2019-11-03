@@ -92,6 +92,7 @@ tests/grib_optimize_scaling: tests/CMakeFiles/grib_optimize_scaling.dir/grib_opt
 tests/grib_optimize_scaling: tests/CMakeFiles/grib_optimize_scaling.dir/build.make
 tests/grib_optimize_scaling: lib/libeccodes.so
 tests/grib_optimize_scaling: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_optimize_scaling: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_optimize_scaling: tests/CMakeFiles/grib_optimize_scaling.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_optimize_scaling"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_optimize_scaling

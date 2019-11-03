@@ -92,6 +92,7 @@ examples/C/c_bufr_keys_iterator: examples/C/CMakeFiles/c_bufr_keys_iterator.dir/
 examples/C/c_bufr_keys_iterator: examples/C/CMakeFiles/c_bufr_keys_iterator.dir/build.make
 examples/C/c_bufr_keys_iterator: lib/libeccodes.so
 examples/C/c_bufr_keys_iterator: /usr/lib/x86_64-linux-gnu/libm.so
+examples/C/c_bufr_keys_iterator: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/C/c_bufr_keys_iterator: examples/C/CMakeFiles/c_bufr_keys_iterator.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable c_bufr_keys_iterator"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C/c_bufr_keys_iterator

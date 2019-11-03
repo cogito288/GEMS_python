@@ -92,6 +92,7 @@ examples/C/c_bufr_attributes: examples/C/CMakeFiles/c_bufr_attributes.dir/bufr_a
 examples/C/c_bufr_attributes: examples/C/CMakeFiles/c_bufr_attributes.dir/build.make
 examples/C/c_bufr_attributes: lib/libeccodes.so
 examples/C/c_bufr_attributes: /usr/lib/x86_64-linux-gnu/libm.so
+examples/C/c_bufr_attributes: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/C/c_bufr_attributes: examples/C/CMakeFiles/c_bufr_attributes.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable c_bufr_attributes"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C/c_bufr_attributes

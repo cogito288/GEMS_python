@@ -92,6 +92,7 @@ examples/C/c_grib_list: examples/C/CMakeFiles/c_grib_list.dir/grib_list.c.o
 examples/C/c_grib_list: examples/C/CMakeFiles/c_grib_list.dir/build.make
 examples/C/c_grib_list: lib/libeccodes.so
 examples/C/c_grib_list: /usr/lib/x86_64-linux-gnu/libm.so
+examples/C/c_grib_list: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 examples/C/c_grib_list: examples/C/CMakeFiles/c_grib_list.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable c_grib_list"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/examples/C/c_grib_list

@@ -92,6 +92,7 @@ tests/grib_multi_from_message: tests/CMakeFiles/grib_multi_from_message.dir/grib
 tests/grib_multi_from_message: tests/CMakeFiles/grib_multi_from_message.dir/build.make
 tests/grib_multi_from_message: lib/libeccodes.so
 tests/grib_multi_from_message: /usr/lib/x86_64-linux-gnu/libm.so
+tests/grib_multi_from_message: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 tests/grib_multi_from_message: tests/CMakeFiles/grib_multi_from_message.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable grib_multi_from_message"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tests/grib_multi_from_message

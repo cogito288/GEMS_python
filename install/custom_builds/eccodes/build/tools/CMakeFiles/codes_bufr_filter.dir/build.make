@@ -93,6 +93,7 @@ bin/codes_bufr_filter: tools/CMakeFiles/codes_bufr_filter.dir/build.make
 bin/codes_bufr_filter: tools/libgrib_tools.a
 bin/codes_bufr_filter: lib/libeccodes.so
 bin/codes_bufr_filter: /usr/lib/x86_64-linux-gnu/libm.so
+bin/codes_bufr_filter: /usr/lib/x86_64-linux-gnu/libopenjp2.so
 bin/codes_bufr_filter: tools/CMakeFiles/codes_bufr_filter.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ../bin/codes_bufr_filter"
 	cd /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/tools && /usr/bin/cmake -E remove /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/bin/codes_bufr_filter

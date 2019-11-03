@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/examples/C/grib_set_data.c
+stdio.h
+-
+stdlib.h
+-
+eccodes.h
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/examples/C/eccodes.h
+
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes.h
+grib_api.h
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/grib_api.h
+
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes_windef.h
+
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/grib_api.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+sys/types.h
+-
+eccodes_windef.h
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes_windef.h
+sys/time.h
+-
+math.h
+-
+eccodes_version.h
+/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes_version.h
+
+src/eccodes_version.h
+

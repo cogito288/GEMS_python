@@ -193,15 +193,20 @@ def sub2ind(array_shape, rows, cols):
 def length(arr):
     return max(arr.shape)
 
-def repmat(arr, rep_size):
-    if len(rep_size)==2:
+def repmat(arr, change_size):
+    if len(change_size)==2:
         m, n = rep_size
         return np.tile(arr, (n, m)).T
-    elif len(rep_size)==3:
+    elif len(change_size)==3:
         m, n, r = rep_size
         return np.tile(arr, (n, r, m))
     else:
         raise NotImplementedError
+        
+def permute(arr, change_size):
+    if (len(change_size)!=3) or (len(arr.shape)!=3):
+        raise NotImplementedError
+    return np.transpose(arr, change_size)
 
 def h5read(filename, datasetname):
     with h5py.File(filename, 'r') as f:
