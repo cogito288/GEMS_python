@@ -181,18 +181,27 @@ def sub2ind(siz, dim1, dim2):
 def ind2sub(array_shape, ind):
     if len(array_shape) != 2:
         raise NotImplementedError
-    rows = (ind.astype('int') / array_shape[1])
-    cols = (ind.astype('int') % array_shape[1]) # or numpy.mod(ind.astype('int'), array_shape[1])
+    rows = (ind.astype('int') / array_shape[1]).astype(int)
+    cols = (ind.astype('int') % array_shape[1]).astype(int) # or numpy.mod(ind.astype('int'), array_shape[1])
     return (rows, cols)
 
 def sub2ind(array_shape, rows, cols):
     if len(array_shape) != 2:
         raise NotImplementedError
-    return rows*array_shape[1] + cols
-
+    return (rows*array_shape[1] + cols).astype(int)
 
 def length(arr):
     return max(arr.shape)
+
+def repmat(arr, rep_size):
+    if len(rep_size)==2:
+        m, n = rep_size
+        return np.tile(arr, (n, m)).T
+    elif len(rep_size)==3:
+        m, n, r = rep_size
+        return np.tile(arr, (n, r, m))
+    else:
+        raise NotImplementedError
 
 def h5read(filename, datasetname):
     with h5py.File(filename, 'r') as f:

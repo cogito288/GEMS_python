@@ -25,11 +25,10 @@ lat_goci, lon_goci = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_go
 grid_goci = np.vstack((lon_goci.T.flatten(), lat_goci.T.flatten())).T
 grid_kor = np.vstack((lon_kor.T.flatten(), lat_kor.T.flatten())).T
 
-
-### Find surrounding pixels using delaunay triangulation
 DT = matlab.delaunayTriangulation(grid_goci)
 ti = DT.find_simplex(grid_kor)
 triPx = DT.simplices[ti, :]
+
 triPx_UL = np.min(triPx, axis=1)
 I, J = matlab.ind2sub(lon_goci.shape, triPx_UL)
 surrPx = np.zeros((len(I), 4))
@@ -38,32 +37,55 @@ surrPx[:, 1] = matlab.sub2ind(lon_goci.shape, I, J+1) # Upper Right
 surrPx[:, 2] = matlab.sub2ind(lon_goci.shape, I+1, J) # Lower Left
 surrPx[:, 3] = matlab.sub2ind(lon_goci.shape, I+1, J+1) # Lower Right
 
-lon_surr = lon_goci[surrPx]
-lat_surr = lat_goci[surrPx]
-diff_lon = lon_surr - np.tile(grid_kor[:, 1], (1, 4))
-diff_lat = lat_surr - np.tile(grid_kor[:, 2], (1, 4))
+lon_surr = lon_goci.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape) # lon_goci[surrPx]
+lat_surr = lat_goci.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
+diff_lon = lon_surr - matlab.repmat(grid_kor[:, 0], (1, 4))
+diff_lat = lat_surr - matlab.repmat(grid_kor[:, 1], (1, 4))
 
-d_surr = np.sqrt(np.power(diff_lon, 2) + np.power(diff_lat))
-inDsq = 1./np.power(d_surr)
+d_surr = np.sqrt(np.power(diff_lon, 2) + np.power(diff_lat, 2))
+invDsq = 1./np.power(d_surr, 2)
 
-k = np.zeros(matlab.length(I), 1)
+k = np.zeros((matlab.length(I), 1))
+
 for i in range(matlab.length(I)):
     k[i] = surrPx[i, d_surr[i, :]==min(d_surr[i, :])]
-matlab.savemat(data_base_dir, 'grid_goci_surrPx.mat', mdict={'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
+
+matlab.savemat(data_base_dir, 'grid_goci_surrPx.mat', {'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
 
 d_surr, invDsq, k, surrPx = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci_surrPx.mat'), keys=['d_surr', 'invDsq', 'k', 'surrPx'])
 
 def do_masking(GOCI):
     # global var: surrPX, k, invDsq, lon_kor
-    mask = GOCI[k]
+    GOCI = GOCI_aod
+    mask = GOCI.flatten()[k]
     mask = np.isnan(mask)
-    value = GOCI[surrPx]
+    value = GOCI.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
     valueD = np.multiply(value, invDsq) # ".*": element-wise multiplication
     invDsq_nan = invDsq
     invDsq_nan[np.isnan(value)] = np.nan
     GOCI = np.divide(np.nansum(valueD, axis=1), np.nansum(invDsq_nan, axis=1))
     GOCI = GOCI.reshape(lon_kor.shape)
-    GOCI[mask] = np.nan
+    #GOCI[mask] = np.nan
+    tmp = GOCI.flatten()
+    tmp[mask.flatten()] = np.nan
+    GOCI = tmp.reshape(GOCI.shape)
+    return GOCI
+
+def do_masking(GOCI):
+    # global var: surrPX, k, invDsq, lon_kor
+    GOCI = GOCI_aod
+    mask = GOCI.flatten()[k]
+    mask = np.isnan(mask)
+    value = GOCI.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
+    valueD = np.multiply(value, invDsq) # ".*": element-wise multiplication
+    invDsq_nan = invDsq
+    invDsq_nan[np.isnan(value)] = np.nan
+    GOCI = np.divide(np.nansum(valueD, axis=1), np.nansum(invDsq_nan, axis=1))
+    GOCI = GOCI.reshape(lon_kor.shape)
+    #GOCI[mask] = np.nan
+    tmp = GOCI.flatten()
+    tmp[mask.flatten()] = np.nan
+    GOCI = tmp.reshape(GOCI.shape)
     return GOCI
 
 avgtime = []
@@ -80,19 +102,23 @@ for yr in YEARS:
     
     for j in range(len(list_AOD)):
         tStart = time.time()
-        GOCI_aod = matlab.loadmat(os.path.join(goci_path, 'AOD', str(yr), list_AOD[j]))
-        GOCI_ae = matlab.loadmat(os.path.join(goci_path, 'AE', str(yr), list_AE[j]))
-        GOCI_fmf = matlab.loadmat(os.path.join(goci_path, 'FMF', str(yr), list_FMF[j]))
-        GOCI_ssa = matlab.loadmat(os.path.join(goci_path, 'SSA', str(yr), list_SSA[j]))
+        mat = matlab.loadmat(os.path.join(goci_path, 'AOD', str(yr), list_AOD[j]))
+        GOCI_aod = mat['GOCI_aod']
+        mat = matlab.loadmat(os.path.join(goci_path, 'AE', str(yr), list_AE[j]))
+        GOCI_ae = mat['GOCI_ae']
+        mat = matlab.loadmat(os.path.join(goci_path, 'FMF', str(yr), list_FMF[j]))
+        GOCI_fmf = mat['GOCI_fmf']
+        mat = matlab.loadmat(os.path.join(goci_path, 'SSA', str(yr), list_SSA[j]))
+        GOCI_ssa = mat['GOCI_ssa']
         
         GOCI_aod = do_masking(GOCI_aod)
         GOCI_ae = do_masking(GOCI_ae)
         GOCI_ssa = do_masking(GOCI_ssa)
-        
-        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AOD', str(yr), f'kor_{list_AOD[j]}.mat'), {'GOCI_aod':GOCI_aod})
-        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AE', str(yr), f'kor_{list_AE[j]}.mat'), {'GOCI_AE':GOCI_ae})
-        matlab.savemat(os.path.join(goci_path, 'GOCI', 'FMF', str(yr), f'kor_{list_FMF[j]}.mat'), {'GOCI_FMF':GOCI_fmf})
-        matlab.savemat(os.path.join(goci_path, 'GOCI', 'SSA', str(yr), f'kor_{list_SSA[j]}.mat'), {'GOCI_SSA':GOCI_ssa})
+
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AOD', str(yr)), f'kor_{list_AOD[j]}.mat', {'GOCI_aod':GOCI_aod})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'AE', str(yr)), f'kor_{list_AE[j]}.mat', {'GOCI_AE':GOCI_ae})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'FMF', str(yr)), f'kor_{list_FMF[j]}.mat', {'GOCI_FMF':GOCI_fmf})
+        matlab.savemat(os.path.join(goci_path, 'GOCI', 'SSA', str(yr)), f'kor_{list_SSA[j]}.mat', {'GOCI_SSA':GOCI_ssa})
         print (list_AOD[j])
         tEnd = time.time()
         avgtime.append(tEnd-tStart)
