@@ -12,7 +12,7 @@ import glob
 import time
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 goci_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered') 
 korea_path = os.path.join(data_base_dir, 'Station', 'AirQuality_Korea')
 
@@ -24,7 +24,7 @@ lat_goci, lon_goci = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_go
 
 grid_goci = np.vstack((lon_goci.T.flatten(), lat_goci.T.flatten())).T
 grid_kor = np.vstack((lon_kor.T.flatten(), lat_kor.T.flatten())).T
-
+"""
 DT = matlab.delaunayTriangulation(grid_goci)
 ti = DT.find_simplex(grid_kor)
 triPx = DT.simplices[ti, :]
@@ -50,31 +50,14 @@ k = np.zeros((matlab.length(I), 1))
 for i in range(matlab.length(I)):
     k[i] = surrPx[i, d_surr[i, :]==min(d_surr[i, :])]
 
-matlab.savemat(data_base_dir, 'grid_goci_surrPx.mat', {'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
-
+matlab.savemat(os.path.join(data_base_dir, 'grid'), 'grid_goci_surrPx.mat', {'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
+"""
 d_surr, invDsq, k, surrPx = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci_surrPx.mat'), keys=['d_surr', 'invDsq', 'k', 'surrPx'])
 
 def do_masking(GOCI):
     # global var: surrPX, k, invDsq, lon_kor
     GOCI = GOCI_aod
-    mask = GOCI.flatten()[k]
-    mask = np.isnan(mask)
-    value = GOCI.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
-    valueD = np.multiply(value, invDsq) # ".*": element-wise multiplication
-    invDsq_nan = invDsq
-    invDsq_nan[np.isnan(value)] = np.nan
-    GOCI = np.divide(np.nansum(valueD, axis=1), np.nansum(invDsq_nan, axis=1))
-    GOCI = GOCI.reshape(lon_kor.shape)
-    #GOCI[mask] = np.nan
-    tmp = GOCI.flatten()
-    tmp[mask.flatten()] = np.nan
-    GOCI = tmp.reshape(GOCI.shape)
-    return GOCI
-
-def do_masking(GOCI):
-    # global var: surrPX, k, invDsq, lon_kor
-    GOCI = GOCI_aod
-    mask = GOCI.flatten()[k]
+    mask = GOCI.flatten()[k.astype(int)]
     mask = np.isnan(mask)
     value = GOCI.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
     valueD = np.multiply(value, invDsq) # ".*": element-wise multiplication

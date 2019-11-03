@@ -1,21 +1,24 @@
-### Package import
-import os
-import h5py
-import time
-import numpy as np
-
-### Common
+### Package Import
 import sys
-project_path = 'C:\\Users\\user\\Downloads\\matlab2python\\matlab2python\\python-refactor'
-#project_path = '/home/cogito/Uncertainty/matlab2python/python-refactor'
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
-from Code.utils import helpers
+
+import scipy.io as sio
+import numpy as np
+import glob
+import time
+import h5py 
 
 ### Setting path
-data_path = os.path.join(project_path, 'Data')
-work_path = os.path.join(data_path, 'pre', 'OMI_L3_tempConv')
-# addpath(genpath([path_data,'/matlab_func/']))  % Add the path of external function (matlab_func) folder with subfolders
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+omi_l3_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI_L3_tempConv')  # work_path
+
+
+### Setting period
+YEARS = [2016] #, 2018, 2019
 
 pname_list = ['OMNO2d','OMSO2e_m','OMDOAO3e_m','OMHCHOG']
 
@@ -23,17 +26,16 @@ mask = np.zeros((720, 1440))
 mask[340:552, 1020:1308] = 1
 mask = mask.flatten()
 
-
 ### Temporal convolution with gaussian
 # for i in range(4):
 i = 3
 pname = pname_list[i]
 
 ### Load data
-YEARS = range(2005, 2019+1)
+#YEARS = range(2005, 2019+1)
+YEARS = [2016]
 for yr in YEARS:
-    # data_yr = sio.loadmat(os.path.join(work_path, f'{pname}_{yr}.mat'))
-    data_yr = sio.loadmat(os.path.join(work_path, f'{pname}_trop_CS_{yr}_DU.mat'))
+    data_yr = matlab.loadmat(os.path.join(omi_l3_path, f'{pname}_trop_CS_{yr}_DU.mat'))
     data_subset = data_yr[mask==1, :]
     data = np.concatenate((data, data_subset), axis=1)
 data_org = data
@@ -52,5 +54,4 @@ for k in range(data.shape[0]):
                 x_sum = x_sum+x
         data_conv[k,t] = x_sum/w_sum
     print (k)
-# sio.savemat(os.path.join(work_path, f'tempConv_{pname}_sigma_{sigma}_2005_2019.mat'), mdict={'data_conv':data_conv, 'data':data})
-sio.savemat(os.path.join(work_path, f'tempConv_{pname}_trop_CS_sigma{sigma}_2005_2019.mat'), mdict={'data_conv':data_conv, 'data':data})
+matlab.savemat(omi_l3_paht, f'tempConv_{pname}_trop_CS_sigma{sigma}_2005_2019.mat', {'data_conv':data_conv, 'data':data})
