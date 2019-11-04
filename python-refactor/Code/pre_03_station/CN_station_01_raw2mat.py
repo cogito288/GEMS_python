@@ -92,6 +92,7 @@ for yr in YEARS:
             print('NO file in #03i (DOY) \n',doy)
             # 여기에 아예 빈날 np.nan matrix 생성해서 넣는걸로 수정..
         stn_yr=np.concatenate((stn_yr stn_doy), axis=1)
-    fname = stn_code_data_{yr}_finxed_ms.mat
-    matlab.savemat(os.path.join(path, 'stn_code_data'), objective = stn_code_data_[yr]_fixed_ms.mat'],{'stn_yr':stn_yr})   print (yr)
+    fname = f'stn_code_data_{yr}_finxed_ms.mat'
+    matlab.savemat(os.path.join(path, 'stn_code_data'), fname,{'stn_yr':stn_yr})
+    print (yr)
 
