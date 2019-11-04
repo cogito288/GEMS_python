@@ -9,8 +9,7 @@ python3 -V
 sudo apt-get install -y python3-pip
 sudo apt-get install python3-dev
 sudo pip3 install virtualenv 
-#virtualenv venv 
-source matlab2python/venv/bin/activate
+#source matlab2python/venv/bin/activate
 
 # Cmake
 sudo apt-get install build-essential
