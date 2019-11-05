@@ -9,6 +9,15 @@ import os
 from pyhdf.SD import SD, SDC ### HDF4 
 
 """
+Notes
+[A, B]  -> np.concatenate((A,B),axis=1)
+[A; B]  -> np.concatenate((A,B),axis=0)
+
+[b,I] = sortrows(a,i)  ->       I = argsort(a[:,i]), b=a[I,:]
+"""
+
+
+"""
 def csvwrite_with_headers(path, data, header):
 	#% This function functions like the build in MATLAB function csvwrite but
 	#% allows a row of headers to be easily inserted
@@ -77,6 +86,17 @@ fclose(fid);
 dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
 """
 
+def sortrows(arr, columns):
+    # B = sortrows(A,column)
+    # np.lexsort ? 
+    # Should test performance 
+    # columns : list
+    tmp_df = pd.DataFram(arr, columns=list(range(arr.ndim)))
+    tmp_df.sort_values(by=columns, inplace=True)
+    data = tmp_df.values
+    del tmp_df
+    return data         
+
 def hdfread(path, dataset): # HDF4
     result = None
     hdf_file =  SD(path, SDC.READ)
@@ -142,13 +162,18 @@ def datenum(datestr):
     #     Python: January 1 of year 1
     year = int(datestr[:4])
     month = int(datestr[4:6])
-    day = int(datestr[6:])
+    day = int(datestr[6:8])
     if (month==0) and (day==0):
         year -= 1
         month = 12
         day = 31
+        
     d = date(year, month, day) # 00:00:00
-    return 366 + d.toordinal()
+    result = 366 + d.toordinal() 
+    if len(datestr)>8: # suspect yyyymmddHH
+        hour = datestr[8:10]
+        result += (hour/24)
+    return result
 
 def datestr(ordinal):
     origin = np.datetime64('0000-01-01', 'D') - np.timedelta64(1, 'D')
@@ -198,6 +223,9 @@ def length(arr):
     else:
         raise NotImplementedError
 
+def ismember(A, B):
+    return np.nonzero(np.in1d(A,B))[0]
+        
 def repmat(arr, change_size):
     if len(change_size)==2:
         m, n = rep_size
