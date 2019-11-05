@@ -49,8 +49,8 @@ source venv/bin/activate
 ############################### pygrib
 source $GEMS_HOME/venv/bin/activate
 sudo apt-get install libgeos-3.6.2 libgeos-dev
-pip install numpy matplotlib 
-pip install https://github.com/matplotlib/basemap/archive/master.zip
+pip3 install numpy matplotlib 
+pip3 install https://github.com/matplotlib/basemap/archive/master.zip
 cd $INSTALL_DIR/custom_builds
 git clone https://github.com/jswhit/pygrib
 cd pygrib
