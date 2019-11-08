@@ -11,6 +11,10 @@ sudo apt-get install python3-dev
 sudo pip3 install virtualenv 
 #source matlab2python/venv/bin/activate
 
+# see plot in terminal 
+sudo apt-get install python3-tk -y
+
+
 # Cmake
 sudo apt-get install build-essential
 sudo apt-get install cmake
