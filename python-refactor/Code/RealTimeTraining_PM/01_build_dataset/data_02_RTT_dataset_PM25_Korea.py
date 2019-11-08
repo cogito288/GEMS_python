@@ -1,6 +1,16 @@
- , close all
+### Package Import
+import sys
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
+sys.path.insert(0, project_path)
+from Code.utils import matlab
 
-
+import scipy.io as sio
+import numpy as np
+import glob
+import pandas as pd
+import random
 # path_nas4 = '//10.72.26.54/irisnas4/Data/Aerosol_Work/'
 # path_nas6 = '/10.72.26.46/irisnas6/Data/Aerosol/'
 # addpath('/10.72.26.46/irisnas2/Work/Aerosol/matlab_func/')

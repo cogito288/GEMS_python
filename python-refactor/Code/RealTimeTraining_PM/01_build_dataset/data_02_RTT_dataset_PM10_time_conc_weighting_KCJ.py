@@ -89,7 +89,7 @@ for yr in YEARS:
             data_stn[data_stn[:,-1]==1,:]=[]
         
         if doy <=30 && yr == 2015:
-            for utc in range(7):
+            for utc in range(7+1):
                 if not np.all(data_stn==0): # Not etmpty
                 elif data_stn[data_stn[:,28]==1,:].shape[0]>1:
                     rmovr = random.sample(data_stn[data_stn[:,-1]==1,:], np.round(data_stn[data_stn[:,-1]==1,:].shape[0]*0.99))
@@ -332,8 +332,8 @@ for yr in YEARS:
                             idx_high = np.where(data_stn[:,25] <= high[-1,25] & data_stn[:,23]>=400 & data_stn[:,]==1)[0]
                             data_stn[idx_high,:] = []     
                     elif high_rate>30 & low_rate>30:
-                        print (('high_rate = {high_rate:3.2f}\n')
-                        print (('low_rate = {low_rate:3.2f}\n')
+                        print ('high_rate = {high_rate:3.2f}\n')
+                        print ('low_rate = {low_rate:3.2f}\n')
                         # remove the high concentration samples
                         idx_high = np.where(data_stn[:,25] <= high[-1,25] & data_stn[:,23]>=400 & data_stn[:,]==1)[0]
                         data_stn[idx_high,:] = []
