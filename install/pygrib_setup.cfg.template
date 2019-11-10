@@ -12,7 +12,8 @@
 # If the libraries and include files are installed in separate locations,
 # use grib_api_libdir and grib_api_incdir to specify the locations
 # separately.  
-grib_api_dir=/home/sehyun/source/eccodes
+#grib_api_dir=/home/sehyun/source/eccodes
+grib_api_dir=~/source/eccodes
 # if grib_api was built with jasper support for JPEG200,
 # uncomment and set to jasper lib install location.
 # If the libraries and include files are installed in separate locations,
