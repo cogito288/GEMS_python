@@ -85,6 +85,10 @@ fclose(fid);
 %
 dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
 """
+
+
+    
+    
 # https://stackoverflow.com/questions/620305/convert-year-month-day-to-day-of-year-in-python
 def is_leap_year(year):
     """ if year is a leap year return True
@@ -315,3 +319,25 @@ def permute(arr, axes):
     else:
         return None # should be raise error
     
+def heatscatter_paper(X, Y, outpath, outname, numbins=120, markersize=20, marker='o',
+                      plot_colorbar=1, plot_lsf=1, xlab='', ylab='', title=''):
+    # (X, Y, outpath, outname, numbins, markersize, marker, plot_colorbar, plot_lsf, xlab, ylab, title)
+    # (val_scatter[:,0], val_scatter[:,1], [path,'/dataset/scatterplot'], 'PM10_RF_val.jpg','','','',1,'','Observed PM_1_0 Concentration (\mug/m^3)','Estimated PM_1_0 Concentration (\mug/m^3)','PM_1_0 Validation')
+    values, xedges, yedges = np.histogram2d(X, Y, [numbins, numbins])
+    centers_X = (xedges[:-1] + xedges[1:]) / 2
+    centers_Y = (yedges[:-1] + yedges[1:]) / 2
+    
+    binsize_X = np.abs(centers_X[1] - centers_X[0]) / 2
+    binsize_Y = np.abs(centers_Y[1] - centers_Y[0]) / 2
+    bins_X = np.zeros((numbins, 2))
+    bins_Y = np.zeros((numbins, 2))
+    
+    for i in range(numbins):
+        bins_X[i, 0] = centers_X[i] - binsize_X
+        bins_X[i, 1] = centers_X[i] + binsize_X
+        bins_Y[i, 0] = centers_Y[i] - binsize_Y
+        bins_Y[i, 1] = centers_Y[i] + binsize_Y
+    scatter_COL = np.zeros((length(X), 1))
+    onepercent = np.round(length(X) / 100)    
+    print ('Generating colormap...\n')
+    # Need to implement more
