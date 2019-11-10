@@ -2,7 +2,7 @@
 
 Convert matlab code to python code in GEMS project.
 
-## Testbad
+## Testbed
 - OS: Ubuntu 18.04.3 LTS
 - python: python3.6
 
