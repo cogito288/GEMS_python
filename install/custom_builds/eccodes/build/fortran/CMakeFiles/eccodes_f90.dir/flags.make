@@ -7,11 +7,11 @@ C_FLAGS =  -pipe -pedantic -O2 -g -DNDEBUG -fPIC
 
 C_DEFINES = -DHAVE_ECCODES_CONFIG_H -Deccodes_f90_EXPORTS
 
-C_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include -I/usr/include/openjpeg-2.1 
+C_INCLUDES = -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/Downloads/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include 
 
 Fortran_FLAGS = -O2 -g -DNDEBUG -Jmodules -fPIC  
 
 Fortran_DEFINES = -DHAVE_ECCODES_CONFIG_H -Deccodes_f90_EXPORTS
 
-Fortran_INCLUDES = -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include -I/usr/include/openjpeg-2.1 
+Fortran_INCLUDES = -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/fortran/modules -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/src -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/fortran -I/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/fortran -I/home/sehyun/Downloads/GEMS_python/venv/lib/python3.6/site-packages/numpy/core/include 
 

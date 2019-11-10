@@ -1,4 +1,4 @@
-# Install script for directory: /home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/ifs_samples
+# Install script for directory: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/ifs_samples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,9 +39,9 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1/cmake_install.cmake")
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1_mlgrib2/cmake_install.cmake")
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1_mlgrib2_ieee64/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1_mlgrib2/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ifs_samples/grib1_mlgrib2_ieee64/cmake_install.cmake")
 
 endif()
 

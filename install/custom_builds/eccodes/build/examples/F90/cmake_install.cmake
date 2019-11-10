@@ -1,4 +1,4 @@
-# Install script for directory: /home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/examples/F90
+# Install script for directory: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/examples/F90
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

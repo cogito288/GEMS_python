@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib_to_netcdf.dir/grib_to_netcdf.c.o  -o ../bin/grib_to_netcdf -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a /usr/lib/x86_64-linux-gnu/libnetcdf.so ../lib/libeccodes.so -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 

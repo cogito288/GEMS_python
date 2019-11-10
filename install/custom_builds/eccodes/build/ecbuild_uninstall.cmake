@@ -6,15 +6,15 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-if(NOT EXISTS "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: /home/sehyun/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt")
+if(NOT EXISTS "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt")
 endif()
 
-file(READ "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt" files)
+file(READ "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
-if(EXISTS "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/extra_install.txt")
-  file(READ "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/extra_install.txt" __files)
+if(EXISTS "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/extra_install.txt")
+  file(READ "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/extra_install.txt" __files)
   string(REGEX REPLACE "\n" ";" __files "${__files}")
   list(APPEND files ${__files})
 endif()

@@ -95,17 +95,17 @@
 
 /* packages */
 
-#define HAVE_JPEG         1
+#define HAVE_JPEG         0
 
 #define HAVE_LIBJASPER    0
 
-#define HAVE_LIBOPENJPEG  1
+#define HAVE_LIBOPENJPEG  0
 
 #define HAVE_LIBPNG  0
 
 /* #undef HAVE_AEC */
 
-#define HAVE_NETCDF
+/* #undef HAVE_NETCDF */
 
 /* #undef HAVE_MEMFS */
 

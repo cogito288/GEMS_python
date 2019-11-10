@@ -1,4 +1,4 @@
-#!/home/sehyun/GEMS_python/venv/bin/python
+#!/home/sehyun/Downloads/GEMS_python/venv/bin/python
 
 import sys
 import getopt

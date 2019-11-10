@@ -13,7 +13,7 @@ git clone https://github.com/cogito288/GEMS_python.git
 cd GEMS_python/install
 ```
 
-3. Modify GEMS_HOME 
+3. Modify GEMS_HOME  in install_01_common.sh
 ```bash
 chmod +x install_01_common.sh
 source install_01_common.sh

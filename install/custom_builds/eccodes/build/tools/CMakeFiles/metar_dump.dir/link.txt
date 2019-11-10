@@ -1,1 +1,1 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/metar_dump.dir/metar_dump.c.o  -o ../bin/metar_dump -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/metar_dump.dir/metar_dump.c.o  -o ../bin/metar_dump -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 

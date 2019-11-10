@@ -20,19 +20,19 @@
 #define ECBUILD_VERSION "3.1.0"
 #endif
 #ifndef ECBUILD_MACROS_DIR
-#define ECBUILD_MACROS_DIR  "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/cmake"
+#define ECBUILD_MACROS_DIR  "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/cmake"
 #endif
 
 /* config info */
 
-#define ECCODES_OS_NAME          "Linux-5.0.0-23-generic"
+#define ECCODES_OS_NAME          "Linux-5.0.0-32-generic"
 #define ECCODES_OS_BITS          64
 #define ECCODES_OS_BITS_STR      "64"
 #define ECCODES_OS_STR           "linux.64"
-#define ECCODES_OS_VERSION       "5.0.0-23-generic"
+#define ECCODES_OS_VERSION       "5.0.0-32-generic"
 #define ECCODES_SYS_PROCESSOR    "x86_64"
 
-#define ECCODES_BUILD_TIMESTAMP  "20191029190618"
+#define ECCODES_BUILD_TIMESTAMP  "20191110221024"
 #define ECCODES_BUILD_TYPE       "RelWithDebInfo"
 
 #define ECCODES_C_COMPILER_ID      "GNU"
@@ -54,8 +54,8 @@
 #define ECCODES_INSTALL_LIB_DIR   "/home/sehyun/source/eccodes/lib"
 #define ECCODES_INSTALL_DATA_DIR  "/home/sehyun/source/eccodes/share/eccodes"
 
-#define ECCODES_DEVELOPER_SRC_DIR "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source"
-#define ECCODES_DEVELOPER_BIN_DIR "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build"
+#define ECCODES_DEVELOPER_SRC_DIR "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source"
+#define ECCODES_DEVELOPER_BIN_DIR "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build"
 
 #define EC_HAVE_FORTRAN
 

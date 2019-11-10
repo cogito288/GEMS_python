@@ -348,15 +348,6 @@ set_target_properties(gts_count PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS gts_count )
 list(APPEND _IMPORT_CHECK_FILES_FOR_gts_count "${_IMPORT_PREFIX}/bin/gts_count" )
 
-# Import target "grib_to_netcdf" for configuration "RelWithDebInfo"
-set_property(TARGET grib_to_netcdf APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
-set_target_properties(grib_to_netcdf PROPERTIES
-  IMPORTED_LOCATION_RELWITHDEBINFO "${_IMPORT_PREFIX}/bin/grib_to_netcdf"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS grib_to_netcdf )
-list(APPEND _IMPORT_CHECK_FILES_FOR_grib_to_netcdf "${_IMPORT_PREFIX}/bin/grib_to_netcdf" )
-
 # Import target "codes_bufr_filter" for configuration "RelWithDebInfo"
 set_property(TARGET codes_bufr_filter APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
 set_target_properties(codes_bufr_filter PROPERTIES

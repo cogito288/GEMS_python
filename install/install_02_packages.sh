@@ -11,8 +11,8 @@ sudo apt-get install libgeos-3.6.2 libgeos-dev -y
 # Install eccodes
 cd $INSTALL_DIR
 mkdir -p custom_builds/eccodes; cd custom_builds/eccodes
-wget https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.14.1-Source.tar.gz?api=v2
-tar -xzf eccodes-2.14.1-Source.tar.gz?api=v2
+wget -O eccodes-2.14.1-Source.tar.gz https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.14.1-Source.tar.gz?api=v2
+tar -xzf eccodes-2.14.1-Source.tar.gz
 mkdir build ; cd build
 cmake \
 -DCMAKE_INSTALL_PREFIX=~/source/eccodes \
@@ -38,7 +38,8 @@ echo "export ECCODES_DIR=$ECCODES_DIR" >> ~/.bashrc # https://confluence.ecmwf.i
 
 echo "Creating virtualenv"
 cd $GEMS_HOME
-#/usr/bin/python3 -m virtualenv venv
+/usr/bin/python3 -m virtualenv venv
+echo '' > venv/.gitignore
 source venv/bin/activate
 
 #deactivate

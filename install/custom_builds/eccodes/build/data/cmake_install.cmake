@@ -1,4 +1,4 @@
-# Install script for directory: /home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/data
+# Install script for directory: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/data
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,10 +39,10 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/data/tigge/cmake_install.cmake")
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/data/bufr/cmake_install.cmake")
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/data/metar/cmake_install.cmake")
-  include("/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/data/gts/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/data/tigge/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/data/bufr/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/data/metar/cmake_install.cmake")
+  include("/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/data/gts/cmake_install.cmake")
 
 endif()
 

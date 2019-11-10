@@ -1,1 +1,1 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/tigge_check.dir/tigge_check.c.o  -o ../bin/tigge_check -Wl,-rpath,"\$ORIGIN/../lib" ../lib/libeccodes.so libtigge_tools.a -lm /usr/lib/x86_64-linux-gnu/libopenjp2.so -lpthread 
+/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/tigge_check.dir/tigge_check.c.o  -o ../bin/tigge_check -Wl,-rpath,"\$ORIGIN/../lib" ../lib/libeccodes.so libtigge_tools.a -lm -lpthread 

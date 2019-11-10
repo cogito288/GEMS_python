@@ -19,7 +19,7 @@ sudo apt-get install python3-tk -y
 sudo apt-get install build-essential
 sudo apt-get install cmake
 
-GEMS_HOME="/home/sehyun/GEMS_python"
+GEMS_HOME="/home/sehyun/Downloads/GEMS_python"
 # bash_profile에 PATH를 추가해줍니다.
 echo "export GEMS_HOME=$GEMS_HOME" >> ~/.bashrc
 echo "export PATH=$PATH:$GEMS_HOME" >> ~/.bashrc

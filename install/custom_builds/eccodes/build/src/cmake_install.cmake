@@ -1,4 +1,4 @@
-# Install script for directory: /home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src
+# Install script for directory: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/lib/libeccodes.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib/libeccodes.so")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libeccodes.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libeccodes.so")
     if(CMAKE_INSTALL_DO_STRIP)
@@ -49,11 +49,11 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
-    "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/grib_api.h"
-    "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes.h"
-    "/home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes_windef.h"
-    "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/src/eccodes_version.h"
-    "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/eccodes_config.h"
+    "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/grib_api.h"
+    "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes.h"
+    "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/src/eccodes_windef.h"
+    "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/src/eccodes_version.h"
+    "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/eccodes_config.h"
     )
 endif()
 

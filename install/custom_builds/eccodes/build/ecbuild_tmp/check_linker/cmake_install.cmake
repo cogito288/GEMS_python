@@ -1,4 +1,4 @@
-# Install script for directory: /home/sehyun/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/share/ecbuild/check_linker
+# Install script for directory: /home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/eccodes-2.14.1-Source/share/ecbuild/check_linker
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,15 +38,15 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/lib/libdso1.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/lib/libdso1.so")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/lib/libdso2.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/lib/libdso2.so")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/bin/main")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/bin/main")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -57,5 +57,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/sehyun/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/ecbuild_tmp/check_linker/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

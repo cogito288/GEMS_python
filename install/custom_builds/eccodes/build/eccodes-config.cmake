@@ -67,7 +67,7 @@ endif()
 ### handle third-party dependencies
 if(DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT)
   set(ECCODES_LIBRARIES         "eccodes;eccodes_f90")
-  set(ECCODES_TPLS              "Python;NumPy;CMath;OpenJPEG" )
+  set(ECCODES_TPLS              "Python;NumPy;CMath" )
 
   include(${CMAKE_CURRENT_LIST_FILE}.tpls OPTIONAL)
 endif()
@@ -76,7 +76,7 @@ endif()
 if(NOT eccodes_BINARY_DIR)
   find_file(eccodes_TARGETS_FILE
     NAMES eccodes-targets.cmake
-    HINTS ${eccodes_CMAKE_DIR};/home/sehyun/GEMS_python/install/custom_builds/eccodes/build
+    HINTS ${eccodes_CMAKE_DIR};/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build
     NO_DEFAULT_PATH)
   if(eccodes_TARGETS_FILE)
     include(${eccodes_TARGETS_FILE})
@@ -92,7 +92,7 @@ if( DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT )
 endif()
 
 ### export features and check requirements
-set(eccodes_FEATURES "TESTS;EXAMPLES;JPG;NETCDF;PYTHON;FORTRAN;INSTALL_ECCODES_DEFINITIONS;INSTALL_ECCODES_SAMPLES")
+set(eccodes_FEATURES "TESTS;EXAMPLES;JPG;PYTHON;FORTRAN;INSTALL_ECCODES_DEFINITIONS;INSTALL_ECCODES_SAMPLES")
 if(DEFINED ECBUILD_2_COMPAT AND ECBUILD_2_COMPAT)
   set(ECCODES_FEATURES ${eccodes_FEATURES})
 endif()
