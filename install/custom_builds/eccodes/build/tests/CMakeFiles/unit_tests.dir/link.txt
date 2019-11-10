@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/unit_tests.dir/unit_tests.c.o  -o unit_tests -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../lib/libeccodes.so -lm -lpthread 

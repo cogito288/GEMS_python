@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib_ls.dir/grib_ls.c.o  -o ../bin/grib_ls -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 

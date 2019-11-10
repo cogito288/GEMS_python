@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/julian.dir/julian.c.o  -o julian -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../lib/libeccodes.so -lm -lpthread 

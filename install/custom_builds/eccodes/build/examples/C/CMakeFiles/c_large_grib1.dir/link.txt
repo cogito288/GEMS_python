@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_large_grib1.dir/large_grib1.c.o  -o c_large_grib1 -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 

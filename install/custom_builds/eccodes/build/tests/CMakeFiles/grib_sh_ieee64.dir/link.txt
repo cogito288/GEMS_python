@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/grib_sh_ieee64.dir/grib_sh_ieee64.c.o  -o grib_sh_ieee64 -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../lib/libeccodes.so -lm -lpthread 

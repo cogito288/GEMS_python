@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_bufr_read_header.dir/bufr_read_header.c.o  -o c_bufr_read_header -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 

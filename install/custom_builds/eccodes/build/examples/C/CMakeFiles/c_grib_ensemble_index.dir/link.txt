@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_grib_ensemble_index.dir/grib_ensemble_index.c.o  -o c_grib_ensemble_index -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 

@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/bufr_compare.dir/bufr_compare.c.o  -o ../bin/bufr_compare -Wl,-rpath,"\$ORIGIN/../lib" libgrib_tools.a ../lib/libeccodes.so -lm -lpthread 

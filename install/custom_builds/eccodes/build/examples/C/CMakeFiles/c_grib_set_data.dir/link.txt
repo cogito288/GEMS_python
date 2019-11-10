@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -pedantic -O2 -g -DNDEBUG      -Wl,--disable-new-dtags CMakeFiles/c_grib_set_data.dir/grib_set_data.c.o  -o c_grib_set_data -Wl,-rpath,/home/sehyun/Downloads/GEMS_python/install/custom_builds/eccodes/build/lib ../../lib/libeccodes.so -lm -lpthread 
