@@ -11,7 +11,7 @@ import numpy as np
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 data_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD') 
 write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered')
 

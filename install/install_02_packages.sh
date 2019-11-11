@@ -23,23 +23,10 @@ cmake \
 -ENABLE_FORTRAN=OFF \
  ../eccodes-2.14.1-Source/
 
-echo "Creating virtualenv"
-cd $GEMS_HOME
-/usr/bin/python3 -m virtualenv venv
-echo '' > venv/.gitignore
-source venv/bin/activate
-source $GEMS_HOME/venv/bin/activate
-pip3 install --install-option="--prefix=~/source/eccodes" eccodes-python
-deactivate
 
 make
 ctest
 make install
-
-
-# NetCDF is not installed
-# ????? Binary file is writtend into -- Build files have been written to: /home/sehyun/custom_builds/eccodes/build
-# nano ~/.bashrc
 
 ECCODES_DIR=~/source/eccodes
 ECCODES_DEFINITION_PATH=~/source/eccodes/share/eccodes/definitions
@@ -47,6 +34,15 @@ echo "export ECCODES_DEFINITION_PATH=$ECCODES_DEFINITION_PATH" >> ~/.bashrc # ht
 echo "export ECCODES_DIR=$ECCODES_DIR" >> ~/.bashrc # https://confluence.ecmwf.int//display/ECC/ecCodes+installation
 source ~/.bashrc
 
+echo "Creating virtualenv"
+cd $GEMS_HOME
+/usr/bin/python3 -m virtualenv venv
+echo '' > venv/.gitignore
+#source venv/bin/activate
+source $GEMS_HOME/venv/bin/activate
+sudo apt-get install libffi-dev python3-dev
+pip3 install --install-option="--prefix=~/source/eccodes" eccodes-python
+deactivate
 
 
 #deactivate
