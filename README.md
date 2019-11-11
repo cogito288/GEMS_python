@@ -12,7 +12,7 @@ Convert matlab code to python code in GEMS project.
 ```bash
 sudo bash ./change-ubuntu-mirror.sh -k
 ```
-
+- [git - 간편 안내서](https://rogerdudler.github.io/git-guide/index.ko.html)
 
 ## Setting
 1. 
