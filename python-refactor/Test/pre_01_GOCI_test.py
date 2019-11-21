@@ -15,6 +15,7 @@ import pygrib
 import re
 from osgeo import gdal
 import tempfile
+import subprocess
 #import arcpy
 #from arcpy import env
 
@@ -24,6 +25,19 @@ flist = ['/home/sehyun/GEMS_python/python-refactor/Code/pre_01_raw/GOCI_01_02.py
 '/home/sehyun/GEMS_python/python-refactor/Code/pre_01_raw/GOCI_05_BL_1km.py',]
 
 for filename in flist:
-    cme = ['/home/sehyun/GEMS_python/venv/bin/python', filename]
-    subprocess.call(cmd)
+    cmd = ['/home/sehyun/GEMS_python/venv/bin/python', filename]
+    #subprocess.call(cmd)
+
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    # Grab stdout line by line as it becomes available.  This will loop until 
+    # p terminates.
+    while p.poll() is None:
+        l = p.stdout.readline() # This blocks until it receives a newline.
+        print (l)
+    # When the subprocess terminates there might be unconsumed output 
+    # that still needs to be processed.
+    print (p.stdout.read())
     break
+
+
+
