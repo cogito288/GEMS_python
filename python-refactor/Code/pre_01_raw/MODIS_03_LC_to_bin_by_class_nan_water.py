@@ -20,6 +20,7 @@ import pygrib
 import re
 from osgeo import gdal
 import tempfile
+import subprocess
 #import arcpy
 #from arcpy import env
 
