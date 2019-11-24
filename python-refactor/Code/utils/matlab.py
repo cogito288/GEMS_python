@@ -6,6 +6,8 @@ import h5py
 import hdf5storage
 import gdal
 import os
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
 from pyhdf.SD import SD, SDC ### HDF4 
 
 """
@@ -341,3 +343,17 @@ def heatscatter_paper(X, Y, outpath, outname, numbins=120, markersize=20, marker
     onepercent = np.round(length(X) / 100)    
     print ('Generating colormap...\n')
     # Need to implement more
+    
+def m_kor(lon, lat, data):
+    east = 131.5
+    west = 124
+    north = 39
+    south = 33
+    fig = plt.figure(figsize=(10,5))
+    ax = fig.add_subplots(1,1,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+    ax.set_extent([west, east, south, north])
+    ax.gridlines()
+    ax.contourf(lons, lats, data)
+    ax.set_title(f"{yr}/{mm:02d}", fontsize=25)
+    #plt.show()   
+    return fig

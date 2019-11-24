@@ -1,6 +1,16 @@
-  
+### Package Import
+import sys
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
+sys.path.insert(0, project_path)
+from Code.utils import matlab
 
-time.time()
+import scipy.io as sio
+import numpy as np
+import glob
+import time
+import pandas as pd
 
 # path_data = '/Volumes/irisnas5/Data/'
 # path= '/Volumes/irisnas5/GEMS/PM/00_EA6km/'
@@ -12,61 +22,60 @@ time.time()
 # # # #
 path_data = '/share/irisnas5/Data/'
 path= '/share/irisnas5/GEMS/PM/00_EA6km/'
-addpath(genpath('/share/irisnas5/Data/matlab_func/'))
+#addpath(genpath('/share/irisnas5/Data/matlab_func/'))
 
-type = {'conc','time','time_conc'}
-target = {'PM10','PM25'}
+target = ['PM10','PM25']
+type_list = ['conc','time','time_conc']
+YEARS = [2015, 2016, 2017]
 
 ## Load grid
 matlab.loadmat(os.path.join(path_data,'grid/grid_goci.mat'])
 
-for t=2
-    for i=1
-        for yr=2015:2017
-            if yr%4==0
+
+for t in [2]:
+    for i in [1]:
+        for yr in YEARS:
+            if yr%4==0:
                 days = 366
                 daysInMonths = [31,29,31,30,31,30,31,31,30,31,30,31]
-            else
+            else:
                 days = 365
                 daysInMonths = [31,28,31,30,31,30,31,31,30,31,30,31]
-            
-            
-            
             daily = []
             monthly=[]
             annual =[]
-            for doy = 1:days
-                [yy, mm, dd] = datevec(matlab.datenum(yr,1,doy))
-                try
-                    for utc=0:7
-                        
+            for doy in range(1,days+1):
+                yy, mm, dd = matlab.get_ymd(yr, doy) # should check 
+                #[yy, mm, dd] = datevec(matlab.datenum(yr,1,doy))
+                try:
+                    for utc in range(7+1): #0:7
+                        fname = f"cases_EA6km_{yr}_{doy:03d}_{utc:02d}.mat"
                         # load cases file for nan matrix
-                        matlab.loadmat(os.path.join(path_data, 'EA_GOCI6km/cases_mat/',str(yr),'/cases_EA6km_',str(yr),'_',
-                            str(doy, '#03i'),'_',str(utc,'#02i'),'.mat'])
-                        data = table2array(data_tbl)
-                        data = data(:,[5:12,59,13:19,28:31,36:38])
+                        data_tbl = matlab.loadmat(os.path.join(path_data, 'EA_GOCI6km/cases_mat/',str(yr),fname))['data_tbl']
+                        data = data_tbl #table2array(data_tbl)
+                        data = data[:,[4:12,58,12:19,27:31,35:38]]
                         
-                        data(data==-9999)np.nan
-                        data(np.isnp.full(data)==1)=-9999
+                        data[data==-9999] = np.nan
+                        data[np.isnan(data)] = -9999
                         [idy,idx] = np.where(data == -9999)
                         idy = np.unique(idy)
-                        data(idy.flatten(),:) = -9999
-                        data(data==-9999)np.nan
-                        nanidx =np.isnp.full(data(:,1))
-                        clear data_tbl data idy idx
+                        data[idy.flatten(),:] = -9999
+                        data[data==-9999] = np.nan
+                        nanidx = np.isnan(data[:,0])
+                        del data_tbl, data, idy, idx
                         
-                        try
+                        try:
                             # read prediction file
-                            pred = pd.read_csv(os.path.join(path,'RTT/',type{t},'/RF_pred/',target{i},'/rf_',target{i},'_RTT_EA6km_',
-                                str(yr),'_',str(doy,'#03i'),'_',str(utc,'#02i'),'.csv'],1,1)
+                            fname = f"rf_{target[i]}_RTT_EA6km_{yr}_{doy:03d}_{utc:02d}.csv"
+                            pred = pd.read_csv(os.path.join(path,'RTT/',type_list[t],'/RF_pred/',target{i},fname),header=1)
                             
                             # nan masking to prediction PM concentration.
-                            pred(nanidx==1,:)=nan
-                            if yr==2015 & doy==30
-                                daily(1:218999,1:7) =nan
-                                daily(:,utc+1)=pred
-                            else
-                                daily(:,utc+1)=pred
+                            pred[nanidx==1,:] = np.nan
+                            if yr==2015 & doy==30:
+                                daily[0:218999,0:7] = np.nan
+                                daily[:,utc] = pred
+                            else:
+                                daily[:,utc] = pred
                             
                             
 #                             pred = reshape(pred, size(lon_goci))
@@ -88,47 +97,45 @@ for t=2
 #                             print('-djpeg','-r300',name)
                             
                             print (utc)
-                            close all
-                        catch
-                            print ([str(doy,'#03i'),'_',str(utc,'#02i')])
+                            #close all
+                        except:
+                            print (f"{doy:03d}_{utc:02d}")
                         
                     
                     
                     # save hourly prediction matrix
-                    matlab.savemat(os.path.join(path, 'RF_map/',type{t},'/',target{i},'/daily/',target{i},'_RTT_EA6km_',
-                        str(yr),'_',str(doy,'#03i')],'daily')
-                    clear pred
+                    fname = f"{target[i]}_RTT_EA6km_{yr}_{doy:03d}"
+                    matlab.savemat(os.path.join(path, 'RF_map/',type{t},'/',target{i},'/daily/',fname), {'daily':daily})
+                    #clear pred
                     
-                    daily_avg = np.nanmean(daily,2)
-                    if yr==2015
-                        annual(1:218999,1:29) = nan
-                        annual(:,doy) = daily_avg
-                    else
-                        annual(:,doy) = daily_avg
+                    daily_avg = np.nanmean(daily,axis=1)
+                    if yr==2015:
+                        annual[0:218999,0:29] = np.nan
+                        annual[:,doy] = daily_avg
+                    else:
+                        annual[:,doy] = daily_avg
                     
                     
                     # reshaping and mapping
-                    daily_avg = reshape(daily_avg, size(lon_goci))
+                    daily_avg = daily_avg.reshape(lon_goci.shape)
                     m_kc_RTT(lon_goci,lat_goci,daily_avg)
-                    if i==1
+                    """
+                    if i==1:
                         caxis([0 200])
                     else
                         caxis([0 100])
-                    
-                    colorbar('FontSize',12)
-                    
-                    hold on 
-                    title([str(yr),'/',str(mm, '#02i'),'/',str(dd, '#02i')],'fontweight','bold','FontSize',14)
+                    """
+                    #colorbar('FontSize',12)
+                    #hold on 
+                    #title([str(yr),'/',str(mm, '#02i'),'/',str(dd, '#02i')],'fontweight','bold','FontSize',14)
                     
                     # save map image
-                    name = fullfile(path, ['RF_map/',type{t},'/',target{i},'/daily/',target{i},'_RTT_daily_map_',
-                        sprintf('#04d', yr),'_',sprintf('#03d', doy)])
+                    name = os.path.join(path, 'RF_map/',type_list[t], target[i],'/daily/',f"{target[i]}_RTT_daily_map_{yr:04d}_{doy:03d}")
                     print('-djpeg','-r300',name)
-                    
                     print (doy)
-                    close all
-                catch
-                    print ([str(yr),'_',str(doy,'#03i')])
+                    #close all
+                except:
+                    print (f"{yr}_{doy:03d}") #[str(yr),'_',str(doy,'#03i')])
                 
             
             # save daily prediction matrix
@@ -136,26 +143,26 @@ for t=2
                 str(yr)],'annual')
             
             ## monthly PM mapping
-            monthEnds = [0, cumnp.sum(daysInMonths)]
-            for m = 1:12
-                firstDay = monthEnds(m)+1
-                lastDay = monthEnds(m+1)
+            monthEnds = [0, np.cumsum(daysInMonths)]
+            for m in range(1,12+1):
+                firstDay = monthEnds[m-1]+1
+                lastDay = monthEnds[m]
                 
-                monthly_tmp = annual(:,firstDay:lastDay)
-                monthly(:,m) = np.nanmean(monthly_tmp,2)
+                monthly_tmp = annual[:,firstDay-1:lastDay]
+                monthly[:,m-1] = np.nanmean(monthly_tmp,axis=1)               
+                monthly_avg = np.reshape(np.nanmean(monthly_tmp,axis=1),lon_goci.shape)
                 
-                monthly_avg = reshape(np.nanmean(monthly_tmp,2),size(lon_goci))
-                
-                nan_ratio_mon = np.sum(np.isnp.full(monthly_tmp),2)/size(monthly_tmp,2)
-                nan_ratio_mon = reshape(nan_ratio_mon,size(lon_goci))
+                nan_ratio_mon = np.sum(np.isnan(monthly_tmp),axis=1)/monthly_tmp.shape[1]
+                nan_ratio_mon = nan_ratio_mon.reshape(lon_goci.shape)
                 
                 monthly_avg_m = monthly_avg
-                monthly_avg_m(nan_ratio_mon>0.95) np.nan
+                monthly_avg_m[nan_ratio_mon>0.95] = np.nan
                 
                 #reshaping and mapping
                 m_kc_RTT(lon_goci,lat_goci,monthly_avg_m)
                 #             colormap(jet)
-                if i==1
+                """
+                if i==1:
                     caxis([0 150])
                 else
                     caxis([0 60])
@@ -164,31 +171,30 @@ for t=2
                 
                 hold on 
                 title([str(yr),' / ',str(m, '#02i')],'fontweight','bold','FontSize',14)
-                
+                """
                 #save map image
-                name = fullfile(path, ['RF_map/',type{t},'/',target{i},'/monthly/',target{i},'_RTT_daily_map_',
-                    str(yr),'_',str(m, '#02i')])
+                name = os.path.join(path,'RF_map/',type_list[t],target{i},'/monthly/',f"{target[i]}_RTT_daily_map_{yr}_{m:02d}")
                 print('-djpeg','-r300',name)
                 
                 print (m)
-                close all
+                #close all
                 
             
-            matlab.savemat(os.path.join(path, 'RF_map/',type{t},'/',target{i},'/monthly/',target{i},'_RTT_EA6km_',
-                str(yr)],'monthly')
+            matlab.savemat(os.path.join(path, 'RF_map/',type_list[t],target{i},'/monthly/',f"{target[i]}_RTT_EA6km_{yr}", {'monthly':monthly})
             
             ## annual PM mapping
-            annual = np.nanmean(monthly,2)
-            annual_avg = reshape(annual,size(lon_goci))
-            
-            nan_ratio_yr = np.sum(np.isnp.full(monthly),2)/size(monthly,2)
-            nan_ratio_yr = reshape(nan_ratio_yr,size(lon_goci))
+            annual = np.nanmean(monthly,axis=1)
+            annual_avg = annual.reshape(lon_goci.shape) 
+                      
+            nan_ratio_yr = np.sum(np.isnan(monthly),axis=1)/monthly.shape[1]
+            nan_ratio_yr = nan_ratio_yr.reshape(lon_goci.shape)
             
             annual_avg_m = annual_avg
-            annual_avg_m(nan_ratio_yr>0.95) np.nan
+            annual_avg_m[nan_ratio_yr>0.95] = np.nan
             
             # reshaping and mapping
             m_kc_RTT(lon_goci,lat_goci,annual_avg_m)
+            """
             if i==1
                 caxis([0 150])
             else
@@ -198,14 +204,10 @@ for t=2
             
             hold on 
             title(str(yr),'fontweight','bold','FontSize',14)
-            
+            """
             # save map image
-            name = fullfile(path, ['RF_map/',type{t},'/',target{i},'/annual/',target{i},'_RTT_daily_map_',
-                str(yr)])
+            name = os.path.join(path, 'RF_map/',type_list[t], target{i},'/annual/',f"target[i]_RTT_daily_map_{yr}")
             print('-djpeg','-r300',name)
             
             print (yr)
-            close all
-        
-    
-
+            #close all

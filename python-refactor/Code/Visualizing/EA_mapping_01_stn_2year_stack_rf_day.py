@@ -61,7 +61,7 @@ for yr in YEARS:
     stn_nanidx = []
     
     for doy in range(nanidx.shape[1]):
-        for utc in range(7):
+        for utc in range(7+1):
             nanidx_temp = nanidx[:,doy,utc]
             stn_temp = stn[stn[:,0]==doy & stn[:,3]==utc,:]
             
