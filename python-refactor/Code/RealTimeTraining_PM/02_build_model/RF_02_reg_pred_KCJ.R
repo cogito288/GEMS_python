@@ -1,52 +1,58 @@
+### Package Import
+import sys
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
+sys.path.insert(0, project_path)
+from Code.utils import matlab
+
+import scipy.io as sio
+import numpy as np
+import glob
+import pandas as pd
+import pickle
+#from thundergbm import TGBMClassifier
+from sklearn.ensemble import RandomForestRegressor
 
 # load libraries
-library(ranger)
-library(tictoc)
-rm(list=ls(all=TRUE))
+#library(ranger)
+#library(tictoc)
+#rm(list=ls(all=TRUE))
 
-tic() 
-
-target<-c("PM10","PM25")	## Enter the name of dataset (Please use file names with the unified prefix)
-test<-c("AOD_GOCI_V1","AOD_AERONET_V1","AOD_AERONET_V2","GOCI_AOD")
+target = ["PM10", "PM25"] ## Enter the name of dataset (Please use file names with the unified prefix)
+test = ["AOD_GOCI_V1","AOD_AERONET_V1","AOD_AERONET_V2","GOCI_AOD"]
 # pathname<-"//10.72.26.56/irisnas5/GEMS/Cloud/"  # Nas5/GEMS
-pathname<-"/share/irisnas5/GEMS/Cloud/"  # Nas5/GEMS
-setwd(pathname)
+pathname = "/share/irisnas5/GEMS/Cloud/"  # Nas5/GEMS
+#setwd(pathname)
 
 
-for (i in 2)  
-{
-  tic()
-  for (t in 3)  ## Target type
-  {
-    t1=Sys.time()
+for i in [2]:  
+  for t in [3]:  ## Target type
+    t1=time.time()
+    fname = f"rf_{target[i]}_dataset_wtJP_noUTC_{test[t]}_model_ranger.RData"
+    rf_model = pickle.load(os.path.join(pathname, "RF/PM/",target[i],"/new", fname)) ## when load models
+    fname = f"{target[i]}_dataset_pred_wtJP.csv"
+    pred_tmp = pd.read_csv(os.path.join(pathname, "dataset/PM/",target[i],"/new/",fname))
+    pred_tmp[pred_tmp=="NaN"] = -9999
+    pred = pred_tmp.loc[:,[t,4:25]]
     
-    load(paste("RF/PM/",target[i],"/new/rf_",target[i],"_dataset_wtJP_noUTC_",test[t],"_model_ranger.RData",sep="")) ## when load models
+    del pred_tmp
     
+    pred_cases = rf_model.predict(pred)
+    pred_cases = np.exp(pred_cases)
     
-    pred_tmp<-read.csv(file=paste("dataset/PM/",target[i],"/new/",target[i],"_dataset_pred_wtJP.csv",sep=""))
-    pred_tmp[pred_tmp=="NaN"] <- -9999
-    pred<-pred_tmp[,c(t,5:25)]
+    del pred
     
-    rm(pred_tmp)
+    name = f"{target[i]}_dataset_wtJP_noUTC_{test[t]}_"
+ 
+    fname = f"rf_{name}_pred_ranger.csv"
+    pred_cases.to_csv(os.path.join(pathname, "RF/PM/",target[i],"/new", fname),sep=",")
     
-    pred_cases = predict(rf_model,data=pred)
-    pred_cases<-exp(pred_cases$predictions)
+    del pred_cases
     
-    rm(pred)
-    
-    name<-paste(target[i],"_dataset_wtJP_noUTC_",test[t],"_",sep="")
-    
-    write.table(pred_cases,paste("RF/PM/",target[i],"/new/rf_",name,"_pred_ranger.csv",sep=""),sep=",",append=FALSE)
-    
-    rm(pred_cases)
-    
-    
-    t2=Sys.time()
+    t2=time.time()
     print(t2-t1)
     
-  } # i_target
-  toc()
-} #t_test
-
-
+  # i_target
+#t_test
 

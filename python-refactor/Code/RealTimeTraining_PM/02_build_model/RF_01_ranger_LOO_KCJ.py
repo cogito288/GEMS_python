@@ -50,14 +50,14 @@ for t in [1]:
                             ## Mask Random Forest model using ranger
                             ti = time.time()
                             params = {
-                                    n_estimators=num_tree,
-                                    criterion='mse', # splitrule = 'variance', “mse” for the mean squared error, which is equal to variance reduction, The function to measure the quality of a split.
-                                    min_samples_leaf=5, # min.node.size = 5, 
-                                    n_jobs=8, # num.threads = 8, 
-                                    verbose=2, # verbose = TRUE. for debugging. 
-                                    bootstrap=True, # replace = TRUE, excatly same? not sure...
-                                    max_depth=None, # max.depth=default 0. unlimited depth
-                                    min_samples_split=1, # Fraction of observations to sample. Default is 1 for sampling with replacement
+                                    n_estimators:num_tree,
+                                    criterion:'mse', # splitrule = 'variance', “mse” for the mean squared error, which is equal to variance reduction, The function to measure the quality of a split.
+                                    min_samples_leaf:5, # min.node.size = 5, 
+                                    n_jobs:8, # num.threads = 8, 
+                                    verbose:2, # verbose = TRUE. for debugging. 
+                                    bootstrap:True, # replace = TRUE, excatly same? not sure...
+                                    max_depth:None, # max.depth=default 0. unlimited depth
+                                    min_samples_split:1, # Fraction of observations to sample. Default is 1 for sampling with replacement
                                     #importance = "permutation", 
                                     #write.forest = TRUE, 
                                     #scale.permutation.importance = TRUE, 
