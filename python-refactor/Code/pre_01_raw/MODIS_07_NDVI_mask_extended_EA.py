@@ -32,14 +32,15 @@ for i in YEARS:
     npath = len(workspace)
     for j in range(4,nfile): # range(0,nfile):
         in_raster = flist[j]
-        in_raster_name = os.path.basenam(a) #a[npath+3:]
-        out_raster = os.path.join(path, "03mask", str(i), f"m_{b}")
+        in_raster_name = os.path.basenam(in_raster) #a[npath+3:]
+        out_raster = os.path.join(path, "03mask", str(i), f"m_{in_raster_name}")
 
         #tempEnvironment0 = arcpy.env.snapRaster
-        arcpy.env.snapRaster = a
+        #arcpy.env.snapRaster = a
         # Process: Extract by Mask
         #arcpy.gp.ExtractByMask_sa(a, mask, c)
         # ExtractByMask_sa <in_raster> <in_mask_data> <out_raster>
-        arcpy.env.snapRaster = tempEnvironment0
-        cmd = ["gdal_calc.py", "-A", in_raster, "--outfile", out_raster, 
+        #arcpy.env.snapRaster = tempEnvironment0
+        cmd = ["gdalwarp", "-cutline", mask, in_raster, out_raster]
+        subprocess.call(cmd) 
         print(in_raster_name)

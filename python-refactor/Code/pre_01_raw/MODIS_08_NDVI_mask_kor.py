@@ -1,34 +1,52 @@
-import arcpy
-from arcpy import env
+import sys
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
+sys.path.insert(0, project_path)
+from Code.utils import matlab
+
+import scipy.io as sio
+import numpy as np
 import glob
+import time
+import h5py 
+import pygrib
 import re
-arcpy.CheckOutExtension("spatial")
+from osgeo import gdal
+import tempfile
+import subprocess
+#import arcpy
+#from arcpy import env
+#arcpy.CheckOutExtension("spatial")
 
 path="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MYD13A2\\"
 path_korea="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\SouthKorea\\MYD13A2\\"
 Extent = "123.995024793363 32.9983435120948 131.513769680712 39.0077492770766"
 mask = "\\\\10.72.26.56\\irisnas5\\Data\\mask\\r_mask_korea.tif"
 
-for i in range(2019,2020):
+YEARS = [2019]
+for i in YEARS:
     print(i)
-    env.workspace=""+path+"\\02prj_GCS_WGS84\\"+str(i)+""
-    flist = glob.glob(str(env.workspace)+"\\*.tif")
+    #env.workspace=""+path+"\\02prj_GCS_WGS84\\"+str(i)+""
+    workspace = os.path.join(path, "02prj_GCS_WGS84", str(i)
+    flist = glob.glob(os.path.join(workspace, "*.tif"))
     flist.sort();
     nfile = len(flist)
-    npath = len(env.workspace)
+    npath = len(workspace)
 
     for j in range(4,nfile): # range(0,nfile):
-        a = flist[j]
-        b = a[npath+3:]
-        c = ""+path_korea+"\\03mask\\"+str(i)+"\\m_"+b+""
+        in_raster = flist[j]
+        in_ratser_name = os.path.basenae(in_raster) #a[npath+3:]
+        out_raster = os.path.join(path_korea, "03mask", str(i), f"m_{in_raster_name}") #"+path_korea+"\\03mask\\"+str(i)+"\\m_"+b+""
 
-        tempEnvironment0 = arcpy.env.snapRaster
-        arcpy.env.snapRaster = mask
-        tempEnvironment1 = arcpy.env.extent
-        arcpy.env.extent = Extent
+        #tempEnvironment0 = arcpy.env.snapRaster
+        #arcpy.env.snapRaster = mask
+        #tempEnvironment1 = arcpy.env.extent
+        #arcpy.env.extent = Extent
         # Process: Extract by Mask
-        arcpy.gp.ExtractByMask_sa(a, mask, c)
-        arcpy.env.snapRaster = tempEnvironment0
-        arcpy.env.extent = tempEnvironment1
-
-        print(b)
+        #arcpy.gp.ExtractByMask_sa(a, mask, c)
+        #arcpy.env.snapRaster = tempEnvironment0
+        #arcpy.env.extent = tempEnvironment1
+        cmd = ["gdalwarp", "-cutline", mask, in_raster, out_raster]
+        subprocess.call(cmd) 
+        print(in_raster_name)
