@@ -11,7 +11,7 @@ import numpy as np
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
 write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
@@ -30,23 +30,29 @@ GOCI_dai = np.full([473, 463], np.nan)
 
 
 for yr in YEARS:
-    if yr%4==0:
-        days = 366
-    else:
-        days = 365
+    if yr%4==0: days = 366
+    else: days = 365
     
-    list_aod = glob.glob(os.path.join('AOD', str(yr), '.mat'))
+    list_aod = glob.glob(os.path.join(write_path, 'AOD', str(yr), '*.mat'))
+    list_aod = [os.path.basename(x) for x in list_aod]
     list_aod2 = [(int(x[14:17]), int(x[18:20])) for x in list_aod] # doy, utc 
     num_utc = 8
-    list_doy = np.tile(range(1,days+1),(num_utc,1))
-    list_utc = np.tile(range(num_utc),(1,days))
-    list_all = np.vstack((list_doy.T.flatten(), list_utc.flatten())).T
-    isNotDateExist = np.full(len(list_all), True)
-    isNotDateExist[[doy*8+utc for doy, utc in list_aod2]] = False
+    
+    list_doy = range(1, days+1)
+    list_utc = range(num_utc)
+    list_all = []
+    for doy in list_doy:
+        for utc in list_utc:
+            list_all.append((doy, utc))
+    list_all = np.asarray(list_all)
+
+    list_aod2_to_index = [(doy-1)*num_utc+utc for doy, utc in list_aod2]
+    all_index = set(list(range(len(list_all))))
+    miss_index = list(all_index.difference(list_aod2_to_index))
+    miss_list = list_all[miss_index]
                          
-    miss_list = list_all[isNotDateExist, :]
-    for k in range(len(miss_list)):
-        fname_temp = f'{yr}_{miss_list[k][0]:03d}_{miss_list[k][1]:02d}.mat'
+    for doy, utc in miss_list:
+        fname_temp = f'{yr}_{doy:03d}_{utc:02d}.mat'
         matlab.savemat(dirname=os.path.join(write_path, 'AOD', str(yr)),
                    fname=f'GOCI_AOD_{fname_temp}',
                    data={'GOCI_aod':GOCI_aod})

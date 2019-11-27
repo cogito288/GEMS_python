@@ -20,10 +20,8 @@ YEARS = [2016] #, 2018, 2019]
 MONTHS = range(1, 3+1)
 
 for yr in YEARS:
-    if yr%4==0:
-        days = 366
-    else:
-        days = 365
+    if yr%4==0: days = 366
+    else: days = 365
     if yr==2019:
         days = 148
     

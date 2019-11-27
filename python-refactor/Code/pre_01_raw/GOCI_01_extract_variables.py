@@ -11,7 +11,7 @@ import numpy as np
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
+data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
 write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
@@ -24,7 +24,6 @@ for yr in YEARS:
 
     for mm in MONTHS:
         curr_path = os.path.join(raw_data_path, str(yr), f'{mm:02d}')
-        #os.chdir(curr_path)
         
         list_mm = glob.glob(os.path.join(curr_path, '*.hdf'))
         list_mm = [os.path.basename(f) for f in list_mm]
