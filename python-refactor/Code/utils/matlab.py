@@ -141,31 +141,24 @@ def hdfread(path, dataset): # HDF4
     result = sds_obj.get()
     return result
 
-def loadmat(path, keys=[]):
-    # corresponds to load
-    data = sio.loadmat(path)
-    new_data = []
-    if keys:
-        for key in keys:
-            new_data.append(data[key])
-        return new_data
-    else:
-        return data
-    """
-    # Since we save hdf as scipy mat, we should using scipy.io.loadmat
-    # Otherwise, we should change loadmat and savemat both to use h5py or hdf5storage
-    arr = None
-    with h5py.File(path, 'r') as f:
-        if keys: # not empty
-            arr = dict()
-            for key in keys:
-                data = f.get(key)
-                data = np.array(data)
-                arr[key] = data
-        else: # if key(datasetname) is empty
-            arr = f
-    return arr
-    """
+def loadmat(path):
+    # First, try to load using h5py only working for 7.3 mat 
+    # Second, try to load using scipy io working for 5.0 mat
+    result = None
+    try:
+        with h5py.File(path, 'r') as f:
+            if f.keys(): # if key not empty
+                result = dict()
+                for key in f.keys(): 
+                    result[key] = f[key][()] #np.array(f[key])
+                    # Convert to F order
+                    if result[key].flags['C_CONTIGUOUS'] and (not f[key][()].flags['F_CONTIGUOUS']):
+                        result[key] = result[key].T
+    except OSError:
+        result = sio.loadmat(path)
+    return result
+
+    
 
 ####### Debugging #########
 def check_make_dir(directory):
@@ -173,7 +166,7 @@ def check_make_dir(directory):
         os.makedirs(directory)
 ###########################
 
-def savemat(dirname, fname, data):
+def savemat(fname, data):
     ### Description
     # Matlab: default < 2 GB. More than 2 GB: 7.3v 
     # scipy.io.savemat can save maximally 4 GB.
@@ -181,17 +174,11 @@ def savemat(dirname, fname, data):
     # dirname: directory name for hdf5storage
     # fname: filename
     # data: dictionary
-    check_make_dir(dirname) # debugging
-    sio.savemat(os.path.join(dirname, fname), mdict=data)
-    """
-    For matlab 7.3 mat saving
-    if not isinstance(data, dict):
-        hdf5storage.write(data, dirname, fname, matlab_compatible=True)
-    else:
-        filename = os.path.join(dirname, fname)
-        hdf5storage.writes(data, filename=filename, matlab_compatible=True)
-    """
-
+    check_make_dir(os.path.dirname(fname)) # debugging
+    #sio.savemat(os.path.join(dirname, fname), mdict=data)
+    hdf5storage.writes(mdict=data,
+                      filename=fname,
+                      matlab_compatible=True)
 def datenum(datestr):
     # matlab datenum
     # Ordinal 1:
@@ -265,10 +252,10 @@ def ismember(A, B):
         
 def repmat(arr, change_size):
     if len(change_size)==2:
-        m, n = rep_size
+        m, n = change_size
         return np.tile(arr, (n, m)).T
     elif len(change_size)==3:
-        m, n, r = rep_size
+        m, n, r = change_size
         return np.tile(arr, (n, r, m))
     else:
         raise NotImplementedError
