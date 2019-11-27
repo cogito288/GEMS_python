@@ -141,6 +141,13 @@ def hdfread(path, dataset): # HDF4
     result = sds_obj.get()
     return result
 
+def h5read(filename, datasetname):
+    with h5py.File(filename, 'r') as f:
+        data = f.get(datasetname)[:]
+    if data.flags['C_CONTIGUOUS'] and (not data.flags['F_CONTIGUOUS']):
+        data = data.T
+    return data
+
 def loadmat(path):
     # First, try to load using h5py only working for 7.3 mat 
     # Second, try to load using scipy io working for 5.0 mat
@@ -152,7 +159,7 @@ def loadmat(path):
                 for key in f.keys(): 
                     result[key] = f[key][()] #np.array(f[key])
                     # Convert to F order
-                    if result[key].flags['C_CONTIGUOUS'] and (not f[key][()].flags['F_CONTIGUOUS']):
+                    if result[key].flags['C_CONTIGUOUS'] and (not result[key].flags['F_CONTIGUOUS']):
                         result[key] = result[key].T
     except OSError:
         result = sio.loadmat(path)
@@ -265,10 +272,7 @@ def permute(arr, change_size):
         raise NotImplementedError
     return np.transpose(arr, change_size)
 
-def h5read(filename, datasetname):
-    with h5py.File(filename, 'r') as f:
-        data = f.get(datasetname)[:]
-    return data
+
 
 def get_files_endswith(dirname, pattern):
     # Simple dir 
