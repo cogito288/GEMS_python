@@ -292,26 +292,6 @@ def get_files_endswith(dirname, pattern):
         if os.endswith(pattern):
             files.append(file)
     return files
-    
-def dir(dirname, pattern):
-    # Not same .. 
-    #     list_gpm = matlab.dir(str(yr), '.HDF5')  # list_gpm = dir([num2str(yr),'/*/*.HDF5']);
-
-    
-    """
-    # https://wikidocs.net/39
-    full_fname_list = []
-    try:
-        for (path, dirs, files) in os.walk(dirname):
-            for filename in files:
-                ext = os.path.splitext(filename)[-1]
-                if ext == pattern:
-                    full_name_list.extend(list(map(lambda x: os.path.join(path, x), files)))
-                    #print("%s/%s" % (path, filename))
-    except PermissionError:
-        pass
-    return full_fname_list
-    """
 
 def permute(arr, axes):
     if (arr.ndim) == len(axes):

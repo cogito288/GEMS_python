@@ -31,7 +31,7 @@ lat_gpm, lon_gpm = np.meshgrid(lat_gpm, lon_gpm)
 sio.savemat('grid_gpm.mat', mdict={'lon_gpm':lon_gpm, 'lat_gpm':lat_gpm})
 """
 
-YEARS = [2014]
+YEARS = [2016]
 for yr in YEARS:
     os.chdir(raw_data_path)
     list_gpm = matlab.dir(str(yr), '.HDF5')  # list_gpm = dir([num2str(yr),'/*/*.HDF5']);
