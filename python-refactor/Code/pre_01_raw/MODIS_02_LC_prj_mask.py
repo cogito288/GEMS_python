@@ -20,9 +20,9 @@ import tempfile
 
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+data_base_dir = os.path.join('/', 'share', 'sf_GEMS', 'Data')
 path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
-mask = os.path.join('/10.72.26.56', 'irisnas5', 'Data', 'mask', 'r_rec_N50W110S20E150.tif')
+mask = os.path.join('/share', 'irisnas5', 'Data', 'mask', 'r_rec_N50W110S20E150.tif')
 #tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
 #path_modis="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MCD12Q1\\"
 
