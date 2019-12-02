@@ -16,7 +16,6 @@ import subprocess
 data_base_dir = os.path.join('/', 'share','irisnas6', 'Data','MODIS_tile')
 raw_modis_path = os.path.join(data_base_dir, '00raw', 'MCD12Q1') 
 path_mosaic = os.path.join('/','share','irisnas5','GEMS','GEMS_python', 'Preprocessed_raw', 'MODIS', '01mosaic') #workspace = os.path.join(work_path, '01_mosaic')
-tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
 #path_data="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\"
 #path_work=path_data+"02region\\EastAsia\\MCD12Q1\\"
 #path_raw = path_data+"00raw\\MCD12Q1\\"
@@ -26,6 +25,7 @@ flist = [os.path.basename(f) for f in flist]
 flist.sort()
 
 for k in range(0,len(flist),14):
+    tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
     flist_temp = flist[k:k+14]
     yr = flist_temp[0][9:13]
     for m in range(0,14):
