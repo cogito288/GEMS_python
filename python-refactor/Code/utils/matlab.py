@@ -218,6 +218,7 @@ def delaunayTriangulation(points):
     options = 'Qt Qbb Qc' if N <= 3 else 'Qt Qbb Qc Qx' # Set the QHull options
     DT = Delaunay(points, qhull_options = options)
     
+    """
     tri = DT.simplices
     keep = np.ones(len(tri), dtype = bool)
     for i, t in enumerate(tri):
@@ -225,7 +226,7 @@ def delaunayTriangulation(points):
             keep[i] = False # Point is coplanar, we don't want to keep it
     tri = tri[keep]
     DT.simplices = tri
-    
+    """
     return DT
 """
 def ind2sub(siz, IND):
@@ -235,17 +236,19 @@ def sub2ind(siz, dim1, dim2):
     return np.ravel_multi_index(siz, (dim1, dim2))
 """
 def ind2sub(array_shape, ind):
-    if len(array_shape) != 2:
+    if len(array_shape) == 2:
+        rows = (ind.astype('int') % array_shape[0]).astype(int)
+        cols = (ind.astype('int') / array_shape[0]).astype(int) # or numpy.mod(ind.astype('int'), array_shape[1])
+        return (rows, cols)
+    else:
         raise NotImplementedError
-    rows = (ind.astype('int') / array_shape[1]).astype(int)
-    cols = (ind.astype('int') % array_shape[1]).astype(int) # or numpy.mod(ind.astype('int'), array_shape[1])
-    return (rows, cols)
-
+        
 def sub2ind(array_shape, rows, cols):
-    if len(array_shape) != 2:
+    if len(array_shape) == 2:
+        return (rows + cols*array_shape[0]).astype(int)
+    else:
         raise NotImplementedError
-    return (rows*array_shape[1] + cols).astype(int)
-
+    
 def length(arr):
     if isinstance(arr, np.ndarray):
         return max(arr.shape)
@@ -256,7 +259,8 @@ def length(arr):
 
 def ismember(A, B):
     return np.nonzero(np.in1d(A,B))[0]
-        
+
+"""
 def repmat(arr, change_size):
     if len(change_size)==2:
         m, n = change_size
@@ -266,7 +270,8 @@ def repmat(arr, change_size):
         return np.tile(arr, (n, r, m))
     else:
         raise NotImplementedError
-        
+"""
+
 def permute(arr, change_size):
     if (len(change_size)!=3) or (len(arr.shape)!=3):
         raise NotImplementedError

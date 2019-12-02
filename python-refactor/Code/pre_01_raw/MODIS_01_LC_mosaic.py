@@ -46,7 +46,9 @@ for k in range(0,len(flist),14):
     matlab.check_make_dir(path_mosaic) # debugging
     out_filename = os.path.join(path_mosaic, f"EA_MCD12Q1_mosaic_{yr}.tif")
     pixel_type = 'Int16'
-    cmd = ["gdal_merge.py", "-init", "255", "-ot", pixel_type, "-o", out_filename]
+    cmd = ["gdal_merge.py", "-init", "-9999", "-ot", pixel_type, "-o", out_filename]
+    #cmd = ["gdal_merge.py", "-a_nodata", "-9999", "-ot", pixel_type, "-o", out_filename]
+    #cmd = ["gdal_merge.py", "-ot", pixel_type, "-o", out_filename]
     cmd = cmd + input_files
     subprocess.call(cmd)
     

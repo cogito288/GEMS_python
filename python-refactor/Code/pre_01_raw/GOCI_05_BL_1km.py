@@ -14,11 +14,10 @@ import time
 ### Setting path
 data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 goci_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered') 
-korea_path = os.path.join(data_base_dir, 'Station', 'AirQuality_Korea')
+goci_write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'final', 'GOCI') 
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
-avgtime = []
 
 mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_korea.mat'))
 lat_kor, lon_kor = mat['lat_kor'], mat['lon_kor']
@@ -44,10 +43,10 @@ def create_grid_goci_surrPx(grid_goci):
     surrPx[:, 2] = matlab.sub2ind(lon_goci.shape, I+1, J) # Lower Left
     surrPx[:, 3] = matlab.sub2ind(lon_goci.shape, I+1, J+1) # Lower Right
 
-    lon_surr = lon_goci.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape) # lon_goci[surrPx]
-    lat_surr = lat_goci.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
-    diff_lon = lon_surr - matlab.repmat(grid_kor[:, 0], (1, 4))
-    diff_lat = lat_surr - matlab.repmat(grid_kor[:, 1], (1, 4))
+    lon_surr = lon_goci.T.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape) # lon_goci[surrPx]
+    lat_surr = lat_goci.T.flatten()[list(surrPx.flatten().astype(int))].reshape(surrPx.shape)
+    diff_lon = lon_surr - np.tile(grid_kor[:, 0][:, None], (1,4))
+    diff_lat = lat_surr - np.tile(grid_kor[:, 1][:, None], (1,4))
 
     d_surr = np.sqrt(np.power(diff_lon, 2) + np.power(diff_lat, 2))
     invDsq = 1./np.power(d_surr, 2)
@@ -57,7 +56,7 @@ def create_grid_goci_surrPx(grid_goci):
     for i in range(len(I)):
         k[i] = surrPx[i, d_surr[i, :]==min(d_surr[i, :])]
 
-    fname = os.path.join(data_base_dir, 'gri', 'grid_goci_surrPx.mat')
+    fname = os.path.join(data_base_dir, 'grid', 'grid_goci_surrPx.mat')
     matlab.savemat(fname, {'surrPx':surrPx, 'd_surr':d_surr, 'invDsq':invDsq, 'k':k})
     
 #create_grid_goci_surrPx(grid_goci)    
@@ -70,8 +69,7 @@ del mat
 
 def do_masking(arr):
     # global var: surrPX, k, invDsq, lon_kor
-    arr = GOCI_ae
-    flatten_arr = arr.flatten()
+    flatten_arr = arr.T.flatten()
     
     mask = flatten_arr[k.astype(int)]
     mask = np.isnan(mask)
@@ -79,15 +77,16 @@ def do_masking(arr):
     value = flatten_arr[surrPx.flatten().astype(int)].reshape(surrPx.shape)
     valueD = np.multiply(value, invDsq)
     
-    invDsq_nan = invDsq
+    invDsq_nan = copy.deepcopy(invDsq)
     invDsq_nan[np.isnan(value)] = np.nan
     
     result_arr = np.divide(np.nansum(valueD, axis=1), np.nansum(invDsq_nan, axis=1))
     result_arr[mask.flatten()] = np.nan
     result_arr = result_arr.reshape(lon_kor.shape)
+    
     return result_arr
 
-
+avgtime = []
 for yr in YEARS:
     list_AOD = glob.glob(os.path.join(goci_path, 'AOD', str(yr), "*.mat"))
     list_AOD = [os.path.basename(f) for f in list_AOD]
@@ -100,26 +99,25 @@ for yr in YEARS:
         fname = os.path.join(goci_path, 'AOD', str(yr), f'GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat')
         GOCI_aod = matlab.loadmat(fname)['GOCI_aod']
         GOCI_aod = do_masking(GOCI_aod)
-        fname = os.path.join(goci_path, 'GOCI', 'AOD', str(yr), f'kor_GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat')
+        fname = os.path.join(goci_write_path, 'AOD', str(yr), f'kor_GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat')
         matlab.savemat(fname, {'GOCI_aod':GOCI_aod})
 
         fname = os.path.join(goci_path, 'AE', str(yr), f'GOCI_AE_{yr}_{doy:03d}_{utc:02d}.mat')
         GOCI_ae = matlab.loadmat(fname)['GOCI_ae']
         GOCI_ae = do_masking(GOCI_ae)
-        fname = os.path.join(goci_path, 'GOCI', 'AE', str(yr), f'kor_GOCI_AE_{yr}_{doy:03d}_{utc:02d}.mat')
+        fname = os.path.join(goci_write_path, 'AE', str(yr), f'kor_GOCI_AE_{yr}_{doy:03d}_{utc:02d}.mat')
         matlab.savemat(fname, {'GOCI_ae':GOCI_ae})
-
 
         fname = os.path.join(goci_path, 'FMF', str(yr), f'GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat')
         GOCI_fmf = matlab.loadmat(fname)['GOCI_fmf']
         GOCI_fmf = do_masking(GOCI_fmf)
-        fname = os.path.join(goci_path, 'GOCI', 'FMF', str(yr), f'kor_GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat')
+        fname = os.path.join(goci_write_path, 'FMF', str(yr), f'kor_GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat')
         matlab.savemat(fname, {'GOCI_fmf':GOCI_fmf})
 
         fname = os.path.join(goci_path, 'SSA', str(yr), f'GOCI_SSA_{yr}_{doy:03d}_{utc:02d}.mat')
         GOCI_ssa = matlab.loadmat(fname)['GOCI_ssa']
         GOCI_ssa = do_masking(GOCI_ssa)
-        fname = os.path.join(goci_path, 'GOCI', 'SSA', str(yr), f'kor_GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat')
+        fname = os.path.join(goci_write_path, 'SSA', str(yr), f'kor_GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat')
         matlab.savemat(fname, {'GOCI_ssa':GOCI_ssa})
 
         print (f'{yr}_{doy:03d}_{utc:02d}')

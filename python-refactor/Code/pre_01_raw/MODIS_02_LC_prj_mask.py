@@ -15,15 +15,13 @@ import subprocess
 ### Setting path
 data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
-mask = os.path.join('/10.72.26.56', 'irisnas5', 'Data', 'mask', 'r_rec_N50W110S20E150.tif')
-#tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
+mask = os.path.join(data_base_dir, 'raw', 'mask', 'r_rec_N50W110S20E150.tif')
 #path_modis="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MCD12Q1\\"
 
 flist = glob.glob(os.path.join(path_mosaic, '01mosaic', "*.tif"))
 flist = [os.path.basename(f) for f in flist]
 flist.sort()
 print (flist)
-#npath = len(path_modis+"\\01mosaic\\")
 
 for fname in flist:
     src_dataset = os.path.join(path_mosaic, '01mosaic', fname) # a

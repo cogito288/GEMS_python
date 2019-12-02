@@ -19,9 +19,7 @@ omi_path = os.path.join(data_base_dir, 'Raw', 'OMI')
 ### Setting period
 YEARS = [2016] #, 2018, 2019
 
-
 def create_L3(year, read_path, flist, write_path, fname, data_type):
-    print (f"Creating {fname}")
     doy_000 = matlab.datenum(f'{year}0000')
     if data_type == 'OMDOAO3e':
         list_doy = [matlab.datenum(f'{x[21:25]}{x[26:30]}')-doy_000 for x in flist]
@@ -31,10 +29,11 @@ def create_L3(year, read_path, flist, write_path, fname, data_type):
     
     # Create data_yr
     with h5py.File(os.path.join(write_path, fname), 'w') as f:
-        data_yr = f.create_dataset('data_yr', shape=size, 
+        data_yr = f.create_dataset('data_yr', shape=size, compression="gzip",
                                    dtype=np.float64, fillvalue=-9999, chunks=True)
-        for i, read_fname in enumerate(flist[:2]):
-            print (f"Reading {read_fname}")
+        for i, read_fname in enumerate(flist[:20]):
+            print (f'Reading {data_type}_{year}_{list_doy[i]:03d}')
+            #print (f"Reading {read_fname}")
             if data_type == 'OMNO2d':
                 data = matlab.h5read(os.path.join(read_path, read_fname), 
                                  '/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2TropCloudScreened')
@@ -68,7 +67,7 @@ def create_L3(year, read_path, flist, write_path, fname, data_type):
                 data[sza>=78]=np.nan
             
             data[np.isnan(data)] = -9999 # trick. data_yr(isnan(data_yr))=-9999;
-            data_yr[:, list_doy[i]] = data.flatten() # Put daily data as column vector
+            data_yr[:, list_doy[i]-1] = data.flatten() # Put daily data as column vector
             # header = [f'd{x:03d}' for x in range(1, days+1)] # Not used after
     print (f"Created {fname}")
 
@@ -223,7 +222,6 @@ for yr in YEARS:
     
     tmp_fname = f'OMHCHOG_{yr}_DU.mat'
     matlab.savemat(write_path, tmp_fname, {'data_yr':data_yr})
-    
     
     print (yr)
     tElapsed = time.time() - tStart
