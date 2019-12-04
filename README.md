@@ -45,7 +45,7 @@ source install_02_packages.sh
 ```bash
 cd ..
 source ~/.bashrc
-source venv/bin/activate
+source ../venv/bin/activate
 ```
 
 6. Install required packages
