@@ -16,6 +16,7 @@ import pygrib
 ### Setting path
 #data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 #rdaps_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+
 #path = os.path.join(project_data, 'Data', 'Aerosol', 'Aerosol_Work', 'Korea')
 #data_path = os.path.join(project_data, 'Data', 'Aerosol')
 
