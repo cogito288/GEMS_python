@@ -14,11 +14,14 @@ import h5py
 import pygrib
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-rdaps_path = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
-#path = '/share/irisnas2/Data/Aerosol/RDAPS/';
-#path_data = '/share/irisnas2/Data/Aerosol/00_raw_data/RDAPS/';
+#data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+#rdaps_path = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
+#write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')  # revised
+rdaps_path = os.path.join('/', 'share', 'irisnas8', 'Data', 'NWP', 'UM', 'RDAPS', 'analysis')  # revised
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') # revised
+
 #run('/share/irisnas3/Data/drought/GLDAS/nctoolbox-1.1.3/nctoolbox-1.1.3/setup_nctoolbox.m');
 
 ### Setting period
@@ -28,6 +31,7 @@ for yr in YEARS:
     curr_path = os.path.join(rdaps_path, str(yr))
     list_char = glob.glob(os.path.join(curr_path, '*000.*.gb2'))
     list_char = [os.path.basename(f) for f in list_char]
+    list_char.sort(); # revised
     list_date = [x[21:29] for x in list_char]
     list_dnum = [matlab.datenum(date) for date in list_date]
     doy_000 = matlab.datenum(f'{yr}0101')-1
