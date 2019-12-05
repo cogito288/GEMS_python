@@ -38,7 +38,8 @@ for fname in flist:
     src_dataset = os.path.join(path_mosaic, '01mosaic', fname) # a
     dataset = gdal.Open(src_dataset, gdal.GA_Update)
     
-    dataset.SetNoDataValue(255)
+    #dataset.SetNoDataValue(255)
+    #dataset[dataset<-9999] = np.nan
     last_num = src_dataset[-8:] # b e.g. 2827.hdf
     print (src_dataset)
     
