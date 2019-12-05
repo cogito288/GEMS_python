@@ -5,7 +5,7 @@ import h5py
 ### Common
 import sys
 import numpy as np
-project_path = 'C:\\Users\\user\\Downloads\\matlab2python\\matlab2python\\python-refactor'
+project_path = '\\home\\shpark\\GEMS_python\\python-refactor'
 #project_path = '/home/cogito/Uncertainty/matlab2python/python-refactor'
 sys.path.insert(0, project_path)
 from Code.utils import matlab
