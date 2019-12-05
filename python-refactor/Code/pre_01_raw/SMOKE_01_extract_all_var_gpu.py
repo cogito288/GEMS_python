@@ -15,9 +15,13 @@ import h5py
 import pygrib
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-emis_path = os.path.join(data_base_dir, 'Raw', 'EMIS')  
+#data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+#emis_path = os.path.join(data_base_dir, 'Raw', 'EMIS')  
+
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')  # revised
+emis_path = os.path.join('/','share','irisnas8','Data','Aerosol','00_raw_data', 'EMIS')  
 write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'EMIS')  
+
 # emis_path = '/lustre/gpu_storage/Data/Aerosol/00_raw_data/EMIS/';
 #path_data = '/share/irisnas5/Data/';
 #path = [path_data,'pre/EMIS/'];
@@ -32,15 +36,15 @@ write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'EMIS')
 
 ## 9 km domain
 nr=82; nc=67;
-YEARS = [2016] # range(2017, 2019+1)
-KNU_dir = 'KNU_27_01'
+YEARS = [2017] # range(2017, 2019+1)
+KNU_dir = 'KNU_09_01'  # revised
 
 for yr in YEARS:
     if (yr%4)==0: days=366
     else: days=365
 
     curr_path = os.path.join(emis_path, KNU_dir, str(yr))
-    list_date = list(range(matlab.datenum(f'{yr}0101'), matlab.datenum(f'{yr}1231')+1))
+    list_date = list(range(matlab.datenum(f'{yr}0101'), matlab.datenum(f'{yr}1231')+1)) #################
     list_date = [str(d) for d in list_date]    
     list_char = [f'NIER_09h_EMIS_{d}' for d in list_date]
     list_char = [os.path.basename(f) for f in list_char]
@@ -90,7 +94,7 @@ for yr in YEARS:
 
 ## 27 km domain
 nr=128; nc=174;
-YEARS = [2016] # range(2017, 2019+1)
+YEARS = [2017] # range(2017, 2019+1)
 KNU_dir = 'KNU_27_01'
 for yr in YEARS:
     tStart = time.time()
