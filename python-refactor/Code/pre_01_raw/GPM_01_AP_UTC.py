@@ -9,8 +9,8 @@ import numpy as np
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GPM', '3IMERGHH') 
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+raw_data_path = os.path.join('/', 'share', 'irisnas7', 'RAW_DATA', 'GPM','00raw', '3IMERGHH') 
 write_path = os.path.join(data_base_dir, 'Prepreossed_raw', 'GPM', 'AP_24h_hourly')
 
 # Accumulated Precipitation : From the time in the day before To the time in the day
@@ -30,15 +30,15 @@ lat_gpm, lon_gpm = np.meshgrid(lat_gpm, lon_gpm)
 matlab.savemat('grid_gpm.mat', {'lon_gpm':lon_gpm, 'lat_gpm':lat_gpm})
 """
 
-YEARS = [2016]
+YEARS = [2014, 2015, 2016, 2017, 2018, 2019]
 for yr in YEARS:
     list_gpm = glob.glob(os.path.join(raw_data_path, str(yr), '*/*.HDF5'))
     list_gpm.sort()
     doy_0 = matlab.datenum(str(yr-1)+'1231')
     # First day UTC 00
     list_temp = list_gpm[:48]
+    tmp_fname = './temp_gpm.mat'
     
-        tmp_fname = './temp_gpm.mat'
     with h5py.File(tmp_fname, 'w') as f:
         size = (1800, 3600, 48)
         gpm = f.create_dataset('gpm', shape=size, 
