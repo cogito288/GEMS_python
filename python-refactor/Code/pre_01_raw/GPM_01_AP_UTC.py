@@ -18,10 +18,13 @@ from Code.utils import helpers
 % path_data = '//10.72.26.45/irisnas7/RAW_DATA/GPM/00raw/3IMERGHH/';
 % path = '//10.72.26.45/irisnas7/RAW_DATA/GPM/01mat/AP_24h_hourly/';
 path_data = '/share/irisnas7/RAW_DATA/GPM/00raw/3IMERGHH/';
-path = '/share/irisnas7/RAW_DATA/GPM/01mat/AP_24h_hourly/';
+path = '/share/irisnas5/GEMS/GEMS_python/Preprocessed_raw/GPM/01mat/AP_24h_hourly/';
 """
-raw_data_path = os.path.join(project_path, 'Data', 'Raw', 'GPM', '3IMERGHH') 
-write_path = os.path.join(project_path, 'Data', 'Prepreossed_raw', 'GPM', 'AP_24h_hourly')
+
+raw_data_path = '/share/irisnas7/RAW_DATA/GPM/00raw/3IMERGHH/';
+write_path = '/share/irisnas5/GEMS/GEMS_python/Preprocessed_raw/GPM/01mat/AP_24h_hourly/';
+#raw_data_path = os.path.join(project_path, 'Data', 'Raw', 'GPM', '3IMERGHH') 
+#write_path = os.path.join(project_path, 'Data', 'Prepreossed_raw', 'GPM', 'AP_24h_hourly')
 
 """
 name = '2014/3B-HHR.MS.MRG.3IMERG.20141231-S000000-E002959.0000.V04A.HDF5'
