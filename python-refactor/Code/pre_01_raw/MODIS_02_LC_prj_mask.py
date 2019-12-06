@@ -6,18 +6,11 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
-import numpy as np
 import glob
-import time
-import h5py 
-import pygrib
-import re
+import time 
 from osgeo import gdal
 import tempfile
-#import arcpy
-#from arcpy import env
-
+import subprocess
 
 ### Setting path
 data_base_dir = os.path.join('/','share','irisnas5','GEMS','GEMS_python')
@@ -26,20 +19,13 @@ mask = os.path.join('/share', 'irisnas5', 'Data', 'mask', 'r_rec_N50W110S20E150.
 #tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
 #path_modis="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MCD12Q1\\"
 
-
 flist = glob.glob(os.path.join(path_mosaic, '01mosaic', "*.tif"))
 flist = [os.path.basename(f) for f in flist]
 flist.sort()
-nfile = len(flist)
 print (flist)
-#npath = len(path_modis+"\\01mosaic\\")
 
 for fname in flist:
     src_dataset = os.path.join(path_mosaic, '01mosaic', fname) # a
-    dataset = gdal.Open(src_dataset, gdal.GA_Update)
-    
-    #dataset.SetNoDataValue(255)
-    #dataset[dataset<-9999] = np.nan
     last_num = src_dataset[-8:] # b e.g. 2827.hdf
     print (src_dataset)
     
