@@ -3,16 +3,19 @@ import os
 base_dir = os.environ['GEMS_HOME']
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
+import matlab
+from Code.utils import matlab
 from Code.utils import matlab
 
 import numpy as np
 import glob
 import h5py
+import scipy.io as sio
 
 ### Setting path
 data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 raw_data_path = os.path.join('/', 'share', 'irisnas7', 'RAW_DATA', 'GPM','00raw', '3IMERGHH') 
-write_path = os.path.join(data_base_dir, 'Prepreossed_raw', 'GPM', 'AP_24h_hourly')
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GPM', 'AP_24h_hourly')
 
 # Accumulated Precipitation : From the time in the day before To the time in the day
 """
@@ -31,7 +34,7 @@ lat_gpm, lon_gpm = np.meshgrid(lat_gpm, lon_gpm)
 matlab.savemat('grid_gpm.mat', {'lon_gpm':lon_gpm, 'lat_gpm':lat_gpm})
 """
 
-YEARS = [2014, 2015, 2016, 2017, 2018, 2019]
+YEARS = [2014] #, 2015, 2016, 2017, 2018, 2019]
 for yr in YEARS:
     list_gpm = glob.glob(os.path.join(raw_data_path, str(yr), '*/*.HDF5'))
     list_gpm.sort()
@@ -53,9 +56,10 @@ for yr in YEARS:
             gpm[:,:,j] = gpm_temp
             gpm_temp[np.isnan(gpm_temp)] = 0
             precip += gpm_temp
+            
         precip = precip*0.5 #### 30분 자료인데, 단위는 hour 단위라서 0.5곱해줌
-        ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{doy:3d}_UTC00.mat')
-        matlab.savemat(ap_fname, {'precip':precip})
+        ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{str(doy).zfill(3)}_UTC00.mat')
+        sio.savemat(ap_fname, {'precip':precip})
 
         precip = np.zeros((1800, 3600))
         for aa in range(3, len(list_gpm)-48+1, 2):
