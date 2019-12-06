@@ -7,6 +7,7 @@ from Code.utils import matlab
 
 import numpy as np
 import glob
+import h5py
 
 ### Setting path
 data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
