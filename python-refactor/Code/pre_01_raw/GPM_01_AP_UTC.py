@@ -38,8 +38,7 @@ for yr in YEARS:
     doy_0 = matlab.datenum(str(yr-1)+'1231')
     # First day UTC 00
     list_temp = list_gpm[:48]
-    tmp_fname = './temp_gpm.mat'
-    
+    tmp_fname = './temp_gpm.mat'    
     with h5py.File(tmp_fname, 'w') as f:
         size = (1800, 3600, 48)
         gpm = f.create_dataset('gpm', shape=size, 
