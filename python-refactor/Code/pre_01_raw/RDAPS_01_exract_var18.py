@@ -75,8 +75,8 @@ for yr in YEARS:
         
         doy = matlab.datenum(fname[21:29])-doy_000
         utc = int(fname[29:31])
-        fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}_006.mat'
-        #fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}.mat'
+        #fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}_006.mat'
+        fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}.mat'
         matlab.savemat(os.path.join(write_path, str(yr), fname), {'rdaps':rdaps})
         print (fname)
     print (yr)
