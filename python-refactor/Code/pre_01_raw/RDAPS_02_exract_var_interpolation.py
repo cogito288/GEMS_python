@@ -24,7 +24,7 @@ for yr in YEARS:
     if yr%4==0: days = 366
     else: days = 365
     
-    for i in range(1, days+1):
+    for i in [1]: #range(1, days+1):
         data00 = matlab.loadmat(os.path.join(curr_path, f'RDAPS_{yr}_{i:03d}_00.mat')) # rdaps
         data00 = data00['rdaps']
 
@@ -46,18 +46,18 @@ for yr in YEARS:
         for j in range(1, 5+1):
             rdaps = np.multiply((data06 - data00), (j/6)) + data00 # 01 to 05 UTC
             fname = f'RDAPS_{yr}_{i:03d}_{j:02d}.mat'
-            matlab.savemat(curr_path, fname, {'rdaps':rdaps})
+            matlab.savemat(os.path.join(curr_path, fname), {'rdaps':rdaps})
                 
             rdaps = np.multiply((data12 - data06), (j/6)) + data06 # 07 to 11 UTC
             fname = f'RDAPS_{yr}_{i:03d}_{j+6:02d}.mat'
-            matlab.savemat(curr_path, fname, {'rdaps':rdaps})
+            matlab.savemat(os.path.join(curr_path, fname), {'rdaps':rdaps})
                 
             rdaps = np.multiply((data18 - data12), (j/6)) + data12 # 13 to 17 UTC
             fname = f'RDAPS_{yr}_{i:03d}_{j+12:02d}.mat'
-            matlab.savemat(curr_path, fname, {'rdaps':rdaps})
+            matlab.savemat(os.path.join(curr_path, fname), {'rdaps':rdaps})
                 
             rdaps = np.multiply((data24 - data18), (j/6)) + data18 # 19 to 23 UTC
             fname = f'RDAPS_{yr}_{i:03d}_{j+18:02d}.mat'
-            matlab.savemat(curr_path, fname, {'rdaps':rdaps})
+            matlab.savemat(os.path.join(curr_path, fname), {'rdaps':rdaps})
                 
         print (i)
