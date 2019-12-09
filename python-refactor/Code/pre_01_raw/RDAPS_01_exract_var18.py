@@ -28,8 +28,7 @@ for yr in YEARS:
     curr_path = os.path.join(rdaps_path, str(yr))
     list_char = glob.glob(os.path.join(curr_path, '*000.*.gb2'))
     list_char = [os.path.basename(f) for f in list_char]
-    list_date = [x[21:29] for x in list_char]
-    list_dnum = [matlab.datenum(date) for date in list_date]
+    list_char.sort()
     doy_000 = matlab.datenum(f'{yr}0101')-1
     rdaps = np.full((419,491,18), np.nan) 
     
@@ -73,10 +72,11 @@ for yr in YEARS:
         data = rdaps_data.select(name='Specific humidity', typeOfLevel='heightAboveGround')[0].values
         rdaps[:,:,17] = np.squeeze(data)
         
-
-        doy = list_dnum[i]-doy_000;
-        fname = f'RDAPS_{yr}_{doy:03d}_{fname[29:31]}.mat'
-        #fname = f'RDAPS_{yr}_{doy:03d}_{fname[29:31]}_006.mat'
-        matlab.savemat(os.path.join(write_path, str(yr)), fname, {'rdaps':rdaps})
+        
+        doy = matlab.datenum(fname[21:29])-doy_000
+        utc = int(fname[29:31])
+        fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}_006.mat'
+        #fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}.mat'
+        matlab.savemat(os.path.join(write_path, str(yr), fname), {'rdaps':rdaps})
         print (fname)
     print (yr)
