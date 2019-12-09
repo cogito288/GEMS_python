@@ -62,7 +62,7 @@ cp $INSTALL_DIR/pygrib_setup.cfg.template setup.cfg
 sudo rm -rf .git
 zip -r ../pygrib.zip *
 cd ..
-pip3 install pygrib.zip
+pip install pygrib.zip
 
 
 ################################ # pyhdf for HDF4     
@@ -84,9 +84,9 @@ ogrinfo --version
 sudo apt-get install libgdal-dev -y
 export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
-pip3 install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
 
 
 sudo apt install python-gdal -y
 ############################### Install pyhdf
-pip3 install pyhdf
+pip install pyhdf
