@@ -8,11 +8,12 @@ from Code.utils import matlab
 
 import numpy as np
 import glob
+import copy
 
 ### Setting path
 data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
 raw_data_path = os.path.join(data_base_dir, 'Raw', 'GPM', '3IMERGHH') 
-write_path = os.path.join(data_base_dir, 'Prepreossed_raw', 'GPM', 'AP_24h_hourly')
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GPM', 'AP_24h_hourly')
 
 # Accumulated Precipitation : From the time in the day before To the time in the day
 """
@@ -35,99 +36,45 @@ YEARS = [2016]
 for yr in YEARS:
     list_gpm = glob.glob(os.path.join(raw_data_path, str(yr), '*/*.HDF5'))
     list_gpm.sort()
-    doy_0 = matlab.datenum(str(yr-1)+'1231')
+    doy0 = matlab.datenum(str(yr-1)+'1231')
     # First day UTC 00
     list_temp = list_gpm[:48]
-    
-        tmp_fname = './temp_gpm.mat'
-    with h5py.File(tmp_fname, 'w') as f:
-        size = (1800, 3600, 48)
-        gpm = f.create_dataset('gpm', shape=size, 
-                                       dtype=np.float64, fillvalue=0, chunks=True)
-        precip = np.zeros((1800, 3600))
-        doy = matlab.datenum(os.path.basename(list_temp[0])[21:29])-doy_0+1
+   
+    size = (1800, 3600, 24)
+    gpm = np.zeros(size)
+    doy = matlab.datenum(os.path.basename(list_temp[0])[21:29])-doy0+1
+    print (f'doy: {doy}')
+    for j, fname in enumerate(list_temp):
+        gpm_temp = matlab.h5read(fname, '/Grid/precipitationCal')
+        gpm_temp = np.float64(gpm_temp)
+        gpm_temp[gpm_temp<-9999] = 0 #np.nan
+        gpm_temp[np.isnan(gpm_temp)] = 0
+        gpm[:,:,int(j/2)] += gpm_temp
 
-        for j, fname in enumerate(list_temp):
-            gpm_temp = matlab.h5read(fname, '/Grid/precipitationCal')
+    precip = np.nansum(gpm, axis=2)
+    precip *= 0.5
+    ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{doy:03d}_UTC00.mat')
+    print (f'Saving ... {ap_fname}')
+    matlab.savemat(ap_fname, {'precip':precip})
+
+    for aa in range(2, len(list_gpm)-48, 2):
+        gpm[:, :, 0:23] = gpm[:, :, 1:]
+        gpm[:, :, -1] = 0
+
+        list_temp = list_gpm[aa+46:aa+48]
+        doy = matlab.datenum(os.path.basename(list_gpm[aa])[21:29])-doy0+1
+        UTC = os.path.basename(list_gpm[aa])[31:33]
+        for j in range(2):
+            print (f'Reading ... {list_temp[j]}')
+            gpm_temp = matlab.h5read(list_temp[j], '/Grid/precipitationCal')
             gpm_temp = np.float64(gpm_temp)
-            gpm_temp[gpm_temp<-9999] = np.nan
-            gpm[:,:,j] = gpm_temp
+            gpm_temp[gpm_temp<-9999] = 0 #np.nan
             gpm_temp[np.isnan(gpm_temp)] = 0
-            precip += gpm_temp
-        precip = precip*0.5 #### 30분 자료인데, 단위는 hour 단위라서 0.5곱해줌
-        ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{doy:3d}_UTC00.mat')
+            gpm[:, :, -1] += gpm_temp
+        
+        precip = np.nansum(gpm, axis=2)
+        precip *= 0.5
+        ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{doy:03d}_UTC{UTC}.mat')
+        print (f'Saving ... {ap_fname}')
         matlab.savemat(ap_fname, {'precip':precip})
-
-        precip = np.zeros((1800, 3600))
-        for aa in range(3, len(list_gpm)-48+1, 2):
-            #gpm = gpm[:,:,2:]
-            list_temp = list_gpm[aa+45:aa+47]
-
-            doy = matlab.datenum(os.path.basename(list_gpm[aa])[21:29])-doy0+1
-            UTC = os.path.basename(list_gpm[aa])[31:33]
-            for j in range(2):
-                gpm_temp = matlab.h5read(list_temp[j], '/Grid/precipitationCal')
-                gpm_temp = np.float64(gpm_temp)
-                gpm_temp[gpm_temp<-9999] = np.nan
-                gpm[:,:,j+46] = gpm_temp
-
-                gpm_temp[np.isnan(gpm_temp)] = 0
-                precip += gpm_temp    
-            precip = precip*0.5 # 30분 자료인데, 단위는 hour 단위라서 0.5곱해줌
-            ap_fname = os.path.join(write_path, str(yr), f'gpm_AP_{yr}_{doy:3d}_UTC{UTC}.mat')
-            matlab.savemat(ap_fname, {'precip':precip})
-            print (ap_fname)
-    os.remove(tmp_fname)
     print (year)
-"""
-% %%
-% for yr = 2018
-%     cd(path_data)
-%     list_gpm_a = dir([num2str(yr-1),'/12/*1231-*.HDF5']);
-%     list_gpm = dir([num2str(yr),'/*/*.HDF5']);
-%     list_gpm_f = [{list_gpm_a.folder}';{list_gpm.folder}'];
-%     list_gpm = [{list_gpm_a.name}';{list_gpm.name}'];
-%     
-%     doy0 = datenum([num2str(yr-1),'1231'],'yyyymmdd');
-%     
-%     % First day UTC 00
-%     list_temp = list_gpm(1:48);
-%     doy = datenum(list_temp{1}(22:29),'yyyymmdd')-doy0+1;
-%     gpm = zeros(1800,3600,48); %lat 1800, lon 3600
-%     
-%     for j=1:48
-%         gpm_temp = h5read([list_gpm_f{j},'/',list_temp{j}], '/Grid/precipitationCal');
-%         gpm_temp = double(gpm_temp);
-%         gpm_temp(gpm_temp<-9999)=nan;
-%         gpm(:,:,j) = gpm_temp;
-%     end
-%     
-%     precip = nansum(gpm,3);
-%     precip = precip * 0.5;%%%% 30분 자료인데, 단위는 hour 단위라서 0.5곱해줌
-%     save([path,num2str(yr),'/gpm_AP_',num2str(yr),'_',num2str(doy,'%03i'),...
-%         '_UTC00.mat'], 'precip');
-%     
-%     % For doy 001 UTC01 to doy 365(366) UTC23
-% %     cd([path_data,num2str(yr)])
-%     for aa = 3:2:length(list_gpm)-48
-%         gpm = gpm(:,:,3:end);
-%         list_temp = list_gpm(aa+46:aa+47);
-%         list_f_temp = list_gpm_f(aa+46:aa+47);
-%         doy = datenum(list_gpm{aa}(22:29),'yyyymmdd')-doy0+1;
-%         UTC = list_gpm{aa}(32:33);
-%         for j=1:2
-%             gpm_temp = h5read([list_f_temp{j},'/',list_temp{j}], '/Grid/precipitationCal');
-%             gpm_temp = double(gpm_temp);
-%             gpm_temp(gpm_temp<-9999)=nan;
-%             gpm(:,:,j+46) = gpm_temp;
-%         end
-%         
-%         precip = nansum(gpm,3);
-%         precip = precip * 0.5;%%%% 30분 자료인데, 단위는 hour 단위라서 0.5곱해줌
-%         save([path,num2str(yr),'/gpm_AP_',num2str(yr),'_',num2str(doy,'%03i'),...
-%             '_UTC',UTC,'.mat'], 'precip');
-%         disp(['gpm_AP_',num2str(yr),'_',num2str(doy,'%03i'),'_UTC',UTC])
-%     end
-%     disp(yr)
-% end
-"""
