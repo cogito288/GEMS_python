@@ -14,28 +14,25 @@ import h5py
 import pygrib
 import re
 from osgeo import gdal
+import subprocess
 import tempfile
-#import arcpy
-#from arcpy import env
-
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+data_base_dir = os.path.join(project_path, 'Data')
 raw_modis_path = os.path.join(data_base_dir, 'Raw', 'MODIS', 'MCD12Q1') 
 path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', '01mosaic') #workspace = os.path.join(work_path, '01_mosaic')
-tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # should call clean up to delete
+tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # will be deleted
 #path_data="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\"
 #path_work=path_data+"02region\\EastAsia\\MCD12Q1\\"
 #path_raw = path_data+"00raw\\MCD12Q1\\"
 
 flist = glob.glob(os.path.join(raw_modis_path, "*.hdf"))
-flist = [os.path.basename(f) for f in flist]
 flist.sort()
 nfile = len(flist)
 
 for k in range(0,nfile,14):
     flist_temp = flist[k:k+14]
-    yr = flist_temp[0][9:13]
+    yr = os.path.basename(flist_temp[0])[9:13]
     #print (flist_temp[0])
     #print (yr)
 
@@ -47,7 +44,7 @@ for k in range(0,nfile,14):
         
         gdal_dataset = gdal.Open(os.path.join(raw_modis_path, fname))
         src_dataset = gdal_dataset.GetSubDatasets()[0][0]
-        subprocess.call(["gdal_translate", dset, dst_dataset])
+        subprocess.call(["gdal_translate", src_dataset, dst_dataset])
         
         if m==0:
             input_files = [dst_dataset]
@@ -59,7 +56,7 @@ for k in range(0,nfile,14):
     fname = f"EA_MCD12Q1_mosaic_{yr}.tif"
     out_filename = os.path.join(path_mosaic, fname)
     pixel_type = 'Int16'
-    cmd = ["gdal_merge.py", "-init", "-9999", "-ot", pixel_type, "-o", out_filename]
+    cmd = ["gdal_merge.py", "-init", "255", "-ot", pixel_type, "-o", out_filename]
     #cmd = ["gdal_merge.py", "-a_nodata", "-9999", "-ot", pixel_type, "-o", out_filename]
     #cmd = ["gdal_merge.py", "-ot", pixel_type, "-o", out_filename]
     cmd = cmd + input_files
