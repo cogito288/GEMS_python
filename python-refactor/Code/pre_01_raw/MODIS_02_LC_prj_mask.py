@@ -8,20 +8,15 @@ from Code.utils import matlab
 
 import glob
 import time 
-from osgeo import gdal
 import tempfile
-import subprocess
+import rasterio as rio
+from rasterio.warp import calculate_default_transform, reproject, Resampling
+
 
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
 path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
 mask = os.path.join(data_base_dir, 'Raw', 'mask', 'r_rec_N50W110S20E150.tif')
-
-mask_data = gdal.Open(mask)
-minx, xres, xskew, maxy, yskew, yres = mask_data.GetGeoTransform() # minx == upper left x, uly == upper right y 
-maxx = minx + xres * mask_data.RasterXSize
-miny = maxy + yres * mask_data.RasterYSize
-bounds = (minx, miny, maxx, maxy)
 #path_modis="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MCD12Q1\\"
 
 flist = glob.glob(os.path.join(path_mosaic, '01mosaic', "*.tif"))
@@ -36,20 +31,34 @@ for src_dataset in flist:
     
     dst_dataset02 = os.path.join(path_mosaic, '02prj_GCS_WGS84', f'GCS_EA_MCD12Q1_{last_num}') # c
     dst_dataset03 = os.path.join(path_mosaic, '03masked_N50W110S20E150', f'm_MODIS_LC_500m_{last_num}') # d
-    
-    input_raster = gdal.Open(src_dataset)
-    gdal.Warp(dst_dataset02, input_raster,
-        srcSRS='+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs',
-        dstSRS='EPSG:4326', 
-        xRes=5.11542231032757E-03, yRes=5.11542231032757E-03,
-        resampleAlg='near',
-        outputBounds=bounds,
-        creationOptions=['COMPRESS=LZW'],
-    )
-    # gdalwarp -tr 5.11542231032757E-03 5.11542231032757E-03 -r near -s_srs '+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs' -t_srs EPSG:4326 -te xmin ymin xmax ymax -co compress=LZ77 src_dataset dst_dataset02
-    print (bounds)
-    print (src_dataset)
-    print (dst_dataset02)
+
+    dst_crs = 'EPSG:4326'
+    with rio.open(src_dataset) as src:
+        transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds, resolution=5.11542231032757E-03)
+        kwargs = src.meta.copy()
+        kwargs.update({
+	    		'crs': dst_crs,
+		    	'transform': transform,
+			    'width': width,
+    			'height': height,
+                'nodata':255,
+                'compress':'LZW',
+        })
+
+        with rio.open(dst_dataset02, 'w', **kwargs) as dst:
+            for i in range(1, src.count+1):
+	            reproject(
+    		        source=rio.band(src, i),
+	    		    destination=rio.band(dst, i),
+    	    		src_transform=src.transform,
+	     	    	src_crs=src.crs,
+            	    dst_transform=transform,
+		            dst_crs=dst_crs,
+          			resampling=Resampling.nearest,
+    	    		#src_nodata=255.0,
+                )
+            print (dst.meta)
+
     # Process: Extract by Mask
     #cmd = ["gdaltindex", "temp_mask.shp", mask]
     #print (cmd)
