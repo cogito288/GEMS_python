@@ -90,3 +90,7 @@ pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL
 sudo apt install python-gdal -y
 ############################### Install pyhdf
 pip install pyhdf
+
+############################### Install rasterio
+sudo apt-get install python3-numpy
+pip3 install rasterio
