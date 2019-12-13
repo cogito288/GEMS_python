@@ -37,25 +37,25 @@ for src_dataset in flist:
         transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds, resolution=5.11542231032757E-03)
         kwargs = src.meta.copy()
         kwargs.update({
-	    		'crs': dst_crs,
-		    	'transform': transform,
-			    'width': width,
-    			'height': height,
+                'crs': dst_crs,
+                'transform': transform,
+                'width': width,
+                'height': height,
                 'nodata':255,
                 'compress':'LZW',
         })
 
         with rio.open(dst_dataset02, 'w', **kwargs) as dst:
             for i in range(1, src.count+1):
-	            reproject(
-    		        source=rio.band(src, i),
-	    		    destination=rio.band(dst, i),
-    	    		src_transform=src.transform,
-	     	    	src_crs=src.crs,
-            	    dst_transform=transform,
-		            dst_crs=dst_crs,
-          			resampling=Resampling.nearest,
-    	    		#src_nodata=255.0,
+                reproject(
+                    source=rio.band(src, i),
+                    destination=rio.band(dst, i),
+                    src_transform=src.transform,
+                    src_crs=src.crs,
+                    dst_transform=transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.nearest,
+                    #src_nodata=255.0,
                 )
             print (dst.meta)
 

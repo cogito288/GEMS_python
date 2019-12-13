@@ -38,12 +38,17 @@ for k in range(0,nfile,14):
     
     # Mosaic
     matlab.check_make_dir(path_mosaic) # debugging
-    fname = f"EA_MCD12Q1_mosaic_{yr}.tif"
-    out_filename = os.path.join(path_mosaic, fname)
+    dst_fname = os.path.join(path_mosaic, f"EA_MCD12Q1_mosaic_{yr}.tif")
     pixel_type = 'Int16'
-    cmd = ["gdal_merge.py", "-n", "255", "-a_nodata", "-9999", "-ot", pixel_type, "-o", out_filename]
-    cmd = cmd + input_files
+    in_nodata_val = "255"
+    out_nodata_val = "-9999"
+    compression = "COMPRESS=LZW"
+    
+    cmd = ["gdal_merge.py", "-n", in_nodata_val, "-a_nodata", out_nodata_val, "-ot", pixel_type]
+    cmd += ["-co", compression]
+    cmd += ["-o", dst_fname]
+    cmd += input_files
     subprocess.call(cmd)
     
     tmpdirname.cleanup()
-    print(yr)
+    print (os.path.basename(dst_fname))
