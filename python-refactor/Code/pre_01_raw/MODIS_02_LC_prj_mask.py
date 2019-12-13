@@ -6,21 +6,34 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
+import json
 import glob
 import time 
 import tempfile
 import rasterio as rio
-from rasterio.warp import calculate_default_transform, reproject, Resampling
-
+from rasterio import features
+from rasterio.mask import mask
+from rasterio.warp import (
+    calculate_default_transform, 
+    aligned_target,
+    reproject, 
+    Resampling
+)
 
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
 path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
-mask = os.path.join(data_base_dir, 'Raw', 'mask', 'r_rec_N50W110S20E150.tif')
-#path_modis="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MCD12Q1\\"
-
+maskfile = os.path.join(data_base_dir, 'Raw', 'mask', 'r_rec_N50W110S20E150.tif')
+with rio.open(maskfile) as masksrc:
+    band = masksrc.read(1)
+    maskarr = (band!=255)
+    shapes = []
+    for geometry, raster_value in features.shapes(band, mask=maskarr, transform=masksrc.transform):
+        shapes.append(json.loads(json.dumps(geometry)))
+    
 flist = glob.glob(os.path.join(path_mosaic, '01mosaic', "*.tif"))
 flist.sort()
+
 
 for src_dataset in flist:
     last_num = os.path.basename(src_dataset)[-8:] # b 2016.tif
@@ -33,44 +46,49 @@ for src_dataset in flist:
     dst_dataset03 = os.path.join(path_mosaic, '03masked_N50W110S20E150', f'm_MODIS_LC_500m_{last_num}') # d
 
     dst_crs = 'EPSG:4326'
+    resolution = 5.11542231032757E-03 # same with maskfile resolution
     with rio.open(src_dataset) as src:
-        transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds, resolution=5.11542231032757E-03)
+        transform, width, height = calculate_default_transform(
+                src.crs, dst_crs, 
+                src.width, src.height, *src.bounds, 
+                resolution=resolution)
+
         kwargs = src.meta.copy()
         kwargs.update({
                 'crs': dst_crs,
                 'transform': transform,
                 'width': width,
                 'height': height,
-                'nodata':255,
+                'nodata':-9999,
                 'compress':'LZW',
         })
 
-        with rio.open(dst_dataset02, 'w', **kwargs) as dst:
+        with rio.open(dst_dataset02, 'w', **kwargs) as dst02:
             for i in range(1, src.count+1):
                 reproject(
                     source=rio.band(src, i),
-                    destination=rio.band(dst, i),
+                    destination=rio.band(dst02, i),
                     src_transform=src.transform,
                     src_crs=src.crs,
+                    src_nodata=-9999,
                     dst_transform=transform,
                     dst_crs=dst_crs,
+                    dst_nodata=-9999,
+                    dst_resolution=resolution,
                     resampling=Resampling.nearest,
-                    #src_nodata=255.0,
                 )
-            print (dst.meta)
+    with rio.open(dst_dataset02) as dst02:
+        out_img, out_transform = mask(dataset=dst02, shapes=shapes, crop=True)
+        out_meta = dst02.meta.copy()
 
-    # Process: Extract by Mask
-    #cmd = ["gdaltindex", "temp_mask.shp", mask]
-    #print (cmd)
-    #subprocess.call(cmd)
-
-    #cmd = ["gdalwarp", "-cutline", "temp_mask.shp", 
-    #       dst_dataset02, dst_dataset03]
-    #subprocess.call(cmd)
-
-    #cmd = ["rm", "temp_mask.shp"]
-    #subprocess.call(cmd)
-    #arcpy.gp.ExtractByMask_sa(dst_dataset02, mask, dst_dataset03)
-    #arcpy.env.snapRaster = tempEnvironment0
-    
-    print(os.path.basename(src_dataset))
+        epsg_code = int(dst02.crs.data['init'][5:])
+        out_meta.update({"height": out_img.shape[1],
+                         "width": out_img.shape[2],
+                         "transform": out_transform,
+                         "crs": dst_crs}
+                       )
+        with rio.open(dst_dataset03, 'w', **out_meta) as dst03:
+            dst03.write(out_img)
+            
+    print (os.path.basename(dst_dataset02))
+    print (os.path.basename(dst_dataset03))
