@@ -108,7 +108,7 @@ for yr in YEARS:
     list_date = [x[:4]+x[5:7]+x[8:] for x in list_date] #  '20160101' format
 
     
-for i, date in enumerate(list_date):
+    for i, date in enumerate(list_date):
         doy = i+1
         fname = f'egts3d_l.{yr}.{date[4:8]}.{KNU_dir}.AQFv1.ncf'
         #try:
