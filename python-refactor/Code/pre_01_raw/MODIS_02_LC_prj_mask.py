@@ -85,8 +85,10 @@ for src_dataset in flist:
         out_meta.update({"height": out_img.shape[1],
                          "width": out_img.shape[2],
                          "transform": out_transform,
-                         "crs": dst_crs}
+                         "crs": dst_crs,
+                         "compress":"LZW"}
                        )
+        print (out_meta)
         with rio.open(dst_dataset03, 'w', **out_meta) as dst03:
             dst03.write(out_img)
             
