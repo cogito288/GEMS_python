@@ -29,7 +29,7 @@ write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'EMIS')
 
 ## 27 km domain
 nr=128; nc=174;
-YEARS = [2016] # range(2017, 2019+1)
+YEARS = [2017] # range(2017, 2019+1)
 KNU_dir = 'KNU_27_01'
 for yr in YEARS:
     tStart = time.time()
@@ -59,12 +59,24 @@ for yr in YEARS:
             data = np.rot90(data)
             emiss_all[:,:,j-1,2:]=np.float64(np.squeeze(data[:,:,0,:])) # vertical layer : 1
     
-            if i != 1:
+            if i != 0:
                 try:
                     ncfile2 = netcdf.NetCDFFile(os.path.join(curr_path, f'NIER_09h_EMIS_{list_date[i-1]}', fname), 'r')
                     temp = ncfile2.variables[var[j]]
+                    ncfile2.close()
                     data2 = copy.deepcopy(temp.data)
-                    ncfile2.close()                        
+                    data2 = np.transpose(data2, (3, 2, 1, 0))
+                    data2 = np.rot90(data2)
+                    emiss_all[:,:,j-1,:2]=np.float64(np.squeeze(data2[:,:,0,1:3])) # forecast 01-02UTC
+                except:
+                    pass
+            else:
+                try:
+                    ncfile2 = netcdf.NetCDFFile(os.path.join(emis_path, KNU_dir, str(yr-1), f'NIER_09h_EMIS_{yr-1}1231', fname), 'r')
+                    temp = ncfile2.variables[var[j]]
+                    ncfile2.close()                    
+                    data2 = copy.deepcopy(temp.data)
+                    data2 = np.transpose(data2, (3, 2, 1, 0))
                     data2 = np.rot90(data2)
                     emiss_all[:,:,j-1,:2]=np.float64(np.squeeze(data2[:,:,0,1:3])) # forecast 01-02UTC
                 except:
@@ -94,7 +106,7 @@ for yr in YEARS:
 
 ## 9 km domain
 nr=82; nc=67;
-YEARS = [2016] # range(2017, 2019+1)
+YEARS = [2017] # range(2017, 2019+1)
 KNU_dir = 'KNU_09_01'
 
 for yr in YEARS:
@@ -119,19 +131,31 @@ for yr in YEARS:
         for j in range(1, len(var)):
             temp = ncfile.variables[var[j]]
             data = copy.deepcopy(temp.data)
-            # matlab ncread -> (174, 128, 15, 22)
-            # pyhton netcdf read -> (22, 15, 128, 174) = (TSTEP, LAY, ROW, COL) 
-            data = np.transpose(data, (3, 2, 1, 0)) # now, (174, 128, 15, 22)
+            # matlab ncread -> (67, 82, 15, 22)
+            # pyhton netcdf read -> (22, 15, 82, 67) = (TSTEP, LAY, ROW, COL) 
+            data = np.transpose(data, (3, 2, 1, 0)) # now, (67, 82, 15, 22)
             #ncfile.close()
             data = np.rot90(data)
             emiss_all[:,:,j-1,2:]=np.float64(np.squeeze(data[:,:,0,:])) # vertical layer : 1
     
-            if i != 1:
+            if i != 0:
                 try:
                     ncfile2 = netcdf.NetCDFFile(os.path.join(curr_path, f'NIER_09h_EMIS_{list_date[i-1]}', fname), 'r')
                     temp = ncfile2.variables[var[j]]
+                    ncfile2.close()                    
                     data2 = copy.deepcopy(temp.data)
-                    ncfile2.close()                        
+                    data2 = np.transpose(data2, (3, 2, 1, 0))
+                    data2 = np.rot90(data2)
+                    emiss_all[:,:,j-1,:2]=np.float64(np.squeeze(data2[:,:,0,1:3])) # forecast 01-02UTC
+                except:
+                    pass
+            else:
+                try:
+                    ncfile2 = netcdf.NetCDFFile(os.path.join(emis_path, KNU_dir, str(yr-1), f'NIER_09h_EMIS_{yr-1}1231', fname), 'r')
+                    temp = ncfile2.variables[var[j]]
+                    ncfile2.close()                    
+                    data2 = copy.deepcopy(temp.data)
+                    data2 = np.transpose(data2, (3, 2, 1, 0))
                     data2 = np.rot90(data2)
                     emiss_all[:,:,j-1,:2]=np.float64(np.squeeze(data2[:,:,0,1:3])) # forecast 01-02UTC
                 except:
