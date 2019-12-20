@@ -15,9 +15,6 @@ import re
 from osgeo import gdal
 import tempfile
 import subprocess
-#import arcpy
-#from arcpy import env
-#arcpy.CheckOutExtension("spatial")
 
 path_data="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\00raw\\MYD13A2\\"
 path="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MYD13A2\\"
