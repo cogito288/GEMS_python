@@ -5,21 +5,17 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
 import numpy as np
 import glob
-import time
-import h5py 
-import pygrib
 import re
-from osgeo import gdal
 import tempfile
-import subprocess
 
-path_data="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\00raw\\MYD13A2\\"
+data_base_dir = os.path.join(project_path, 'Data')
+path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
+class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
+
+path_data = os.path.join(project_path, "\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\00raw\\MYD13A2\\"
 path="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MYD13A2\\"
-#Extent = "112.99111237331 23.9931929698016 146.998439892367 48.0049852944791"
-#mask = "\\\\10.72.26.56\\irisnas5\\Data\\Aerosol\\SRTM\\SRTM_DEM_mask.tif"
 
 YEARS = [2019]
 for j in YEARS: 
