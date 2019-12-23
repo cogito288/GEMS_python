@@ -27,19 +27,18 @@ path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MYD13A2')
 maskfile = os.path.join(data_base_dir, 'Raw', 'mask', 'v_rec_N50W110S20E150.shp')
 with fiona.open(maskfile, "r") as shapefile:
     shapes = [feature["geometry"] for feature in shapefile]
-    
+dst_crs = 'EPSG:4326'
+
 YEARS = [2016]
 for yr in YEARS:
     print(yr)
     flist = glob.glob(os.path.join(path_modis, '02prj_GCS_WGS84', str(yr), "*.tif"))
     flist.sort()
-    
-    dst_crs = 'EPSG:4326'
     for src_dataset in flist:
         matlab.check_make_dir(os.path.join(path_modis, '02prj_GCS_WGS84', str(yr))) # debugging
-        matlab.check_make_dir(os.path.join(path_modis, '03masked_N50W110S20E150', str(yr))) # debugging
+        matlab.check_make_dir(os.path.join(path_modis, '03mask', str(yr))) # debugging
         
-        dst_dataset03 = os.path.join(path_modis, '03masked_N50W110S20E150', str(yr), f'm_{os.path.basename(src_dataset)[2:]}') # d
+        dst_dataset = os.path.join(path_modis, '03mask', str(yr), f'm_{os.path.basename(src_dataset)[2:]}') # d
         with rio.open(src_dataset) as dst02:
             out_img, out_transform = mask(dataset=dst02, shapes=shapes, crop=True)
             out_meta = dst02.meta.copy()
@@ -50,6 +49,6 @@ for yr in YEARS:
                              "compress":"LZW"}
                            )
             print (out_meta)
-            with rio.open(dst_dataset03, 'w', **out_meta) as dst03:
+            with rio.open(dst_dataset, 'w', **out_meta) as dst03:
                 dst03.write(out_img)
-        print (os.path.basename(dst_dataset03))
+        print (os.path.basename(dst_dataset))

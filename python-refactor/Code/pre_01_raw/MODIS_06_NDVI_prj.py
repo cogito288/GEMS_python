@@ -31,8 +31,7 @@ for yr in YEARS:
     
     for src_dataset in flist:
         matlab.check_make_dir(os.path.join(path_modis, '02prj_GCS_WGS84', str(yr))) # debugging
-        matlab.check_make_dir(os.path.join(path_modis, '03masked_N50W110S20E150', str(yr))) # debugging
-    
+        
         dst_dataset02 = os.path.join(path_modis, '02prj_GCS_WGS84', str(yr), f'p_{os.path.basename(src_dataset)}') # c        
         dst_crs = 'EPSG:4326'
         resolution = 1.02308446206551E-02 # same with maskfile resolution
