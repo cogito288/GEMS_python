@@ -5,53 +5,49 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import numpy as np
 import glob
-import re
 import tempfile
+import subprocess
+from osgeo import gdal
 
 data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
-class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
+path_read = os.path.join(data_base_dir, 'Raw', 'MODIS', 'MYD13A2')
+path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MYD13A2', '01mosaic')
+tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # will be deleted
 
-path_data = os.path.join(project_path, "\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\00raw\\MYD13A2\\"
-path="\\\\10.72.26.46\\irisnas6\\Data\\MODIS_tile\\02region\\EastAsia\\MYD13A2\\"
-
-YEARS = [2019]
-for j in YEARS: 
-    print(j)
-    #env.workspace=""+path+""
-    path_data_temp=os.path.join(path_data, str(j)) #""+path_data+"\\"+str(j)+""
-    flist = glob.glob(os.path.join(path_data_temp, "*.hdf"))
+YEARS = [2016]
+for yr in YEARS: 
+    print(yr)
+    flist = glob.glob(os.path.join(path_read, str(yr), '*.hdf'))
     flist.sort()
     nfile = len(flist)
-    npath = len(path_data_temp)
-
-    path_mosaic = os.path.join(path, "01mosaic", j)
-    for k in range(56,nfile,14): # range(0,nfile,14):
+    for k in range(0,nfile,14): 
         flist_temp = flist[k:k+14]
-        doy = flist_temp[0][npath+14:npath+17]
-
-        tiles = []
+        doy = os.path.basename(flist_temp[0])[13:16]
+        input_files = []
         for m in range(0,14):
-            # Extract Subdataset
             src_dataset = flist_temp[m]
-            dst_dataset = f"NDVI_{doy}_{m+1}.tif"
-            #arcpy.ExtractSubDataset_management(a, b, "0")
-            cmd = ["gdal_translate", src_dataset, dst_dataset, "-b", "0"]
+            gdal_dataset = gdal.Open(os.path.join(path_read, src_dataset))
+            src_dataset = gdal_dataset.GetSubDatasets()[0][0]
+            dst_dataset = os.path.join(tmpdirname.name, f"NDVI_{doy}_{m+1}.tif")
+            cmd = ["gdal_translate", src_dataset, dst_dataset]
             subprocess.call(cmd)
-            tiles.append(dst_dataset)
-                    
-        # Mosaic
+            input_files.append(dst_dataset)
         
-        fname = f"MYD13A2_{j}_{doy}.tif"
-        #arcpy.MosaicToNewRaster_management(tiles, path_mosaic, fname, "", "16_BIT_SIGNED", "", "1", "LAST", "FIRST")
-        # MosaicToNewRaster(input_rasters, output_location, raster_dataset_name_with_extension, {coordinate_system_for_the_raster}, {pixel_type}, {cellsize}, number_of_bands, {mosaic_method}, {mosaic_colormap_mode})
-        out_fname = os.path.join(path_mosaic, fnam)
-        cmd = ["gdal_merge.py", "-o", out_fname, "-ot", "Int16"]
-        cmd.append(tiles)
+        path_write_temp = os.path.join(path_write, str(yr))
+        matlab.check_make_dir(path_write_temp) # debugging
+        dst_fname = os.path.join(path_write_temp, f"MYD13A2_{yr}_{doy}.tif")
+        pixel_type = 'Int16'
+        in_nodata_val = "255"
+        out_nodata_val = "-9999"
+        compression = "COMPRESS=LZW"
+
+        cmd = ["gdal_merge.py", "-n", in_nodata_val, "-a_nodata", out_nodata_val, "-ot", pixel_type]
+        cmd += ["-co", compression]
+        cmd += ["-o", dst_fname]
+        cmd += input_files
         subprocess.call(cmd)
-        for m in range(0,14):
-            #arcpy.Delete_management(""+path+"\\NDVI_"+str(doy)+"_"+str(m+1)+".tif")
-            os.remove(os.path.join(path, f"NDVI_{doy}_{m+1}.tif"))
+
+        #tmpdirname.cleanup()
+        print (os.path.basename(dst_fname))
         print(doy)
