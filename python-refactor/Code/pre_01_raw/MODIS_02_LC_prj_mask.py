@@ -80,8 +80,6 @@ for src_dataset in flist:
     with rio.open(dst_dataset02) as dst02:
         out_img, out_transform = mask(dataset=dst02, shapes=shapes, crop=True)
         out_meta = dst02.meta.copy()
-
-        epsg_code = int(dst02.crs.data['init'][5:])
         out_meta.update({"height": out_img.shape[1],
                          "width": out_img.shape[2],
                          "transform": out_transform,
