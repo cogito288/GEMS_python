@@ -12,7 +12,7 @@ import rasterio as rio
 from scipy.ndimage.filters import generic_filter as gf
 
 data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
+path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
 class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
 
 @njit

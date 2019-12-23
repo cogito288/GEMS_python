@@ -8,21 +8,18 @@ from Code.utils import matlab
 
 import json
 import glob
-import time 
-import tempfile
 import rasterio as rio
 from rasterio import features
 from rasterio.mask import mask
 from rasterio.warp import (
     calculate_default_transform, 
-    aligned_target,
     reproject, 
     Resampling
 )
 
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
-path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
+path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
 maskfile = os.path.join(data_base_dir, 'Raw', 'mask', 'r_rec_N50W110S20E150.tif')
 with rio.open(maskfile) as masksrc:
     band = masksrc.read(1)

@@ -15,7 +15,7 @@ import tempfile
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
 raw_modis_path = os.path.join(data_base_dir, 'Raw', 'MODIS', 'MCD12Q1') 
-path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', '01mosaic') #workspace = os.path.join(work_path, '01_mosaic')
+path_mosaic = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1', '01mosaic') #workspace = os.path.join(work_path, '01_mosaic')
 tmpdirname = tempfile.TemporaryDirectory(dir=base_dir)  # will be deleted
 
 flist = glob.glob(os.path.join(raw_modis_path, "*.hdf"))

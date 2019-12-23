@@ -32,13 +32,17 @@ for yr in YEARS:
             dst_dataset = os.path.join(tmpdirname.name, f"NDVI_{doy}_{m+1}.tif")
             cmd = ["gdal_translate", src_dataset, dst_dataset]
             subprocess.call(cmd)
+            
+            dst_dataset = os.path.join(f"NDVI_{doy}_{m+1}.tif")
+            cmd = ["gdal_translate", src_dataset, dst_dataset]
+            subprocess.call(cmd)
+            
             input_files.append(dst_dataset)
         
-        path_write_temp = os.path.join(path_write, str(yr))
-        matlab.check_make_dir(path_write_temp) # debugging
-        dst_fname = os.path.join(path_write_temp, f"MYD13A2_{yr}_{doy}.tif")
+        dst_fname = os.path.join(path_write, str(yr), f"MYD13A2_{yr}_{doy}.tif")
+        matlab.check_make_dir(os.path.dirname(dst_fname)) # debugging
         pixel_type = 'Int16'
-        in_nodata_val = "255"
+        in_nodata_val = "-3000"
         out_nodata_val = "-9999"
         compression = "COMPRESS=LZW"
 
@@ -47,7 +51,6 @@ for yr in YEARS:
         cmd += ["-o", dst_fname]
         cmd += input_files
         subprocess.call(cmd)
-
         #tmpdirname.cleanup()
         print (os.path.basename(dst_fname))
         print(doy)

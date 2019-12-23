@@ -6,12 +6,13 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
+import numpy as np
 import rasterio as rio
 import glob
 import time 
 
 data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS')
+path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
 class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
 
 YEARS = [2016]
@@ -48,10 +49,11 @@ for yr in YEARS:
         for ii, col in enumerate(class_name):
             dst_dataset02 = os.path.join(path_modis, "02_LC_binary", str(yr), f"MODIS_LC_500m_EA_{col}_{yr}.tif")
             band2 = band.copy()
-            band2[band2==(ii+1)] = 1
-            band2[band2!=1] = 0
+            band2 = np.where(band2==(ii+1), 1, 0)
+            band2 = band2.astype('uint8')
             kwargs = dst.meta.copy()
             kwargs.update({
+                    'dtype': 'uint8',
                     'compress':'LZW',
             })
             with rio.open(dst_dataset02, 'w', **kwargs) as dst02:
