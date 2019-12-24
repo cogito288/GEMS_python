@@ -1,41 +1,49 @@
-#% path_data = '//10.72.26.56/irisnas5/Data/';
-#% path_modis = '//10.72.26.46/irisnas6/Data/MODIS_tile/02region/EastAsia/MYD13A2/03mask/';
-#% path = '//10.72.26.56/irisnas5/Data/EA_GOCI6km/';
-import os
+### Package Import
 import sys
-project_path = '/home/cogito/Desktop/GEMS_python/matlab2python/python-refactor'
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
+from Code.utils import matlab
 
-from Code.utils.matlab import *
-
+import glob
 import numpy as np
-from matplotlib.pyplot import imread
-from scipy.interploate import gridata
+import rasterio as rio
+from scipy.interpolate import griddata
 
-path_data = os.path.join('/', 'share', 'irisnan5', 'Data')
-path_modis = os.path.join('/', 'share', 'irsnan6', 'Data', 'MODIS_tile', '02region', 'EastAsia', 'MYD13A2', '03mask')
-path = os.path.join('/', 'share', 'irisnan5', 'Data', 'EA_GOCI6km')
+### Setting path
+data_base_dir = os.path.join(project_path, 'Data')
+path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MYD13A2', '03mask') 
+path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km', 'MODIS_NDVI')
 
-# % addpath(genpath('/share/irisnas5/Data/matlab_func/'))
+mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci.mat')) # lon_goci, lat_goci
+lon_goci = mat['lon_goci']
+lat_goci = mat['lat_goci']
+del mat
 
-matlab.loadmat(os.path.join(path_data, 'grid', 'grid_GCS_MODIS_1km_EA.mat'))
-matlab.loadmat(os.path.join(path_data, 'grid', 'grid_goci.mat'))
+mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_GCS_MODIS_1km_EA.mat'))
+points = np.array([mat['lon_gcs_1km'].ravel(order='F'), mat['lat_gcs_1km'].ravel(order='F')]).T
+del mat
 
-YEARS = [2019]
+YEARS = [2016]
 for yr in YEARS:
-    os.chdir(os.path.join(path_modis, str(yr)))
-    flist = get_files_endswith(".", ".tif")
-    for i in range(len(flist)):
-        ndvi = imread(flist[i])
+    flist = glob.glob(os.path.join(path_read, str(yr), "*.tif"))
+    flist.sort()
+    for fname in flist:
+        print (os.path.basename(fname))
+        with rio.open(fname) as src:
+            ndvi = src.read(1)
         ndvi = np.float64(ndvi)
         ndvi[ndvi<=-32767] = np.nan
         ndvi = np.divide(ndvi, 10000)
-        ndivi[ndvi<-1] = np.nan
-        ndvi[ndvi>1] = np.nan
-
-        ndivi = griddata(points=zip(lon_gcs_1km, lat_gcs_1km), values=ndvi, method='linear', fill_value=zip(lon_goci, lat_goci)) # Need to check same with 
-        # ndvi = griddata(lon_gcs_1km,lat_gcs_1km,ndvi,lon_goci,lat_goci,'linear');
-        fname = flist[i][10:-4]
-        matlab.savemat(os.path.join(path, 'MODIS_NDVI', str(yr)), f'EA_MODIS_NDVI_{fname}.mat', ndvi)
-        print (flist[i])
-    print (yr)    
+        ndvi[np.abs(ndvi)>=0.99] = np.nan
+        values = ndvi.ravel(order='F')
+        ndivi = griddata(points=points, 
+                         values=values, 
+                         xi=(lon_goci, lat_goci),
+                         method='linear')
+        matlab.savemat(os.path.join(path_write, str(yr), f'EA_MODIS_NDVI_{os.path.basename(fname)[10:-4]}.mat'), 
+                       {'ndvi':ndivi})
+        del ndvi
+        print (f'EA_MODIS_NDVI_{os.path.basename(fname)[10:-4]}.mat')
+    print (yr)

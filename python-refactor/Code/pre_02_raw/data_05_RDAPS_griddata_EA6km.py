@@ -1,39 +1,42 @@
-import os
+### Package Import
 import sys
-project_path = '/home/cogito/Desktop/GEMS_python/matlab2python/python-refactor'
+import os
+base_dir = os.environ['GEMS_HOME']
+project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
-
 from Code.utils import matlab
 
+import glob
 import numpy as np
 #from matplotlib.pyplot import imread
 from scipy.interploate import griddata
-import time
 
-#% path_data = '//10.72.26.52/irisnas2/Data/Aerosol/';
-#% path = '//10.72.26.56/irisnas5/Work/NOXO3/';
+### Setting path
+data_base_dir = os.path.join(project_path, 'Data')
+path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km', 'OMI_tempConv')
+
 path_data = os.path.join('/', 'share', 'irisnas5', 'Data')
 path = os.path.join('/', 'share', 'irisnas5', 'Data', 'EA_GOCI6km', 'RDAPS')
-#addpath(genpath('/share/irisnas5/Data/matlab_func/'))
 
-matlab.loadmat(os.path.join(path_data, 'grid', 'grid_goci.mat'))
-matlab.loadmat(os.path.join(path_data, 'grid', 'grid_rdaps.mat'))
+mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci.mat')) # lon_goci, lat_goci
+lon_goci = mat['lon_goci']
+lat_goci = mat['lat_goci']
+del mat
 
-YEARS = [2019]
+mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_rdaps.mat')) 
+lon_rdaps = mat['lon_rdaps']
+lat_rdaps = mat['lat_rdaps']
+del mat
+points = np.array([lon_rdaps.ravel(order='F'), lat_rdaps.ravel(order='F')])
+del lon_rdaps, lat_rdaps
+
+YEARS = [2016]
 for yr in YEARS:
-	os.chdir(os.path.join(path_data, 'pre', 'RDAPS', str(yr)))
-	flist = matlab.get_files_endswith('.', '.mat')
-    #%     list_utc = char(list);
-    #%     list_utc = str2num(list_utc(:,16:17));
-    #%     list = list(list_utc==4);
-    #%     for i =3001:length(list)
-	for i in range(185, 2000+1):
-        #%     for i = 4501:6000
-        #%     for i = 2001:3000
-        #%     for i = 1001:2000
-        #%     for i = 1:1000
-		rdaps = matlab.loadmat(flist[i])
-		T = rdaps[:, :, 0] #'Temperature_height_above_ground'
+    flist = glob.glob(os.path.join(path_read, str(yr), '*.mat')
+    for fname in flist: # in range(1, 2000+1):
+        rdaps = matlab.loadmat(fname)['rdaps']
+        T = rdaps[:, :, 0] #'Temperature_height_above_ground'
         D = rdaps[:, :, 1] # 'Dew-point_temperature_height_above_ground'
         RH = rdaaps[:, :, 2] # 'Relative_humidity_height_above_ground'
         U = rdaps[:, :, 3]  # 'u-component_of_wind_height_above_ground'
@@ -52,42 +55,43 @@ for yr in YEARS:
         LatentHeatFlux = rdaps[:,:,16] #% 'Latent_heat_net_flux_surface_3_Hour_Average'
         SpecificHumidity = rdaps[:,:,17] #% 'Specific_humidity_height_above_ground'
         
-        T = griddata(zip(lon_rdaps,lat_rdaps),T,zip(lon_goci,lat_goci),method='linear') - 273.15
-        D = griddata(zip(lon_rdaps,lat_rdaps),D,zip(lon_goci,lat_goci),method='linear') - 273.15
-        RH = griddata(zip(lon_rdaps,lat_rdaps),RH,zip(lon_goci,lat_goci),method='linear')
-        U = griddata(zip(lon_rdaps,lat_rdaps),U,zip(lon_goci,lat_goci),method='linear')
-        V = griddata(zip(lon_rdaps,lat_rdaps),V,zip(lon_goci,lat_goci),method='linear')
-        maxWS = griddata(zip(lon_rdaps,lat_rdaps),maxWS,zip(lon_goci,lat_goci),method='linear')
-        P_srf = griddata(zip(lon_rdaps,lat_rdaps),P_srf,zip(lon_goci,lat_goci),method='linear')
-        PBLH = griddata(zip(lon_rdaps,lat_rdaps),PBLH,zip(lon_goci,lat_goci),method='linear')
-        Visibility = griddata(zip(lon_rdaps,lat_rdaps),Visibility,zip(lon_goci,lat_goci),method='linear')
-        Tsrf = griddata(zip(lon_rdaps,lat_rdaps),Tsrf,zip(lon_goci,lat_goci),method='linear') - 273.15
-        Tmax = griddata(zip(lon_rdaps,lat_rdaps),Tmax,zip(lon_goci,lat_goci),method='linear') - 273.15
-        Tmin = griddata(zip(lon_rdaps,lat_rdaps),Tmin,zip(lon_goci,lat_goci),method='linear') - 273.15
-        AP3h = griddata(zip(lon_rdaps,lat_rdaps),AP3h,zip(lon_goci,lat_goci),method='linear')
-        FrictionalVelocity = zip(griddata(lon_rdaps,lat_rdaps),FrictionalVelocity,zip(lon_goci,lat_goci),method='linear')
-        PotentialEnergy = griddata(zip(lon_rdaps,lat_rdaps),PotentialEnergy,zip(lon_goci,lat_goci),method='linear')
-        SurfaceRoughness = griddata(zip(lon_rdaps,lat_rdaps),SurfaceRoughness,zip(lon_goci,lat_goci),method='linear')
-        LatentHeatFlux = griddata(zip(lon_rdaps,lat_rdaps),LatentHeatFlux,zip(lon_goci,lat_goci),method='linear')
-        SpecificHumidity = griddata(zip(lon_rdaps,lat_rdaps),SpecificHumidity,zip(lon_goci,lat_goci),method='linear')
+        T = griddata(points,T,(lon_goci,lat_goci),method='linear') - 273.15
+        D = griddata(points,D,(lon_goci,lat_goci),method='linear') - 273.15
+        RH = griddata(points,RH,(lon_goci,lat_goci),method='linear')
+        U = griddata(points,U,(lon_goci,lat_goci),method='linear')
+        V = griddata(points,V,(lon_goci,lat_goci),method='linear')
+        maxWS = griddata(points,maxWS,(lon_goci,lat_goci),method='linear')
+        P_srf = griddata(points,P_srf,(lon_goci,lat_goci),method='linear')
+        PBLH = griddata(points,PBLH,(lon_goci,lat_goci),method='linear')
+        Visibility = griddata(points,Visibility,(lon_goci,lat_goci),method='linear')
+        Tsrf = griddata(points,Tsrf,(lon_goci,lat_goci),method='linear') - 273.15
+        Tmax = griddata(points,Tmax,(lon_goci,lat_goci),method='linear') - 273.15
+        Tmin = griddata(points,Tmin,(lon_goci,lat_goci),method='linear') - 273.15
+        AP3h = griddata(points,AP3h,(lon_goci,lat_goci),method='linear')
+        FrictionalVelocity = griddata(points,FrictionalVelocity,(lon_goci,lat_goci),method='linear')
+        PotentialEnergy = griddata(points,PotentialEnergy,(lon_goci,lat_goci),method='linear')
+        SurfaceRoughness = griddata(points,SurfaceRoughness,(lon_goci,lat_goci),method='linear')
+        LatentHeatFlux = griddata(points,LatentHeatFlux,(lon_goci,lat_goci),method='linear')
+        SpecificHumidity = griddata(points,SpecificHumidity,(lon_goci,lat_goci),method='linear')
         
-        matlab.savemat(os.path.join(path,'Temp/',str(yr)),f'EA6km_T_{flist[i][6:17]}',T)
-        matlab.savemat(os.path.join(path,'Dew/',str(yr)),f'EA6km_D_{flist[i][6:17]',D)
-        matlab.savemat(os.path.join(path,'RH/',str(yr)),f'EA6km_RH_{flist[i][6:17]}',RH)
-        matlab.savemat(os.path.join(path,'Uwind/',str(yr)),f'EA6km_U_{flist[i][6:17]}',U)
-        matlab.savemat(os.path.join(path,'Vwind/',str(yr)),f'EA6km_V_{flist[i][6:17]}',V)
-        matlab.savemat(os.path.join(path,'MaxWS/',str(yr)),f'EA6km_maxWS_{flist[i][6:17]}',maxWS)
-        matlab.savemat(os.path.join(path,'Pressure/',str(yr)),f'EA6km_Pressure_srf_{flist[i][6:17]}',P_srf)
-        matlab.savemat(os.path.join(path,'PBLH/',str(yr)),f'EA6km_PBLH_{flist[i][6:17]}',PBLH)
-        matlab.savemat(os.path.join(path,'Visibility/',str(yr)),f'EA6km_Visibility_{flist[i][6:17]}',Visibility)
-        matlab.savemat(os.path.join(path,'Temp_surface/',str(yr)),f'EA6km_Tsrf_{flist[i][6:17]}',Tsrf)
-        matlab.savemat(os.path.join(path,'Temp_max/',str(yr)),f'EA6km_Tmax_{flist[i][6:17]}',Tmax)
-        matlab.savemat(os.path.join(path,'Temp_min/',str(yr)),f'EA6km_Tmin_{flist[i][6:17]}',Tmin)
-        matlab.savemat(os.path.join(path,'AP3h/',str(yr)),f'EA6km_AP3h_{flist[i][6:17]}',AP3h)
-        matlab.savemat(os.path.join(path,'FrictionalVelocity/',str(yr)),f'EA6km_FrictionalVelocity_{flist[i][6:17]}',FrictionalVelocity)
-        matlab.savemat(os.path.join(path,'PotentialEnergy/',str(yr)),f'EA6km_PotentialEnergy_{flist[i][6:17]}',PotentialEnergy)
-        matlab.savemat(os.path.join(path,'SurfaceRoughness/',str(yr)),f'EA6km_SurfaceRoughness_{flist[i][6:17]}',SurfaceRoughness)
-        matlab.savemat(os.path.join(path,'LatentHeatFlux/',str(yr)),f'EA6km_LatentHeatFlux_{flist[i][6:17]}',LatentHeatFlux)
-        matlab.savemat(os.path.join(path,'SpecificHumidity/',str(yr)),f'EA6km_SpecificHumidity_{flist[i][6:17]}',SpecificHumidity)
-        print (f'{flist[i][6:-4]} ... i={i}')
+        base_name = os.path.basename(fname)[6:17]
+        matlab.savemat(os.path.join(path_write,'Temp/',str(yr,f'EA6km_T_{base_name}'), {'T':T})
+        matlab.savemat(os.path.join(path_write,'Dew/',str(yr),f'EA6km_D_{base_name}'),{'D':D})
+        matlab.savemat(os.path.join(path_write,'RH/',str(yr),f'EA6km_RH_{base_name}',{'RH':RH})
+        matlab.savemat(os.path.join(path_write,'Uwind/',str(yr),f'EA6km_U_{base_name}',{'U':U})
+        matlab.savemat(os.path.join(path_write,'Vwind/',str(yr),f'EA6km_V_{base_name}',{'V':V})
+        matlab.savemat(os.path.join(path_write,'MaxWS/',str(yr),f'EA6km_maxWS_{base_name}',{'maxWS':maxWS})
+        matlab.savemat(os.path.join(path_write,'Pressure/',str(yr),f'EA6km_Pressure_srf_{base_name}',{'P_srf':P_srf})
+        matlab.savemat(os.path.join(path_write,'PBLH/',str(yr),f'EA6km_PBLH_{base_name}',{'PBLH':PBLH})
+        matlab.savemat(os.path.join(path_write,'Visibility/',str(yr),f'EA6km_Visibility_{base_name}',{'Visibility':Visibility})
+        matlab.savemat(os.path.join(path_write,'Temp_surface/',str(yr),f'EA6km_Tsrf_{base_name}',{'Tsrf':Tsrf})
+        matlab.savemat(os.path.join(path_write,'Temp_max/',str(yr),f'EA6km_Tmax_{base_name}',{'Tmax':Tmax})
+        matlab.savemat(os.path.join(path,'Temp_min/',str(yr),f'EA6km_Tmin_{base_name}',{'Tmin':Tmin})
+        matlab.savemat(os.path.join(path_write,'AP3h/',str(yr),f'EA6km_AP3h_{base_name}',{'AP3h':AP3h})
+        matlab.savemat(os.path.join(path_write,'FrictionalVelocity/',str(yr),f'EA6km_FrictionalVelocity_{base_name}',{'FrictionalVelocity':FrictionalVelocity})
+        matlab.savemat(os.path.join(path_write,'PotentialEnergy/',str(yr),f'EA6km_PotentialEnergy_{base_name}',{'PotentialEnergy':PotentialEnergy})
+        matlab.savemat(os.path.join(path_write,'SurfaceRoughness/',str(yr),f'EA6km_SurfaceRoughness_{base_name}',{'SurfaceRoughness':SurfaceRoughness})
+        matlab.savemat(os.path.join(path_write,'LatentHeatFlux/',str(yr),f'EA6km_LatentHeatFlux_{base_name}',{'LatentHeatFlux':LatentHeatFlux})
+        matlab.savemat(os.path.join(path_write,'SpecificHumidity/',str(yr),f'EA6km_SpecificHumidity_{base_name}',{'SpecificHumidity':SpecificHumidity})
+        print (f'{base_name}')
 	print (yr)    
