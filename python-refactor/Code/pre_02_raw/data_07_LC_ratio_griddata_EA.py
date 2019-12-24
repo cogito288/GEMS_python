@@ -21,7 +21,7 @@ lat_goci = mat['lat_goci']
 del mat
 
 mat = matlab.loadmat(os.path.join(path_data,'grid','grid_GCS_MODIS_500m_EA.mat'))
-points = np.array([mat['lon_gcs_500m'].ravel(order='F'), mat['lat_gcs_500m'].ravel(order='F')])
+points = np.array([mat['lon_gcs_500m'].ravel(order='F'), mat['lat_gcs_500m'].ravel(order='F')]).T
 del mat
                      
 class_name = ['barren','crop','forest','grass','savannas','shrub','snow','urban','water','wetland']

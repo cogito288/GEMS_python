@@ -10,6 +10,7 @@ import netCDF4
 import numpy as np
 import glob
 from scipy.interpolate import griddata
+import time
 
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
@@ -40,7 +41,10 @@ for yr in YEARS:
         bess = bess.astype('float64')
         bess[bess==-9999] = np.nan
         values = bess.ravel(order='F')
+        tStart = time.time()
         RSDN = griddata(points, values, xi=(lon_goci, lat_goci), method='linear')
+        tElapsed = time.time()-tStart
+        print (f'Time taken : {tElapsed}')
         write_fname = f'EA6km_BESS_RSDN_{yr}_{os.path.basename(fname)[-6:-3]}.mat'
         matlab.savemat(os.path.join(write_path, str(yr), write_fname), {'RSDN':RSDN})
         del bess, RSDN

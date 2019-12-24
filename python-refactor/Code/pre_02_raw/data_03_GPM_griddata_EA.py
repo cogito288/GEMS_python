@@ -26,7 +26,7 @@ lon_gpm = mat['lon_gpm']
 del mat
 lat_gpm = lat_gpm[1100:1400, 2900:3300] # N50 W110 S20 E150
 lon_gpm = lon_gpm[1100:1400, 2900:3300] 
-points = np.array(lon_gpm.ravel(order='F'), lat_gpm.ravel(order='F'))
+points = np.array(lon_gpm.ravel(order='F'), lat_gpm.ravel(order='F')).T
 del lon_gpm, lat_gpm
 
 YEARS = [2016]
@@ -38,7 +38,7 @@ for yr in YEARS:
         values = precip.ravel(order='F')
         precip = griddata(points=points, 
                           values=values,
-                          fill_value=(lon_goci, lat_goci),
+                          xi=(lon_goci, lat_goci),
                           method='linear')
         mathalb.savemat(os.path.join(path_write, str(yr), f'EA6km_{flist[i]}.mat'), precip)
         print (os.path.basename(fname))

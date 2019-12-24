@@ -24,15 +24,13 @@ mat = matlab.loadmat(os.path.join(path_data, 'grid', 'grid_omi_25.mat')
 lon_omi = mat['lon_omi'] 
 lat_omi = mat['lat_omi']
 del mat
-                     
 lon_omi = lon_omi[340:552, 1020:1308]
 lat_omi = lat_omi[340:552, 1020,1308]
-points = np.array(lat_omi.ravel(order='F'), lat_omi.ravel(order='F'))
+points = np.array(lat_omi.ravel(order='F'), lat_omi.ravel(order='F')).T
 del lon_omi, lat_omi
 
 dlist = list(map(lambda x: x+matlab.datenum('20050000'), list(range(1, 5478+1))))
 dvec = list(map(lambda x: matlab.datestr(x), dlist))
-# np.arange(np.datetime64('2005-01-01'), np.datetime64('2019-12-31'))
 
 pname_list = ['OMNO2d', 'OMSO2e_m', 'OMDOAO3e_m', 'OMHCHOG']
 for pname in pname_list:

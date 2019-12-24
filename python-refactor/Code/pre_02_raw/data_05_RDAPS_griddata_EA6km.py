@@ -28,7 +28,7 @@ mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_rdaps.mat'))
 lon_rdaps = mat['lon_rdaps']
 lat_rdaps = mat['lat_rdaps']
 del mat
-points = np.array([lon_rdaps.ravel(order='F'), lat_rdaps.ravel(order='F')])
+points = np.array([lon_rdaps.ravel(order='F'), lat_rdaps.ravel(order='F')]).T
 del lon_rdaps, lat_rdaps
 
 YEARS = [2016]
