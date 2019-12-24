@@ -15,7 +15,7 @@ import time
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
 raw_data_path = os.path.join(data_base_dir, 'Raw', 'BESS') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'BESS')
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km', 'BESS')
 
 mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_bess.mat')) # lon_bess, lat_bess
 points = np.array([mat['lon_bess'].ravel(order='F'), mat['lat_bess'].ravel(order='F')]).T
