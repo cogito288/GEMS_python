@@ -10,8 +10,11 @@ import numpy as np
 from numba import njit
 
 ### Setting path
-data_base_dir = os.path.join(project_path, 'Data')
-path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI') 
+#data_base_dir = os.path.join(project_path, 'Data')
+#path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI') 
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI_tempConv')
+
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
