@@ -82,7 +82,7 @@ for yr in YEARS:
         data[rcf>=0.3]=np.nan
         data[sza>=78]=np.nan
         data_yr[:, doy-1] = data.ravel(order='F')
-    out_fname = os.path.join(path_write, f'OMSO2d_{yr}.mat')
+    out_fname = os.path.join(path_write, f'OMSO2e_m_{yr}.mat')
     matlab.check_make_dir(os.path.dirname(out_fname))
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
