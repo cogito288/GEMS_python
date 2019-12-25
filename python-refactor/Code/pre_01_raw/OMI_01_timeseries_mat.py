@@ -26,7 +26,7 @@ print ('OMNO2d')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_read, 'L3', 'OMNO2d', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMNO2d', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -58,7 +58,7 @@ print ('OMSO2e')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_read, 'L3', 'OMSO2e', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMSO2e', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -95,7 +95,7 @@ print ('OMDOAO3e')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_read, 'L3', 'OMDOAO3e', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMDOAO3e', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -132,7 +132,7 @@ print ('OMHCHOG')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_read, 'L2', 'OMHCHOG', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L2_grid', 'OMHCHOG', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
