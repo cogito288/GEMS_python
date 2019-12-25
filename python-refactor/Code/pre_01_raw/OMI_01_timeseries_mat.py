@@ -76,6 +76,7 @@ for yr in YEARS:
         sza = matlab.h5read(read_fname,
                              '/HDFEOS/GRIDS/OMI Total Column Amount SO2/Data Fields/SolarZenithAngle')
         data = np.float64(data.T); data[data<=-1.2676506e+30] = np.nan 
+        data[data<-10] = np.nan; data[data>2000] = np.nan
         rcf = np.float64(rcf.T); rcf[rcf<=-1.2676506e+30] = np.nan
         sza = np.float64(sza.T); sza[sza<=-1.2676506e+30] = np.nan
         data[rcf>=0.3]=np.nan
