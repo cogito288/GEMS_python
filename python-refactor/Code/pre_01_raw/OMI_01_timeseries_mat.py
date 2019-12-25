@@ -138,7 +138,7 @@ for yr in YEARS:
     
     if yr%4==0: days = 366
     else: days = 365
-
+        
     data_yr = np.ones((1036800, days))*np.nan        
     for read_fname in file_list:
         temp = os.path.basename(read_fname)
@@ -165,7 +165,7 @@ for yr in YEARS:
             VCD_temp = VCD[:,:,k]
             QA_temp = QA[:,:,k]
             sza_temp = sza[:,:,k]
-
+            
             VCD_temp[QA_temp!=0] = np.nan #  Good columns (0) / Suspect columns (1) / Bad columns (2) / missing (<0)
             VCD_temp[sza_temp>88] = np.nan
             VCD_filtered[:,:,k] = VCD_temp
