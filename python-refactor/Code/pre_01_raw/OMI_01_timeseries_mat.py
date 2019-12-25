@@ -173,7 +173,7 @@ for yr in YEARS:
         VCD_avg = np.nanmean(VCD_filtered, axis=2)
         data_yr[:, doy-1] = VCD_avg.ravel(order='F')
         del data, VCD, QA, sza
-    out_fname = os.path.join(path_write, f'OMHCHOG_{yr}.mat')
+    out_fname = os.path.join(path_write, f'OMHCHOG_{yr}_DU.mat')
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
     tElapsed = time.time() - tStart
