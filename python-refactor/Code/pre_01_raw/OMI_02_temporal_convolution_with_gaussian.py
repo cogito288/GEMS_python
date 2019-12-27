@@ -16,7 +16,6 @@ data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI_tempConv')
 
 ### Setting period
-#YEARS = [2016] #, 2018, 2019
 pname_list = ['OMNO2d','OMSO2e_m','OMDOAO3e_m','OMHCHOG']
 
 mask = np.zeros((720, 1440))
@@ -44,7 +43,7 @@ for pname in pname_list:
     sigma = 1
     print (f' data shape : {data.shape}')
     
-    #@njit(error_model='numpy')
+    @njit(error_model='numpy')
     def calculate(data):
         data_conv = np.full(data.shape, np.nan)
         for k in range(data.shape[0]):
@@ -58,10 +57,7 @@ for pname in pname_list:
                         x = data[k, n]*w
                         w_sum += w
                         x_sum += x
-                try:
-                    data_conv[k,t] = x_sum/w_sum
-                except ZeroDivisionError:
-                    data_conv[k,t] = np.nan
+                data_conv[k,t] = x_sum/w_sum
             print (k)
         return data_conv
     data_conv = calculate(data)
