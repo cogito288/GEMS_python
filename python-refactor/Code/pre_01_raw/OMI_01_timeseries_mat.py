@@ -43,7 +43,7 @@ for yr in YEARS:
         data[data<=-1.2676506e+30] = np.nan # Assign NaN value to pixel that is out of valid range
         data = data * 3.7216e-17   
         data_yr[:, doy-1] = data.ravel(order='F')
-    out_fname = os.path.join(path_write, f'OMNO2d_{yr}_DU.mat')
+    out_fname = os.path.join(path_write, f'OMNO2d_trop_CS_{yr}_DU.mat')
     matlab.check_make_dir(os.path.dirname(out_fname))
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
