@@ -12,25 +12,12 @@ import glob
 import pandas as pd
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
-
-
-## # for local
-#path_data = '//10.72.26.46/irisnas6/Data/in_situ/AirQuality_China/china_sites/'
-#path = '//10.72.26.56/irisnas5/Data/Station/Station_CN/'
-#addpath(genpath('//10.72.26.56/irisnas5/Data/matlab_func/'))
-
-
-## # for server
-path_data = '/share/irisnas6/Data/in_situ/AirQuality_China/china_sites/'
-path = '/share/irisnas5/Data/Station/Station_CN/'
-## addpath(genpath('/share/irisnas5/Data/matlab_func/'))
-
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_read = os.path.join('/','share','irisnas6','Data','In_situ','AirQuality_China','china_sites')
+path_write = os.path.join(data_base_dir,'Preprocessed_raw', 'Station','Station_CN')
 
 ### Setting period
-YEARS = [2016] #, 2018, 2019]
+YEARS = [2016]
 
 ## cd(path)
 for yr in YEARS: 
@@ -59,7 +46,7 @@ for yr in YEARS:
             
             # station number matrix
             stn_num = stn_tmp.textdata(1,4:end)
-            stn_num = regexprep(stn_num, 'A', '') #stn_num ³»¿¡ ¹®ÀÚ(A) ¾ø¾ÖÁÖ±â
+            stn_num = regexprep(stn_num, 'A', '') #stn_num ë‚´ì— ë¬¸ì(A) ì—†ì• ì£¼ê¸°
             stn_num = str2double(stn_num)
             if stn_num.shape[0] != stn_value[1:,:].shape[0]:
                 idx = stn_num.shape[0] - stn-value[1:,:].shape[0]
@@ -85,12 +72,12 @@ for yr in YEARS:
                 else:
                     #nan, without time
                     print (f'NO data in {tt:2.0f} (Local Time) on {doy:03d}\n',tt,doy)
-#                     stn=[] ÀÌ°Å ´ë½Å¿¡ np.nan matrix ³Ö´Â°É·Î ¼öÁ¤..
+#                     stn=[] ì´ê±° ëŒ€ì‹ ì— np.nan matrix ë„£ëŠ”ê±¸ë¡œ ìˆ˜ì •..
                
                 stn_doy=np.concatenate((stn_doy stn), axis=1)
         else:
             print('NO file in #03i (DOY) \n',doy)
-            # ¿©±â¿¡ ¾Æ¿¹ ºó³¯ np.nan matrix »ı¼ºÇØ¼­ ³Ö´Â°É·Î ¼öÁ¤..
+            # ì—¬ê¸°ì— ì•„ì˜ˆ ë¹ˆë‚  np.nan matrix ìƒì„±í•´ì„œ ë„£ëŠ”ê±¸ë¡œ ìˆ˜ì •..
         stn_yr=np.concatenate((stn_yr stn_doy), axis=1)
     fname = f'stn_code_data_{yr}_finxed_ms.mat'
     matlab.savemat(os.path.join(path, 'stn_code_data'), fname,{'stn_yr':stn_yr})
