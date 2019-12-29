@@ -6,93 +6,85 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
+import copy
 import numpy as np
-import glob
 import pandas as pd
+import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
-
-
-## # for local
-#path_data = '//10.72.26.46/irisnas6/Data/in_situ/AirQuality_China/china_sites/'
-#path = '//10.72.26.56/irisnas5/Data/Station/Station_CN/'
-#addpath(genpath('//10.72.26.56/irisnas5/Data/matlab_func/'))
-
-
-## # for server
-path_data = '/share/irisnas6/Data/in_situ/AirQuality_China/china_sites/'
-path = '/share/irisnas5/Data/Station/Station_CN/'
-## addpath(genpath('/share/irisnas5/Data/matlab_func/'))
-
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+raw_path = os.path.join(data_base_dir, 'Raw') 
+station_path = os.path.join(data_base_dir, 'Station') 
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
 
-## cd(path)
 for yr in YEARS: 
-    if yt#4==0: days= 366
+    if yr%4==0: days= 366
     else: days=365
     if yr==2019: days=151
-
         
-    flist = glob.glob(os.path.join(path_data,str(yr),'/*.csv'))
-    flist = [os.path.basename(f) for f in flist]
+    flist = glob.glob(os.path.join(raw_path, 'AirQuality_China', 'china_sites', str(yr),'*.csv'))
+    flist = [os.path.basename(fname) for fname in flist]
     
-    stn_yr = []
-    for doy in range(1,days):
+    stn_yr = None
+    for doy in range(1,days+1):
         stn_doy=[]
-        [mm,dd]=ddd2mmdd(yr,doy) #converting doy to day and month
-        fname = [f'china_sites_{yr}{m:02d}{d:02d}.csv' for m, d in zip(mm,dd)]
+        _, mm, dd = matlab.get_ymd(yr, doy) #converting doy to day and month
+        fname = f'china_sites_{yr}{mm:02d}{dd:02d}.csv'
         
-        if fname in flist: #ismember(fname,flist)
-            num,txt,stn_tmp = pd.read_excel(os.path.join(path_data, str(yr), fname)
-            #[num,txt,stn_tmp]=xlsread([path_data, str(yr),'/',fname])
+        print (fname)
+        print (fname in flist)
+        if fname in flist: 
+            stn_tmp = pd.read_csv(os.path.join(raw_path, 'AirQuality_China', 'china_sites', str(yr), fname))
             
             # observation matrix
-            stn_value = stn_tmp.data
-            stn_date = str2double(stn_tmp.textdata(2:end,2))
-            stn_value = np.concatenate((stn_date,stn_value), axis=1) # observation with time
+            stn_value = stn_tmp.values
+            stn_date = stn_tmp['date'].values.reshape(-1,1)
+            stn_value = np.concatenate((stn_date, stn_value), axis=1) # observation with time
             
             # station number matrix
-            stn_num = stn_tmp.textdata(1,4:end)
-            stn_num = regexprep(stn_num, 'A', '') #stn_num ³»¿¡ ¹®ÀÚ(A) ¾ø¾ÖÁÖ±â
-            stn_num = str2double(stn_num)
-            if stn_num.shape[0] != stn_value[1:,:].shape[0]:
-                idx = stn_num.shape[0] - stn-value[1:,:].shape[0]
-                stn_value[end+1:end+idx,:] = np.nan
-            
+            stn_num = stn_tmp.columns[3:]
+            stn_num = [col.replace('A','') for col in stn_num]
+            stn_num = [float(col) for col in stn_num]
+            if len(stn_num) != stn_value[1:,:].shape[0]:
+                idx = len(stn_num) - stn_value[1:,:].shape[0]
+                nan_arr = np.zeros([idx, stn_value.shape[1]])*np.nan
+                stn_value = np.concatenate([stn_value, nan_arr], axis=0)
+             
             # header
-            header = ['doy','yr','mm','dd','time',stn_tmp.textdata(2:16,3)]+stn_num # characters(header)
+            header = ['doy','yr','mm','dd','time']+list(stn_tmp.columns[1:16])+[stn_tmp.columns[2]]+['stn_num'] # characters(header)
             #{'doy','yr','mm','dd','time','AQI','PM2.5','PM2.5_24h','PM10',...
             #   'PM10_24h','SO2','SO2_24h','NO2','NO2_24h','O3','O3_24h','O3_8h','O3_8h_24h','CO','CO_24h','stn_num'}
-            
+            stn_doy = None
             for tt in range(23+1): # tt: china local time
-                stn=np.full((stn_num.shape[0], 21), np.nan)
-                stn[:,0] =doy
-                stn[:,1] =yr
-                stn[:,2] =mm
-                stn[:,3] =dd
-                stn[:,4] =tt
-                stn[:,20] =stn_num
+                stn = np.full((len(stn_num), 21), np.nan)
+                stn[:,0] = doy
+                stn[:,1] = yr
+                stn[:,2] = mm
+                stn[:,3] = dd
+                stn[:,4] = tt
+                stn[:,20] = stn_num
                 
-                ttidx = nmp.sum(stn_value[0,:]==tt)
+                ttidx = np.sum(stn_tmp[stn_tmp['hour']==tt][stn_tmp.columns[3:]].values)
+                print (ttidx)
                 if ttidx>0:
-                    stn[:,5:20] = stn_value[1:,stn_value[0,:]==tt] # without time
+                    stn[:,5:20] = stn_tmp[stn_tmp['hour']==tt][stn_tmp.columns[3:]].values.T # without time
                 else:
                     #nan, without time
-                    print (f'NO data in {tt:2.0f} (Local Time) on {doy:03d}\n',tt,doy)
-#                     stn=[] ÀÌ°Å ´ë½Å¿¡ np.nan matrix ³Ö´Â°É·Î ¼öÁ¤..
-               
-                stn_doy=np.concatenate((stn_doy stn), axis=1)
+                    print (f'NO data in {tt:2.0f} (Local Time) on {doy:03d}\n',tt,doy)     
+                if stn_doy is None:
+                    stn_doy = stn
+                else:
+                    stn_doy = np.concatenate((stn_doy, stn), axis=0)
         else:
             print('NO file in #03i (DOY) \n',doy)
-            # ¿©±â¿¡ ¾Æ¿¹ ºó³¯ np.nan matrix »ı¼ºÇØ¼­ ³Ö´Â°É·Î ¼öÁ¤..
-        stn_yr=np.concatenate((stn_yr stn_doy), axis=1)
+            # ì—¬ê¸°ì— ì•„ì˜ˆ ë¹ˆë‚  nan matrix ìƒì„±í•´ì„œ ë„£ëŠ”ê±¸ë¡œ ìˆ˜ì •..
+        if stn_yr is None:
+            stn_yr = stn_doy
+        else:
+            stn_yr=np.concatenate((stn_yr, stn_doy), axis=0)
+        
     fname = f'stn_code_data_{yr}_finxed_ms.mat'
-    matlab.savemat(os.path.join(path, 'stn_code_data'), fname,{'stn_yr':stn_yr})
+    matlab.savemat(os.path.join(station_path, 'Station_CN', 'stn_code_data', fname), {'stn_yr':stn_yr})
     print (yr)
-

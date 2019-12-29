@@ -11,10 +11,11 @@ from rasterio import features
 from rasterio.mask import mask
 from rasterio.warp import reproject
 import rasterio as rio
+import time
 
 ### Setting path
-data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MYD13A2')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_myd_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MYD13A2')
 maskfile = os.path.join(data_base_dir, 'Raw', 'mask', 'r_mask_korea.tif')
 with rio.open(maskfile) as masksrc:
     band = masksrc.read(1)
@@ -26,10 +27,11 @@ with rio.open(maskfile) as masksrc:
 YEARS = [2016]
 for yr in YEARS:
     print(yr)
-    flist = glob.glob(os.path.join(path_modis, '02prj_GCS_WGS84', str(yr), "*.tif"))
+    flist = glob.glob(os.path.join(path_myd_processed, '02prj_GCS_WGS84', str(yr), "*.tif"))
     flist.sort()
     for src_dataset in flist:
-        dst_dataset = os.path.join(path_modis, '03mask_SouthKorea_MYD13A2', str(yr), f'm_{os.path.basename(src_dataset)[2:]}')
+        tStart = time.time()
+        dst_dataset = os.path.join(path_myd_processed, '03mask_SouthKorea_MYD13A2', str(yr), f'm_{os.path.basename(src_dataset)[2:]}')
         matlab.check_make_dir(os.path.dirname(dst_dataset))
         with rio.open(src_dataset) as src:
             kwargs = src.meta.copy()
@@ -63,4 +65,6 @@ for yr in YEARS:
                     with rio.open(dst_dataset, 'w', **out_meta) as dst:
                         dst.write(out_img)
             os.remove(temp_dataset)
+        tElapsed = time.time() - tStart
+        print (f'time taken : {tElapsed}')
         print (os.path.basename(dst_dataset))

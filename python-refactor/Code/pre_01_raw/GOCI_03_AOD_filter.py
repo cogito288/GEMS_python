@@ -6,22 +6,22 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
 import numpy as np
 import glob
+import time
 from numba import njit
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-data_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_goci_aod = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
+path_goci_filter = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_filtered')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
 num_utc = 8
 
 @njit # for speed up using numba
-def moving_window_2d(bfr_arr, nan_arr):
+def moving_window_2d(utc, bfr_arr, nan_arr):
     # arr is GOCI_aod_bfr
     for j in range(3, 465+1):
         for i in range(3, 475+1):
@@ -36,7 +36,7 @@ def moving_window_2d(bfr_arr, nan_arr):
             box_var = np.nanvar(box.T.flatten()) #, ddof=1)
             if box_var > 0.5:
                 nan_arr[i-3, j-3, utc-1, 0] = 1
-    return bfr_arr, nan_arr
+    return nan_arr
 
 
 for yr in YEARS:
@@ -45,20 +45,22 @@ for yr in YEARS:
     if yr==2019:
         days = 148
     
-    list_aod = glob.glob(os.path.join(data_path, 'AOD', str(yr), '*.mat'))
+    list_aod = glob.glob(os.path.join(path_goci_aod, 'AOD', str(yr), '*.mat'))
     list_aod = [os.path.basename(f) for f in list_aod]
+    list_aod.sort()
     list_date = [x[9:20] for x in list_aod]
 
     for doy in range(1, days+1):
         nan_filter = np.zeros((473, 463, 8, 4))
         data = np.full([473, 463, 8], np.nan)    
         for utc in range(num_utc):
-            fname = os.path.join(data_path, 'AOD', 
+            tStart = time.time()
+            fname = os.path.join(path_goci_aod, 'AOD', 
                                  str(yr), f'GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat')
             GOCI_aod = matlab.loadmat(fname)['GOCI_aod']
             data[:, :, utc] = GOCI_aod
 
-            fname = os.path.join(data_path, 'No_of_Used_500m_Pixels_for_One_6km_Product_Pixel', 
+            fname = os.path.join(path_goci_aod, 'No_of_Used_500m_Pixels_for_One_6km_Product_Pixel', 
                                  str(yr), f'GOCI_num_used_pixels_{yr}_{doy:03d}_{utc:02d}.mat')
             GOCI_num_used_pixels = matlab.loadmat(fname)['GOCI_num_used_pixels']
 
@@ -83,6 +85,8 @@ for yr in YEARS:
         nan_filter[:, :, :, 3] = np.tile(d_idx, (1, 1, 8))
         print (nan_filter.sum())
         fname = f'nan_filter_{yr}_{doy:03d}.mat'
-        matlab.savemat(os.path.join(write_path, 'nan_filter', fname), {'nan_filter':nan_filter})
+        matlab.savemat(os.path.join(path_goci_filter, 'nan_filter', fname), {'nan_filter':nan_filter})
+        tElapsed = time.time() - tStart
+        print (f'time taken : {tElapsed}')
         print (f'Created {fname}')
     print (yr)

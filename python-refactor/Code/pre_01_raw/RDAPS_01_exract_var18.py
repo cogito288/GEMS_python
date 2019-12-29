@@ -6,34 +6,29 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
 import numpy as np
 import glob
-import time
-import h5py 
 import pygrib
+import time
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-rdaps_path = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
-#path = '/share/irisnas2/Data/Aerosol/RDAPS/';
-#path_data = '/share/irisnas2/Data/Aerosol/00_raw_data/RDAPS/';
-#run('/share/irisnas3/Data/drought/GLDAS/nctoolbox-1.1.3/nctoolbox-1.1.3/setup_nctoolbox.m');
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_rdaps_raw = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
+path_rdaps_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
 
 for yr in YEARS:
-    curr_path = os.path.join(rdaps_path, str(yr))
-    list_char = glob.glob(os.path.join(curr_path, '*000.*.gb2'))
-    list_char = [os.path.basename(f) for f in list_char]
-    list_char.sort()
+    file_list = glob.glob(os.path.join(path_rdaps_raw, str(yr), '*000.*.gb2'))
+    file_list.sort()
     doy_000 = matlab.datenum(f'{yr}0101')-1
     rdaps = np.full((419,491,18), np.nan) 
     
-    for i, fname in enumerate(list_char):
-        rdaps_data = pygrib.open(os.path.join(curr_path, fname))
+    for i, fname in enumerate(file_list):
+        tStart = time.time()
+        print (fname)
+        rdaps_data = pygrib.open(fname)
         
         data = rdaps_data.select(name='Temperature', typeOfLevel='heightAboveGround')[0].values
         rdaps[:,:,0] = np.squeeze(data)
@@ -73,10 +68,12 @@ for yr in YEARS:
         rdaps[:,:,17] = np.squeeze(data)
         
         
-        doy = matlab.datenum(fname[21:29])-doy_000
-        utc = int(fname[29:31])
+        doy = matlab.datenum(os.path.basename(fname)[21:29])-doy_000
+        utc = int(os.path.basename(fname)[29:31])
         #fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}_006.mat'
         fname = f'RDAPS_{yr}_{doy:03d}_{utc:02d}.mat'
-        matlab.savemat(os.path.join(write_path, str(yr), fname), {'rdaps':rdaps})
+        matlab.savemat(os.path.join(path_rdaps_processed, str(yr), fname), {'rdaps':rdaps})
         print (fname)
+        tElapsed = time.time() - tStart
+        print (f'{tElapsed} second')
     print (yr)

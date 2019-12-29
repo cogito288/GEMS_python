@@ -6,9 +6,10 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
+import time
 import numpy as np
 import rasterio as rio
-from scipy.interploate import griddata
+from scipy.interpolate import griddata
 
 ### Setting path
 data_base_dir = os.path.join(project_path, 'Data')
@@ -20,9 +21,10 @@ lon_goci, lat_goci = mat['lon_goci'], mat['lat_goci']
 del mat
 
 mat = matlab.loadmat(os.path.join(data_base_dir,'grid','grid_SRTM_1km.mat'))
-points = np.array([mat['lon_gcs_1km'].ravel(order='F'), mat['lat_gcs_1km'].ravel(order='F')]).T
+points = np.array([mat['lon_SRTM_1km'].ravel(order='F'), mat['lat_SRTM_1km'].ravel(order='F')]).T
 del mat
 
+print ('SRTM points : ', points.shape)
 # SRTM DEM
 with rio.open(os.path.join(data_base_dir, 'grid', 'SRTM_DEM_1km.tif')) as src:
     dem = src.read(1)
@@ -32,11 +34,13 @@ dem[dem<0] = np.nan
 values = dem.ravel(order='F')
 dem = griddata(points, values, (lon_goci, lat_goci), methods='linear')
 matlab.savemat(os.path.join(path_write, 'stationary', 'EA6km_SRTM_DEM.mat'), {'dem':dem})
+del points, values
 
 # Population density
 mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_EA_30sec_GPWv4_PopDens.mat')) 
 points = np.array([mat['lon_EA_30sec'].ravel(order='F'), mat['lat_EA_30sec'].ravel(order='F')]).T
 del mat
+print ('EA 30sec points :', points.shape)
 
 popDens_all = np.zeros((3600, 4800, 21))
 for yr in range(2000, 2020+1, 5):
@@ -73,14 +77,22 @@ popDens_all[:,:,18] = common_term*(3/5) + popDens_all[:,:,15]
 popDens_all[:,:,19] = common_term*(4/5) + popDens_all[:,:,15]
 
 for yr in range(2000, 2020+1):
+    tStart = time.time()
     values = popDens_all[:,:,yr-2000].ravel(order='F')
     popDens = griddata(points,values,(lon_goci,lat_goci),'linear')
     matlab.savemat(os.path.join(path_write, 'PopDens', f'EA6km_popDens_{yr}.mat'), \
                    {'popDens':popDens})
+    tElapsed = time.time() - tStart
+    print (f'time taken : {tElapsed}')
+    print ('PopDens'+ f'EA6km_popDens_{yr}.mat')
+    del popDens, values
+del points
+
 # Road density
 mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_GRIP4_8km.mat')) 
 points = np.array([mat['lon_GRIP4_8km'].ravel(order='F'), mat['lat_GRIP4_8km'].ravel(order='F')]).T
 del mat
+print ('grid_GRIP4_8km points :', points.shape)
 
 with rio.open(os.path.join(data_base_dir, 'Preprocessed_raw', 
            'roadDens', 'EA_GRIP4_TOTAL_DENS_m_km2.tif')) as src:
@@ -91,3 +103,4 @@ roadDens[roadDens==src.nodata] = np.nan
 values = roadDens.ravel(order='F')
 roadDens = griddata(points,values,(lon_goci,lat_goci),'linear')
 matlab.savemat(os.path.join(path_write, 'stationary', 'EA6km_roadDens.mat'), {'roadDens':roadDens})
+print ('EA6km_roadDens.mat')

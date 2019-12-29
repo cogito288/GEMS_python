@@ -6,25 +6,17 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
+import copy
 import numpy as np
-import glob
 import pandas as pd
+import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
-
-# # for local 
-# # path_nas6 = '//10.72.26.56/irisnas5/Data/Station/Station_JP/'
-# # addpath(genpath('//10.72.26.56/irisnas5/Data/matlab_func/'))
-# for server
-path_nas6 = '/share/irisnas5/Data/Station/Station_JP/'
-#addpath(genpath('/share/irisnas5/Data/matlab_func/'))
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+raw_path = os.path.join(data_base_dir, 'Raw') 
+station_path = os.path.join(data_base_dir, 'Station') 
 
 ## STN_header
-
 # Korea station_header
 # {'DOY','year','month','day','time','SO2','CO','O3','NO2','PM10','PM25','Lat','Lon','station'}
 
@@ -36,22 +28,26 @@ path_nas6 = '/share/irisnas5/Data/Station/Station_JP/'
 #   'PM10_24h','SO2','SO2_24h','NO2','NO2_24h','O3','O3_24h','O3_8h','O3_8h_24h','CO','CO_24h','stn_num'}
 
 ##
-stn_JP = []
-YEARS = [2019]
+stn_JP = None
+YEARS = [2016]
 for yr in YEARS:
-    if yr%4==0:  days= 366; else: days=365;
-    fname = f'jp_stn_code_data_{yr}.mat'
-    mat = matlab.loadmat(os.path.join(path_nas6,fname))
-
-    stn_yr = stn
-    stn_yr[stn_yr==-9999]=np.nan
-    stn_num = np.unique(stn_yr[:,])
+    if yr%4==0:  days= 366; 
+    else: days=365;
+    stn = matlab.loadmat(os.path.join(station_path, 'Station_JP', f'jp_stn_code_data_{yr}.mat'))['stn']
+    stn_yr = copy.deepcopy(stn)
+    stn_yr[stn_yr==-9999] = np.nan
+    stn_num = np.unique(stn_yr[:,-1])
     
-    stn_doy = []
-    PM10 = []; PM25 = [];  O3 = []; NO2 = []; CO = []; SO2 = []
+    stn_doy = None
+    PM10 = np.zeros((len(stn_num), 9))
+    PM25 = np.zeros((len(stn_num), 9))
+    O3 = np.zeros((len(stn_num), 9))
+    NO2 = np.zeros((len(stn_num), 9))
+    CO = np.zeros((len(stn_num), 9))
+    SO2 = np.zeros((len(stn_num), 9))
     for doy in range(1,days+1):
-        for i in range(1, matlab.length(stn_num)+1):
-            for tt in range(9, 16+1): 9:16 # tt: china local time(GEMS time resoluion(9-16KST))
+        for i in range(1, len(stn_num)+1):
+            for tt in range(9, 16+1): # tt: china local time(GEMS time resoluion(9-16KST))
                 try:
                     stn = stn_yr[stn_yr[:,0]==doy & stn_yr[:,4]==tt,:]
                     stn[stn[:,5]>20,5] =np.nan
@@ -60,30 +56,30 @@ for yr in YEARS:
                     stn[stn[:,8]>300,8] =np.nan
                     stn[stn[:,9]>600,9] =np.nan
                     stn[stn[:,10]>1000,10] =np.nan
-                    CO[i,tt-6] = stn[i,5]
-                    SO2[i,tt-6] = stn[i,6]
-                    O3[i,tt-6] = stn[i,7]
-                    NO2[i,tt-6] = stn[i,8]
-                    PM10[i,tt-6] =stn[i,9]
-                    PM25[i,tt-6] =stn[i,10]
+                    CO[i,tt-8] = stn[i,5]
+                    SO2[i,tt-8] = stn[i,6]
+                    O3[i,tt-8] = stn[i,7]
+                    NO2[i,tt-8] = stn[i,8]
+                    PM10[i,tt-8] =stn[i,9]
+                    PM25[i,tt-8] =stn[i,10]
                     print (tt)
                 except:
-                    CO[i,tt-6] =np.nan
-                    SO2[i,tt-6] =np.nan
-                    O3[i,tt-6] =np.nan
-                    NO2[i,tt-6] =np.nan
-                    PM10[i,tt-6] =np.nan
-                    PM25[i,tt-6] = np.nan                          
+                    CO[i,tt-8] =np.nan
+                    SO2[i,tt-8] =np.nan
+                    O3[i,tt-8] =np.nan
+                    NO2[i,tt-8] =np.nan
+                    PM10[i,tt-8] =np.nan
+                    PM25[i,tt-8] = np.nan                          
                     print (f'NO file in {doy:3.0f} (DOY) \n')
             print (i)
         
-        SEM[:,0] = 3.291*np.nanstd(CO)/np.sqrt(CO.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        SEM[:,1] = 3.291*np.nanstd(SO2)/np.sqrt(SO2.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        SEM[:,2] = 3.291*np.nanstd(O3)/np.sqrt(O3.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        SEM[:,3] = 3.291*np.nanstd(NO2)/np.sqrt(NO2.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        SEM[:,4] = 3.291*np.nanstd(PM10)/np.sqrt(PM10.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        SEM[:,5] = 3.291*np.nanstd(PM25)/np.sqrt(PM25.shape[1])) #to remove all those outside of the 99.9# confidence limits
-        conc_mean = [np.nanmean(CO,axis=1),np.nanmean(SO2,axis=1), np.nanmean(O3,axis=1), np.nanmean(NO2,axis=1),np.nanmean(PM10,axis=1),np.nanmean(PM25,axis=1)]
+        SEM[:,0] = 3.291*np.nanstd(CO)/np.sqrt(CO.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        SEM[:,1] = 3.291*np.nanstd(SO2)/np.sqrt(SO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        SEM[:,2] = 3.291*np.nanstd(O3)/np.sqrt(O3.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        SEM[:,3] = 3.291*np.nanstd(NO2)/np.sqrt(NO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        SEM[:,4] = 3.291*np.nanstd(PM10)/np.sqrt(PM10.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        SEM[:,5] = 3.291*np.nanstd(PM25)/np.sqrt(PM25.shape[1]) #to remove all those outside of the 99.9# confidence limits
+        conc_mean = np.concatenate([np.nanmean(CO,axis=1),np.nanmean(SO2,axis=1), np.nanmean(O3,axis=1), np.nanmean(NO2,axis=1),np.nanmean(PM10,axis=1),np.nanmean(PM25,axis=1)], axis=1)
         th[:,0] =SEM[:,0]+conc_mean[:,0]
         th[:,1] =SEM[:,1]+conc_mean[:,1]
         th[:,2] =SEM[:,2]+conc_mean[:,2]
@@ -99,18 +95,22 @@ for yr in YEARS:
             PM25[ii,PM25[ii,:]>th[ii,5]]=np.nan
         
         try:
-          stn_tt = []
+            stn_tt = []
             for tt2 in range(9,16+1):
                 stn = ndata[ndata[:,0]==doy & ndata[:,4]==tt,:]
                 stn[:,5:11] = np.concatenate((PM25[:,tt2-8], PM10[:,tt2-8], SO2[:,tt-8], NO2[:,tt-8], O3[:,tt-8], CO[:,tt-8]), axis=1)
-                stn_tt = np.concatenate((stn_tt, stn), axis=0)
-            
+                stn_tt = np.concatenate((stn_tt, stn), axis=0)           
         except:
             print (f'NO file in {doy:3.0f} (DOY) \n')
         print (doy)
-        stn_doy = np.concatenate((stn_doy, stn_tt), axis=0)
-    
-    stn_JP = np.concatenate((stn_JP, stn_doy), axis=0)
+        if stn_doy is None:
+            stn_doy = stn_tt
+        else:
+            stn_doy = np.concatenate((stn_doy, stn_tt), axis=0)
+    if stn_JP is None:
+        stn_JP = stn_doy
+    else:
+        stn_JP = np.concatenate((stn_JP, stn_doy), axis=0)
     fname = f'stn_code_data_rm_outlier_{yr}.mat'
     matlab.savemat(os.path.join(path_nas6,'stn_code_data'), fname, {'stn_JP':stn_JP})
     print (yr)

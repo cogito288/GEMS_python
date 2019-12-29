@@ -6,30 +6,25 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
+import copy
 import numpy as np
-import glob
 import pandas as pd
+import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
-# path_nas6 = '//10.72.26.46/irisnas6/Work/Aerosol/'
-# addpath('//10.72.26.46/irisnas2/Work/Aerosol/matlab_func/')
-path_nas6 = '/share/irisnas6/Work/Aerosol/'
-#addpath('/share/irisnas6/Work/Aerosol/matlab_func/')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_preprocessed = os.path.join(data_base_dir, 'Preprocessed_raw')
 
 ##
 YEARS = [2015, 2016]
 for yr in YEARS:
     if yr ==2016: days = 366
     else: days = 365
-    
     for doy in range(1, days+1):
         for utc in range(7+1):
             fname = f'cases_EA6km_{yr}_{doy:03d}_{utc:02d}.mat'
-            matlab.loadmat(os.path.join(path_nas6,'EA_GOCI6km/cases_mat', fname))
+            mat = matlab.loadmat(os.path.join(path_preprocessed,'EA_GOCI6km/cases_mat', fname))
+            data_tbl = pd.DataFrame(
             data = data_tbl.values
             data = data[:,[3:19,27:31,34:37]] # extract specific variables for PMs
             del data_tbl

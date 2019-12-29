@@ -10,14 +10,12 @@ from scipy.io import netcdf
 import numpy as np
 import glob
 import time
-import h5py 
-import pygrib
 import copy
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-emis_path = os.path.join(data_base_dir, 'Raw', 'EMIS')  
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'EMIS')  
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_emis_raw = os.path.join(data_base_dir, 'Raw', 'EMIS') 
+path_emis_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'EMIS') 
 
 # emiss_header = ['ISOPRENE','TRP1','MEOH','ACET','CH4','NO',
 #     'NO2','NH3','CCHO','HCOOH','HCHO','CCO_OH','BALD','MEK','RCO_OH',
@@ -36,7 +34,7 @@ for yr in YEARS:
     if (yr%4)==0: days=366
     else: days=365
 
-    curr_path = os.path.join(emis_path, KNU_dir, str(yr))
+    curr_path = os.path.join(path_emis_raw, KNU_dir, str(yr))
     list_date = list(range(matlab.datenum(f'{yr}0101'), matlab.datenum(f'{yr}1231')+1))
     list_date = [str(matlab.datestr(d)) for d in list_date] # '2016-01-01' format
     list_date = [x[:4]+x[5:7]+x[8:] for x in list_date] #  '20160101' format
@@ -76,13 +74,13 @@ for yr in YEARS:
             if k==23: # last
                 if doy==days: # last
                     fname = f'emiss_27km_{yr+1}_001_00.mat'
-                    matlab.savemat(os.path.join(write_path, KNU_dir, str(yr+1), fname), {'emiss':emiss})
+                    matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr+1), fname), {'emiss':emiss})
                 else:
                     fname = f'emiss_27km_{yr}_{doy+1:03d}_00.mat'
-                    matlab.savemat(os.path.join(write_path, KNU_dir, str(yr), fname), {'emiss':emiss})
+                    matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr), fname), {'emiss':emiss})
             else:
                 fname = f'emiss_27km_{yr}_{doy:03d}_{utc:02d}.mat'
-                matlab.savemat(os.path.join(write_path, KNU_dir, str(yr), fname), {'emiss':emiss})
+                matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr), fname), {'emiss':emiss})
         print (f'{yr}_{doy:03d}')
         #except:
         #    print (f'{yr}_{doy:03d}_no_data!!!!')
@@ -102,13 +100,13 @@ for yr in YEARS:
     if (yr%4)==0: days=366
     else: days=365
 
-    curr_path = os.path.join(emis_path, KNU_dir, str(yr))
+    curr_path = os.path.join(path_emis_raw, KNU_dir, str(yr))
     list_date = list(range(matlab.datenum(f'{yr}0101'), matlab.datenum(f'{yr}1231')+1))
     list_date = [str(matlab.datestr(d)) for d in list_date] # '2016-01-01' format
     list_date = [x[:4]+x[5:7]+x[8:] for x in list_date] #  '20160101' format
 
     
-for i, date in enumerate(list_date):
+    for i, date in enumerate(list_date):
         doy = i+1
         fname = f'egts3d_l.{yr}.{date[4:8]}.{KNU_dir}.AQFv1.ncf'
         #try:
@@ -143,13 +141,13 @@ for i, date in enumerate(list_date):
             if k==23: # last
                 if doy==days: # last
                     fname = f'emiss_9km_{yr+1}_001_00.mat'
-                    matlab.savemat(os.path.join(write_path, KNU_dir, str(yr+1), fname), {'emiss':emiss})
+                    matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr+1), fname), {'emiss':emiss})
                 else:
                     fname = f'emiss_9km_{yr}_{doy+1:03d}_00.mat'
-                    matlab.savemat(os.path.join(write_path, KNU_dir, str(yr), fname), {'emiss':emiss})
+                    matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr), fname), {'emiss':emiss})
             else:
                 fname = f'emiss_9km_{yr}_{doy:03d}_{utc:02d}.mat'
-                matlab.savemat(os.path.join(write_path, KNU_dir, str(yr), fname), {'emiss':emiss})
+                matlab.savemat(os.path.join(path_emis_processed, KNU_dir, str(yr), fname), {'emiss':emiss})
         print (f'{yr}_{doy:03d}')
         #except:
         #    print (f'{yr}_{doy:03d}_no_data!!!!')

@@ -11,16 +11,17 @@ import rasterio as rio
 import glob
 import time 
 
-data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_mcd_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
 class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
 
 YEARS = [2016]
 for yr in YEARS:
-    src_dataset = os.path.join(path_modis, '03masked_N50W110S20E150', f'm_MODIS_LC_500m_{yr}.tif')
-    dst_dataset = os.path.join(path_modis, '01_reclassified', f'reclass_MODIS_LC_500m_EA_{yr}.tif')
+    tStart = time.time()
+    src_dataset = os.path.join(path_mcd_processed, '03masked_N50W110S20E150', f'm_MODIS_LC_500m_{yr}.tif')
+    dst_dataset = os.path.join(path_mcd_processed, '01_reclassified', f'reclass_MODIS_LC_500m_EA_{yr}.tif')
     matlab.check_make_dir(os.path.dirname(dst_dataset)) # Debugging
-    matlab.check_make_dir(os.path.join(path_modis, '02_LC_binary', str(yr))) # Debugging
+    matlab.check_make_dir(os.path.join(path_mcd_processed, '02_LC_binary', str(yr))) # Debugging
     
     with rio.open(src_dataset) as src:
         band = src.read(1).copy()
@@ -47,7 +48,7 @@ for yr in YEARS:
     with rio.open(dst_dataset) as dst:
         band = dst.read(1).copy()
         for ii, col in enumerate(class_name):
-            dst_dataset02 = os.path.join(path_modis, "02_LC_binary", str(yr), f"MODIS_LC_500m_EA_{col}_{yr}.tif")
+            dst_dataset02 = os.path.join(path_mcd_processed, "02_LC_binary", str(yr), f"MODIS_LC_500m_EA_{col}_{yr}.tif")
             band2 = band.copy()
             band2 = np.where(band2==(ii+1), 1, 0)
             band2 = band2.astype('uint8')
@@ -59,3 +60,5 @@ for yr in YEARS:
             with rio.open(dst_dataset02, 'w', **kwargs) as dst02:
                 dst02.write_band(1, band2)
             print (os.path.basename(dst_dataset02))
+    tElapsed = time.time() - tStart
+    print (f'time taken : {tElapsed}')

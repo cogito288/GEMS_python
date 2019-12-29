@@ -6,19 +6,15 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
+import copy
 import numpy as np
-import glob
 import pandas as pd
+import glob
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
-# path = '//10.72.26.56/irisnas5/Data/Station/Station_JP/'
-# addpath(genpath('//10.72.26.56/irisnas5/Data/matlab_func/'))
-path = '/share/irisnas5/Data/Station/Station_JP/'
-#addpath(genpath('/share/irisnas5/Data/matlab_func/'))
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+raw_path = os.path.join(data_base_dir, 'Raw') 
+station_path = os.path.join(data_base_dir, 'Station') 
 
 ## header
 # station_header
@@ -27,16 +23,15 @@ header = ['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25','scod
 ##
 YEARS = range(2017, 2019+1)
 for yr in YEARS:
-    if yr%4==0: days= 366; else: days=365; 
+    if yr%4==0: days= 366; 
+    else: days=365; 
     if yr==2019: days=151; 
         
-    fname = f'stn_code_data_{yr}.mat'
-    mat = matlab.loadmat(os.path.join(path, 'stn_code_data', fname))
-    stn_yr = mat['stn_yr']
-    ndata = stn_yr
-    scode = np.unique(ndata[:,])
+    stn_yr = matlab.loadmat(os.path.join(station_path, 'Station_JP', 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_yr']
+    ndata = copy.deepcopy(stn_yr)
+    scode = np.unique(ndata[:,-1])
 
-    ndata_org = ndata
+    ndata_org = copy.deepcopy(ndata)
     # SO2
     ndata[:,5]=ndata[:,5]*1000; # ppm to ppb
     ndata[ndata[:,5]>400,5]=np.nan 
@@ -54,18 +49,19 @@ for yr in YEARS:
     ndata[ndata[:,9]>1000,9]=np.nan 
     # PM25
     # [ug/m3]
-    ndata[ndata[:,11]>600,11]=np.nan 
+    ndata[ndata[:,10]>600,10]=np.nan 
     
-    ndata[ndata[:,4]<9 | ndata[:,4]>16,:]=[] ########
-    ndata = matlab.sortrows(ndata,[1,5,12])
+    ndata = np.delete(ndata, ndata[:,4]<9 | ndata[:,4]>16, axis=0)
+    ind = np.lexsort((ndata[:,0],ndata[:,4], ndata[:,11]))    
+    ndata = ndata[ind]
     
-    stn_JP = []
+    stn_JP = None
     for doy in range(1,days+1):
         tStart_doy = time.time()
         ndata_temp = ndata[ndata[:,0]==doy,:]
-        scode_temp = np.unique(ndata_temp[:,])
+        scode_temp = np.unique(ndata_temp[:,-1])
         nstn_temp = scode_temp.shape[0]
-        if (ndata_temp.shape[0]%nstn_temp)==0 && (ndata_temp.shape[0]>=(nstn_temp*4)):
+        if ((ndata_temp.shape[0]%nstn_temp)==0) and (ndata_temp.shape[0]>=(nstn_temp*4)):
             SO2 = ndata_temp[:, 5].reshape((nstn_temp, -1))
             CO = ndata_temp[:, 6].reshape((nstn_temp, -1))
             OX = ndata_temp[:, 7].reshape((nstn_temp, -1))
@@ -85,14 +81,14 @@ for yr in YEARS:
             th = np.full((nstn_temp,6), np.nan)
             
             # Same with Japan_stn_outlier and CN_station_02_rm_outlier
-            SEM[:,0] = 3.291*np.nanstd(CO)/np.sqrt(CO.shape[1])) #to remove all those outside of the 99.9# confidence limits
-            SEM[:,1] = 3.291*np.nanstd(SO2)/np.sqrt(SO2.shape[1])) #to remove all those outside of the 99.9# confidence limits
-            SEM[:,2] = 3.291*np.nanstd(O3)/np.sqrt(O3.shape[1])) #to remove all those outside of the 99.9# confidence limits
-            SEM[:,3] = 3.291*np.nanstd(NO2)/np.sqrt(NO2.shape[1])) #to remove all those outside of the 99.9# confidence limits
-            SEM[:,4] = 3.291*np.nanstd(PM10)/np.sqrt(PM10.shape[1])) #to remove all those outside of the 99.9# confidence limits
-            SEM[:,5] = 3.291*np.nanstd(PM25)/np.sqrt(PM25.shape[1])) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,0] = 3.291*np.nanstd(CO)/np.sqrt(CO.shape[1]) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,1] = 3.291*np.nanstd(SO2)/np.sqrt(SO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,2] = 3.291*np.nanstd(O3)/np.sqrt(O3.shape[1]) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,3] = 3.291*np.nanstd(NO2)/np.sqrt(NO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,4] = 3.291*np.nanstd(PM10)/np.sqrt(PM10.shape[1]) #to remove all those outside of the 99.9# confidence limits
+            SEM[:,5] = 3.291*np.nanstd(PM25)/np.sqrt(PM25.shape[1]) #to remove all those outside of the 99.9# confidence limits
 
-            conc_mean = [np.nanmean(CO,axis=1),np.nanmean(SO2,axis=1), np.nanmean(O3,axis=1), np.nanmean(NO2,axis=1),np.nanmean(PM10,axis=1),np.nanmean(PM25,axis=1)]
+            conc_mean = np.hstack([np.nanmean(CO,axis=1),np.nanmean(SO2,axis=1), np.nanmean(O3,axis=1), np.nanmean(NO2,axis=1),np.nanmean(PM10,axis=1),np.nanmean(PM25,axis=1)])
             th[:,0] =SEM[:,0]+conc_mean[:,0]
             th[:,1] =SEM[:,1]+conc_mean[:,1]
             th[:,2] =SEM[:,2]+conc_mean[:,2]
@@ -102,12 +98,12 @@ for yr in YEARS:
             
             nTime = SO2.shape[1] 
             
-            diff1 = SO2 - matlab.repmat(th[:,0],(1,nTime))
-            diff2 = CO - matlab.repmat(th[:,1],(1,nTime))
-            diff3 = OX - matlab.repmat(th[:,2],(1,nTime))
-            diff4 = NO2 - matlab.repmat(th[:,3],(1,nTime))
-            diff5 = PM10 - matlab.repmat(th[:,4],(1,nTime))
-            diff6 = PM25 - matlab.repmat(th[:,5],(1,nTime))
+            diff1 = SO2 - np.tile(th[:,0],[1,nTime])
+            diff2 = CO - np.tile(th[:,1],[1,nTime])
+            diff3 = OX - np.tile(th[:,2],[1,nTime])
+            diff4 = NO2 - np.tile(th[:,3],[1,nTime])
+            diff5 = PM10 - np.tile(th[:,4],[1,nTime])
+            diff6 = PM25 - np.tile(th[:,5],[1,nTime])
             
             SO2[diff1>0]=np.nan
             CO[diff2>0]=np.nan
@@ -123,20 +119,19 @@ for yr in YEARS:
             PM10[nanidx[:,4]==1,:]=np.nan
             PM25[nanidx[:,5]==1,:]=np.nan
             
-            allvar = np.concatenate((SO2.flatten(),CO.flatten(),OX.flatten(),NO2.flatten(),PM10.flatten(),PM25.flatten()), axis=1) ##
-            nanidx_allvar = np.sum(np.isnan(allvar),axis=1)==6 ##
+            allvar = np.hstack([SO2.ravel(order='F'),CO.ravel(order='F'),OX.ravel(order='F'),NO2.ravel(order='F'),PM10.ravel(order='F'),PM25.ravel(order='F')])
+            nanidx_allvar = np.sum(np.isnan(allvar),axis=1)==6 
             
             ndata_temp[:,5:11]=allvar
-            ndata_temp[nanidx_allvar==1,:]=[] ##
-            stn_JP = np.concatenate((stn_JP, ndata_temp), axis=0)
+            ndata_temp = np.delete(ndata_temp, nanidx_allvar==1, axis=0)
+            if stn_JP is None:
+                stn_JP = ndata_temp
+            else:
+                stn_JP = np.vstack([stn_JP, ndata_temp])
             
             tElapsed_doy = time.time() - tStart_doy
             print (f'{yr}_{doy} -- {tElapsed_doy:3.4f} sec')
         else
-            print (f'Less than 4 hourly data in {doy:03d} (DOY) \n')
-        
-        
-    fname = f'stn_code_data_rm_outlier_{yr}_rm.mat''
-    matlab.savemat(os.path.join(path,'stn_code_data'), fname, {'stn_JP':stn_JP})
+            print (f'Less than 4 hourly data in {doy:03d} (DOY) \n')   
+    matlab.savemat(os.path.join(station_path, 'Station_JP','stn_code_data', f'stn_code_data_rm_outlier_{yr}_rm.mat'), {'stn_JP':stn_JP})
     print (yr)
-

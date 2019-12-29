@@ -6,14 +6,13 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
 import numpy as np
 import glob
+import time
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_goci_aod = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019]
@@ -33,8 +32,9 @@ for yr in YEARS:
     if yr%4==0: days = 366
     else: days = 365
     
-    list_aod = glob.glob(os.path.join(write_path, 'AOD', str(yr), '*.mat'))
+    list_aod = glob.glob(os.path.join(path_goci_aod, 'AOD', str(yr), '*.mat'))
     list_aod = [os.path.basename(x) for x in list_aod]
+    list_aod.sort()
     list_aod2 = [(int(x[14:17]), int(x[18:20])) for x in list_aod] # doy, utc 
     num_utc = 8
     
@@ -52,31 +52,34 @@ for yr in YEARS:
     miss_list = list_all[miss_index]
                          
     for doy, utc in miss_list:
+        tStart = time.time()
         fname_temp = f'{yr}_{doy:03d}_{utc:02d}.mat'
         
         matlab.savemat(
-                   fname=os.path.join(write_path, 'AOD', str(yr),f'GOCI_AOD_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'AOD', str(yr),f'GOCI_AOD_{fname_temp}'),
                    data={'GOCI_aod':GOCI_aod})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'FMF', str(yr),f'GOCI_FMF_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'FMF', str(yr),f'GOCI_FMF_{fname_temp}'),
                    data={'GOCI_fmf':GOCI_fmf})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'SSA', str(yr),f'GOCI_SSA_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'SSA', str(yr),f'GOCI_SSA_{fname_temp}'),
                    data={'GOCI_ssa':GOCI_ssa})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'AE', str(yr),f'GOCI_SSA_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'AE', str(yr),f'GOCI_AE_{fname_temp}'),
                    data={'GOCI_ae':GOCI_ae})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'Type', str(yr),f'GOCI_Type_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'Type', str(yr),f'GOCI_Type_{fname_temp}'),
                    data={'GOCI_type':GOCI_type})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'No_of_Used_500m_Pixels_for_One_6km_Product_Pixel', str(yr),f'GOCI_num_used_pixels_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'No_of_Used_500m_Pixels_for_One_6km_Product_Pixel', str(yr),f'GOCI_num_used_pixels_{fname_temp}'),
                    data={'GOCI_num_used_pixels':GOCI_num_used_pixels})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'NDVI', str(yr),f'GOCI_NDVI_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'NDVI', str(yr),f'GOCI_NDVI_{fname_temp}'),
                    data={'GOCI_ndvi':GOCI_ndvi})
         matlab.savemat(
-                   fname=os.path.join(write_path, 'DAI', str(yr),f'GOCI_DAI_{fname_temp}'),
+                   fname=os.path.join(path_goci_aod, 'DAI', str(yr),f'GOCI_DAI_{fname_temp}'),
                    data={'GOCI_dai':GOCI_dai})
         print (fname_temp)
+        tElapsed = time.time() - tStart
+        print (f'Time taken : {tElapsed}')
     print (yr)

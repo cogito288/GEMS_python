@@ -163,6 +163,7 @@ def loadmat(path):
                         result[key] = result[key].T
     except OSError:
         result = sio.loadmat(path)
+        pass
     return result
 
     

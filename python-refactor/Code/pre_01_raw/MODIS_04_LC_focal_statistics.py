@@ -7,12 +7,13 @@ sys.path.insert(0, project_path)
 from Code.utils import matlab
 
 import numpy as np
-from numba import njit
 import rasterio as rio
+from numba import njit
 from scipy.ndimage.filters import generic_filter as gf
+import time
 
-data_base_dir = os.path.join(project_path, 'Data')
-path_modis = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_mcd_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1')
 class_name = ["forest","shrub","savannas","grass","wetland","crop","urban","snow","barren","water"]
 
 @njit
@@ -25,8 +26,9 @@ mask = x**2 + y**2 <= radius**2
 YEARS = [2016]
 for yr in YEARS:
     for col in class_name:
-        input_file = os.path.join(path_modis, '02_LC_binary', str(yr), f"MODIS_LC_500m_EA_{col}_{yr}.tif")
-        output_file = os.path.join(path_modis, "03_LC_ratio", str(yr), f"EA_{col}_ratio_r6_500m_{yr}.tif")
+        tStart = time.time()
+        input_file = os.path.join(path_mcd_processed, '02_LC_binary', str(yr), f"MODIS_LC_500m_EA_{col}_{yr}.tif")
+        output_file = os.path.join(path_mcd_processed, "03_LC_ratio", str(yr), f"EA_{col}_ratio_r6_500m_{yr}.tif")
         
         matlab.check_make_dir(os.path.dirname(output_file))
         
@@ -41,4 +43,5 @@ for yr in YEARS:
             with rio.open(output_file, 'w', **kwargs) as dst:
                 dst.write(circular_mean, 1)
         print (os.path.basename(output_file))
-        
+        tElapsed = time.time() - tStart
+        print (f'time taken : {tElapsed}')

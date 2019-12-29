@@ -8,10 +8,11 @@ from Code.utils import matlab
 
 import numpy as np
 from numba import njit
+import time
 
 ### Setting path
-data_base_dir = os.path.join(project_path, 'Data')
-path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI') 
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_omi_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI')
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
@@ -23,16 +24,17 @@ mask = mask.ravel(order='F')
 
 ### Temporal convolution with gaussian
 for pname in pname_list:
+    tStart = time.time()
     print (pname)
     ### Load data
     YEARS = [2016]
     def read_and_mask(yr):
-        if os.path.isfile(os.path.join(path_read, f'{pname}_{yr}_DU.mat')):
-            data_yr = matlab.loadmat(os.path.join(path_read, f'{pname}_{yr}_DU.mat'))['data_yr']
-        elif os.path.isfile(os.path.join(path_read, f'{pname}_trop_CS_{yr}_DU.mat')):
-            data_yr = matlab.loadmat(os.path.join(path_read, f'{pname}_{yr}_DU.mat'))['data_yr']
-        elif os.path.isfile(os.path.join(path_read, f'{pname}_{yr}.mat')):
-            data_yr = matlab.loadmat(os.path.join(path_read, f'{pname}_{yr}.mat'))['data_yr']
+        if os.path.isfile(os.path.join(path_omi_processed, f'{pname}_{yr}_DU.mat')):
+            data_yr = matlab.loadmat(os.path.join(path_omi_processed, f'{pname}_{yr}_DU.mat'))['data_yr']
+        elif os.path.isfile(os.path.join(path_omi_processed, f'{pname}_trop_CS_{yr}_DU.mat')):
+            data_yr = matlab.loadmat(os.path.join(path_omi_processed, f'{pname}_{yr}_DU.mat'))['data_yr']
+        elif os.path.isfile(os.path.join(path_omi_processed, f'{pname}_{yr}.mat')):
+            data_yr = matlab.loadmat(os.path.join(path_omi_processed, f'{pname}_{yr}.mat'))['data_yr']
         else:
             raise ValueError(f'{pname}_{yr}.mat does not exists though variation tried.')
         data_subset = data_yr[mask==1, :]
@@ -63,7 +65,9 @@ for pname in pname_list:
             print (k)
         return data_conv
     data_conv = calculate(data)
-    matlab.savemat(os.path.join(path_read, f'tempConv_{pname}_sigma{sigma}_2005_2019.mat'), 
+    matlab.savemat(os.path.join(path_omi_processed, f'tempConv_{pname}_sigma{sigma}_2005_2019.mat'), 
                    {'data_conv':data_conv, 'data':data})
     #matlab.savemat(os.path.join(path_read, f'tempConv_{pname}_trop_CS_sigma{sigma}_2005_2019.mat'),
     #                {'data_conv':data_conv, 'data':data})
+    tElapsed = time.time() - tStart
+    print (f'{tElapsed} second')
