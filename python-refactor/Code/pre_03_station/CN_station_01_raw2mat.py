@@ -42,19 +42,19 @@ for yr in YEARS:
             stn_tmp = pd.read_csv(os.path.join(raw_path, 'AirQuality_China', 'china_sites', str(yr), fname))
             
             # observation matrix
-            stn_value = stn_tmp.values
-            stn_date = stn_tmp['date'].values.reshape(-1,1)
-            stn_value = np.concatenate((stn_date, stn_value), axis=1) # observation with time
+            stn_value = stn_tmp.iloc[:,3:].values
+            stn_hour = stn_tmp['hour'].values.reshape(-1,1)
+            stn_type = stn_tmp['type'][0:15]
             
             # station number matrix
-            stn_num = stn_tmp.columns[3:]
-            stn_num = [col.replace('A','') for col in stn_num]
-            stn_num = [float(col) for col in stn_num]
-            if len(stn_num) != stn_value[1:,:].shape[0]:
-                idx = len(stn_num) - stn_value[1:,:].shape[0]
-                nan_arr = np.zeros([idx, stn_value.shape[1]])*np.nan
-                stn_value = np.concatenate([stn_value, nan_arr], axis=0)
-             
+            scode = stn_tmp.columns[3:]
+            scode = [int(a[0:4]) for a in scode]
+            
+
+            
+            
+            
+            
             # header
             header = ['doy','yr','mm','dd','time']+list(stn_tmp.columns[1:16])+[stn_tmp.columns[2]]+['stn_num'] # characters(header)
             #{'doy','yr','mm','dd','time','AQI','PM2.5','PM2.5_24h','PM10',...
