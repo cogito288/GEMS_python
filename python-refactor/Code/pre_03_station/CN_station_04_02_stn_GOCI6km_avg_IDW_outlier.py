@@ -13,24 +13,22 @@ import glob
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-raw_path = os.path.join(data_base_dir, 'Raw') 
-station_path = os.path.join(data_base_dir, 'Station') 
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
-mat = matlab.loadmat(os.path.join(station_path,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat')) # period_GOCI.csv 사용해서 만든거
+import scipy.io as sio
+mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat')) # period_GOCI.csv 사용해서 만든거
 cn_dup_scode2_GOCI6km, cn_stn_GOCI6km_location = mat['cn_dup_scode2_GOCI6km'], mat['cn_stn_GOCI6km_location']
 del mat
 
 dup_scode2 = cn_dup_scode2_GOCI6km[:,1:]
 unq_scode2 = cn_stn_GOCI6km_location[cn_stn_GOCI6km_location[:,8]==0, 1]
-idx = []
-for row in range(cn_stn_GOCI6km_location[:,1].shape[0]):
-    idx.append(np.any(np.equal(dup_scode2, cn_stn_GOCI6km_location[row,1]).all(1)))
-dup_dist = cn_stn_GOCI6km_location[idx, [1,7]]
+idx = [val in dup_scode2 for val in cn_stn_GOCI6km_location[:,1]]
+dup_dist = cn_stn_GOCI6km_location[idx][:, [1,7]]
 
 YEARS = [2016] # range(2015, 2019+1)
 for yr in YEARS:
     fname = f'cn_stn_scode_data_rm_outlier_{yr}.mat'
-    ndata_scode = matlab.loadmat(os.path.join(data_base_dir,'Station/Station_CN/stn_scode_data/', fname))['ndata_scode']
+    ndata_scode = matlab.loadmat(os.path.join(path_station,'Station_CN/stn_scode_data/', fname))['ndata_scode']
 
     if yr%4==0: days=366; 
     else: days=365; 
@@ -41,15 +39,11 @@ for yr in YEARS:
         for CST in range(8, 15+1): #= 8:15  # 0:23  ###### 1:24
             stn_temp2 = stn_temp[stn_temp[:,4]==CST,:]
             if len(stn_temp2)!=0:
-                idx = []
-                for row in range(stn_temp2[:,21].shape[0]):
-                    idx.append(np.any(np.equal(unq_scode2, stn_temp2[row,21]).all(1)))
+                idx = [val in unq_scode2 for val in stn_temp2[:,21]]
                 stn_GOCI6km = stn_temp2[idx, :]
 
                 for j in range(dup_scode2.shape[0]):
-                    idx = []
-                    for row in range(stn_temp2[:,21].shape[0]):
-                        idx.append(np.any(np.equal(dup_scode2[j, :], stn_temp2[row,21]).all(1)))
+                    idx = [val in dup_scode2[j,:] for val in stn_temp2[:,21]]
                     stn_GOCI6km_temp = stn_temp2[idx,:]
 
                     if stn_GOCI6km_temp.shape[0]==1:
@@ -81,4 +75,4 @@ for yr in YEARS:
         print (doy)
     cn_stn_GOCI6km_yr=stn_GOCI6km_yr 
     fname = f'cn_Station_GOCI6km_rm_outlier_{yr}_weight.mat'
-    matlab.savemat(os.path.join(data_base_dir,'Station/Station_CN', fname),{'cn_stn_GOCI6km_yr':cn_stn_GOCI6km_yr})
+    matlab.savemat(os.path.join(path_station,'Station_CN', fname),{'cn_stn_GOCI6km_yr':cn_stn_GOCI6km_yr})
