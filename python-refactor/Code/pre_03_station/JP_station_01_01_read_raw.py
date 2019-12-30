@@ -13,8 +13,7 @@ import glob
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-raw_path = os.path.join(data_base_dir, 'Raw') 
-station_path = os.path.join(data_base_dir, 'Station') 
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 # header = {'doy','year','month','day','KST','SO2','CO','O3','NO2','PM10','PM25','scode'}
 pcode = [['01','SO2','ppb'],
@@ -70,15 +69,15 @@ header_p = ['doy','year','month','day','scode','ccode','KST', 'stn_{varname}']
 # '측정년도/측정국코드/시도코드/측정항목코드/측정단위코드/측정월/측정일'
 
 YEARS = [2016] # range(2009, 2009+1)
-for y in YEARS:
-    file_list = glob.glob(os.path.join(station_path, 'Station_JP', str(yr), f'*_{p:02d}.txt'))
-    data= None
+for yr in YEARS:
+    file_list = glob.glob(os.path.join(path_station, 'Station_JP', str(yr), f'*_{p:02d}.txt'))
     for fname in file_list:
         data_temp = pd.read_csv(fname)
         if data is None:
             data = data_temp
         else:
             data = pd.concat([data, data_temp])
+        print (data)
     if varname == 'PM25': #Need to check
         vv = data[:, data.columns[3]]
         idx_PM25 = vv.isin(['PM25'])
@@ -106,5 +105,5 @@ for y in YEARS:
         else:
             data_new= np.vstack([data_new, data_temp])
     vars()[f'stn{varname}_tbl'] = pd.DateFrame(data_new, columns=header_p) 
-    #vars()[f'stn{varname}_tbl'].to_csv(os.path.join(station_path, 'Station_JP', f'JP_stn{varname}_{yr}.csv'))
-    matlab.savemat(os.path.join(station_path, 'Station_JP', f'JP_stn{varname}_{yr}.mat'), vars()[f'stn{varname}_tbl'].to_dict('list'))
+    matlab.savemat(os.path.join(path_station, 'Station_JP', f'JP_stn{varname}_{yr}.mat'), 
+                   {col: vars()[f'stn{varname}_tbl'][col].values for col in vars()[f'stn{varname}_tbl'].columns})

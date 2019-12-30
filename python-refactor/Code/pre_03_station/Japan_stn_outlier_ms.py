@@ -13,8 +13,7 @@ import glob
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-raw_path = os.path.join(data_base_dir, 'Raw') 
-station_path = os.path.join(data_base_dir, 'Station') 
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 ## STN_header
 # Korea station_header
@@ -33,8 +32,8 @@ YEARS = [2016]
 for yr in YEARS:
     if yr%4==0:  days= 366; 
     else: days=365;
-    stn = matlab.loadmat(os.path.join(station_path, 'Station_JP', f'jp_stn_code_data_{yr}.mat'))['stn']
-    stn_yr = copy.deepcopy(stn)
+    stn_yr = matlab.loadmat(os.path.join(path_station, 'Station_JP', f'stn_code_data_{yr}.mat'))['stn_yr']
+    stn_yr = stn_yr.astype('float64')
     stn_yr[stn_yr==-9999] = np.nan
     stn_num = np.unique(stn_yr[:,-1])
     
@@ -49,7 +48,7 @@ for yr in YEARS:
         for i in range(1, len(stn_num)+1):
             for tt in range(9, 16+1): # tt: china local time(GEMS time resoluion(9-16KST))
                 try:
-                    stn = stn_yr[stn_yr[:,0]==doy & stn_yr[:,4]==tt,:]
+                    stn = stn_yr[(stn_yr[:,0]==doy) & (stn_yr[:,4]==tt),:]
                     stn[stn[:,5]>20,5] =np.nan
                     stn[stn[:,6]>400,6] =np.nan
                     stn[stn[:,7]>400,7] =np.nan
@@ -98,7 +97,7 @@ for yr in YEARS:
             stn_tt = []
             for tt2 in range(9,16+1):
                 stn = ndata[ndata[:,0]==doy & ndata[:,4]==tt,:]
-                stn[:,5:11] = np.concatenate((PM25[:,tt2-8], PM10[:,tt2-8], SO2[:,tt-8], NO2[:,tt-8], O3[:,tt-8], CO[:,tt-8]), axis=1)
+                stn[:,5:11] = np.hstack([PM25[:,tt2-8], PM10[:,tt2-8], SO2[:,tt-8], NO2[:,tt-8], O3[:,tt-8], CO[:,tt-8]])
                 stn_tt = np.concatenate((stn_tt, stn), axis=0)           
         except:
             print (f'NO file in {doy:3.0f} (DOY) \n')
@@ -106,11 +105,11 @@ for yr in YEARS:
         if stn_doy is None:
             stn_doy = stn_tt
         else:
-            stn_doy = np.concatenate((stn_doy, stn_tt), axis=0)
+            stn_doy = np.vstack([stn_doy, stn_tt])
     if stn_JP is None:
         stn_JP = stn_doy
     else:
-        stn_JP = np.concatenate((stn_JP, stn_doy), axis=0)
+        stn_JP = np.vstack([stn_JP, stn_doy])
     fname = f'stn_code_data_rm_outlier_{yr}.mat'
-    matlab.savemat(os.path.join(path_nas6,'stn_code_data'), fname, {'stn_JP':stn_JP})
+    matlab.savemat(os.path.join(path_station,'stn_code_data', fname), {'stn_JP':stn_JP})
     print (yr)

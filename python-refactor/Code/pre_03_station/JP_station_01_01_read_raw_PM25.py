@@ -13,8 +13,7 @@ import glob
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-raw_path = os.path.join(data_base_dir, 'Raw') 
-station_path = os.path.join(data_base_dir, 'Station') 
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 p=11; varname = 'PM25'; # p=51
 header_p = ['doy','year','month','day','scode','ccode','KST', f'stn_{varname}']

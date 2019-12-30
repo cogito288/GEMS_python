@@ -28,12 +28,18 @@ for yr in YEARS:
     fname = f'stn_code_data_rm_outlier_{yr}.mat'
     ndata = matlab.loadmat(os.path.join(path_station,'Station_CN', 'stn_code_data', fname))['stn_CN']
     ndata = np.hstack([ndata, np.zeros([ndata.shape[0], 1])])
+    print (ndata[
     ndata_scode = None
     # Assign scode2
     for j in range(stn_info_cn.shape[0]):
         ndata_temp = ndata[ndata[:,-2]==stn_info_cn[j,0],:]
         for k in range(1,5+1): 
             ndata_temp2 = ndata_temp[ndata_temp[:,2]==k,:]
+            print (ndata_temp2.shape)
+            
+            print (ndata_temp2[:10, 17])
+            print (ndata_temp2[:10, 18])
+            sys.exit()
             if len(ndata_temp2)!=0:
                 yrmon = yr*100+k
                 idx = (stn_info_cn[j,4]<=yrmon)&(stn_info_cn[j,5]>=yrmon)
@@ -52,7 +58,6 @@ for yr in YEARS:
             matlab.savemat(os.path.join(path_station,'Station_CN', fname), {'ndata_scode':ndata_scode})
         print (f'{j} / {stn_info_cn.shape[0]}')
 
-
     ndata_scode = None
     for k in range(1, 1501+1, 100):
         fname = f'stn_scode_data_{yr}_{k:04d}.mat'
@@ -60,6 +65,8 @@ for yr in YEARS:
         if ndata_scode is None:
             ndata_scode = ndata_scode_temp
         else:
+            print (ndata_scode.shape)
+            print (ndata_scode_temp.shape)
             ndata_scode = np.vstack([ndata_scode, ndata_scode_temp])
     fname = f'cn_stn_scode_data_rm_outlier_{yr}.mat'
     matlab.savemat(os.path.join(path_station,'Station_CN','stn_scode_data', fname), {'ndata_scode':ndata_scode,'header_ndata':header_ndata})
