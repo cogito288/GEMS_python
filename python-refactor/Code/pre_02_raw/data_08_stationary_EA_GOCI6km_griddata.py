@@ -9,38 +9,49 @@ from Code.utils import matlab
 import time
 import numpy as np
 import rasterio as rio
-from scipy.interpolate import griddata
+from scipy.ndimage import map_coordinates
 
 ### Setting path
-data_base_dir = os.path.join(project_path, 'Data')
-path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'MODIS', 'MCD12Q1', '03_LC_ratio') 
-path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+path_ea_goci = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km') 
 
-mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_goci.mat')) # lon_goci, lat_goci
+mat = matlab.loadmat(os.path.join(path_grid_raw,'grid_SRTM_1km.mat'))
+lon_SRTM_1km, lat_SRTM_1km = mat['lon_SRTM_1km'], mat['lat_SRTM_1km']
+del mat
+dx = 0.01023084 # point x 간격 np.diff(mat['lon_gcs_500m'])
+dy = 0.01023084 # point y 간격 np.diff(mat['lat_gcs_500m'])
+xmin = np.min(lon_SRTM_1km[0])
+ymin = np.min(lat_SRTM_1km[:, 0])
+
+mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat')) # lon_goci, lat_goci
 lon_goci, lat_goci = mat['lon_goci'], mat['lat_goci']
 del mat
+coords = ((lon_goci-xmin)/dx, (lat_goci-ymin)/dy)
 
-mat = matlab.loadmat(os.path.join(data_base_dir,'grid','grid_SRTM_1km.mat'))
-points = np.array([mat['lon_SRTM_1km'].ravel(order='F'), mat['lat_SRTM_1km'].ravel(order='F')]).T
-del mat
-
-print ('SRTM points : ', points.shape)
 # SRTM DEM
-with rio.open(os.path.join(data_base_dir, 'grid', 'SRTM_DEM_1km.tif')) as src:
+with rio.open(os.path.join(path_grid_raw, 'SRTM_DEM_1km.tif')) as src:
     dem = src.read(1)
 dem = dem.astype('float64')
 dem[dem==src.nodata] = np.nan
 dem[dem<0] = np.nan
-values = dem.ravel(order='F')
-dem = griddata(points, values, (lon_goci, lat_goci), methods='linear')
-matlab.savemat(os.path.join(path_write, 'stationary', 'EA6km_SRTM_DEM.mat'), {'dem':dem})
-del points, values
+tStart = time.time()
+dem = map_coordinates(dem[::-1].T, coords, order=1)
+#dem = griddata(points, values, (lon_goci, lat_goci), method='linear')
+tElapsed = time.time() - tStart
+print (f'time taken : {tElapsed}')
+matlab.savemat(os.path.join(path_ea_goci, 'stationary', 'EA6km_SRTM_DEM.mat'), {'dem':dem})
+print ('stationary/EA6km_SRTM_DEM.mat')
 
 # Population density
-mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_EA_30sec_GPWv4_PopDens.mat')) 
-points = np.array([mat['lon_EA_30sec'].ravel(order='F'), mat['lat_EA_30sec'].ravel(order='F')]).T
+mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_EA_30sec_GPWv4_PopDens.mat')) 
+lon_EA_30sec, lat_EA_30sec = mat['lon_EA_30sec'], mat['lat_EA_30sec']
 del mat
-print ('EA 30sec points :', points.shape)
+dx = 0.00833333 
+dy = 0.00833333 
+xmin = np.min(lon_EA_30sec[0])
+ymin = np.min(lat_EA_30sec[:, 0])
+coords = ((lon_goci-xmin)/dx, (lat_goci-ymin)/dy)
 
 popDens_all = np.zeros((3600, 4800, 21))
 for yr in range(2000, 2020+1, 5):
@@ -78,29 +89,33 @@ popDens_all[:,:,19] = common_term*(4/5) + popDens_all[:,:,15]
 
 for yr in range(2000, 2020+1):
     tStart = time.time()
-    values = popDens_all[:,:,yr-2000].ravel(order='F')
-    popDens = griddata(points,values,(lon_goci,lat_goci),'linear')
-    matlab.savemat(os.path.join(path_write, 'PopDens', f'EA6km_popDens_{yr}.mat'), \
+    values = popDens_all[:,:,yr-2000]
+    popDens = map_coordinates(values[::-1].T, coords, order=1)
+    #popDens = griddata(points,values,(lon_goci,lat_goci),'linear')
+    matlab.savemat(os.path.join(path_ea_goci, 'PopDens', f'EA6km_popDens_{yr}.mat'), \
                    {'popDens':popDens})
     tElapsed = time.time() - tStart
     print (f'time taken : {tElapsed}')
-    print ('PopDens'+ f'EA6km_popDens_{yr}.mat')
-    del popDens, values
-del points
-
+    print (f'PopDens/EA6km_popDens_{yr}.mat')
+    del popDens
+    
 # Road density
-mat = matlab.loadmat(os.path.join(data_base_dir, 'grid', 'grid_GRIP4_8km.mat')) 
-points = np.array([mat['lon_GRIP4_8km'].ravel(order='F'), mat['lat_GRIP4_8km'].ravel(order='F')]).T
+mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_GRIP4_8km.mat')) 
+lon_GRIP4_8km, lat_GRIP4_8km = mat['lon_GRIP4_8km'], mat['lat_GRIP4_8km']
 del mat
-print ('grid_GRIP4_8km points :', points.shape)
+dx = 0.00833333 
+dy = 0.00833333 
+xmin = np.min(lon_EA_30sec[0])
+ymin = np.min(lat_EA_30sec[:, 0])
+coords = ((lon_goci-xmin)/dx, (lat_goci-ymin)/dy)
 
 with rio.open(os.path.join(data_base_dir, 'Preprocessed_raw', 
-           'roadDens', 'EA_GRIP4_TOTAL_DENS_m_km2.tif')) as src:
+           'roadDens', 'GRIP4_TOTAL_DENS_m_km2.tif')) as src:
     roadDens = src.read(1)
 roadDens = roadDens.astype('float64')
 roadDens[roadDens<0] = np.nan
 roadDens[roadDens==src.nodata] = np.nan
-values = roadDens.ravel(order='F')
-roadDens = griddata(points,values,(lon_goci,lat_goci),'linear')
-matlab.savemat(os.path.join(path_write, 'stationary', 'EA6km_roadDens.mat'), {'roadDens':roadDens})
-print ('EA6km_roadDens.mat')
+roadDens = map_coordinates(roadDens[::-1].T, coords, order=1)
+#roadDens = griddata(points,values,(lon_goci,lat_goci),'linear')
+matlab.savemat(os.path.join(path_ea_goci, 'stationary', 'EA6km_roadDens.mat'), {'roadDens':roadDens})
+print ('stationary/EA6km_roadDens.mat')
