@@ -91,14 +91,14 @@ for yr in YEARS:
                 diff4 = NO2 - np.tile(th[:,3][:, None],(1,nTime))
                 diff5 = PM10 - np.tile(th[:,4][:, None],(1,nTime))
                 diff6 = PM25 - np.tile(th[:,5][:, None],(1,nTime))
-
+                
                 CO[diff1>0]=np.nan
                 SO2[diff2>0]=np.nan
                 O3[diff3>0]=np.nan
                 NO2[diff4>0]=np.nan
                 PM10[diff5>0]=np.nan
                 PM25[diff6>0]=np.nan
-
+                
                 CO[nanidx[:,0]==1,:]=np.nan
                 SO2[nanidx[:,1]==1,:]=np.nan
                 O3[nanidx[:,2]==1,:]=np.nan
@@ -111,7 +111,7 @@ for yr in YEARS:
                     stn_CN = ndata_temp
                 else:
                     stn_CN = np.concatenate((stn_CN, ndata_temp), axis=1)
-
+                
                 tElapsed_doy = time.time()-tStart_doy
                 print (f'{yr}_{doy}--{tElapsed_doy:3.4f} sec')
             else:
