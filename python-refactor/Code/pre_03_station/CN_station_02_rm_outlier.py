@@ -23,7 +23,7 @@ for yr in YEARS:
     if yr%4==0: days= 366; 
     else: days=365; 
     if yr==2019: days=151;
-        
+    
     ndata = matlab.loadmat(os.path.join(path_station, 'Station_CN', 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_yr']
     scode = np.unique(ndata[:,-1])
     
@@ -44,8 +44,8 @@ for yr in YEARS:
     # PM10 (ug/m3)
     ndata[ndata[:,8]>1000,8]=np.nan
     
-    ndata = np.delete(ndata, (ndata[:,4]<8) | (ndata[:,4]>15), axis=0)
-    ind = np.lexsort((ndata[:,20],ndata[:,4],ndata[:,0]))
+    ndata = ndata[(ndata[:,4]>=8) & (ndata[:,4]<=15),:]
+    ind = np.lexsort((ndata[:,20],ndata[:,4],ndata[:,0]))    
     ndata = ndata[ind]
     
     stn_CN = None
@@ -62,7 +62,7 @@ for yr in YEARS:
                 NO2 = ndata_temp[:,12].reshape(nstn_temp, -1)
                 PM10 = ndata_temp[:,8].reshape(nstn_temp, -1)
                 PM25 = ndata_temp[:,6].reshape(nstn_temp, -1)
-            
+                
                 nanidx = np.full((nstn_temp,6), np.nan)
                 nanidx[:,0] = np.sum(np.isnan(CO), axis=1)>4
                 nanidx[:,1] = np.sum(np.isnan(SO2), axis=1)>4
@@ -70,20 +70,19 @@ for yr in YEARS:
                 nanidx[:,3] = np.sum(np.isnan(NO2),axis=1)>4
                 nanidx[:,4] = np.sum(np.isnan(PM10),axis=1)>4
                 nanidx[:,5] = np.sum(np.isnan(PM25),axis=1)>4
-            
+                
                 SEM = np.full((nstn_temp,6), -1)
                 th = np.full((nstn_temp,6), -1)
-            
-                #to remove all those outside of the 99.9% confidence limits
-                SEM[:,0] = 3.291*np.nanstd(CO.T).T/np.sqrt(CO.shape[1]) 
-                SEM[:,1] = 3.291*np.nanstd(SO2.T).T/np.sqrt(SO2.shape[1])
-                SEM[:,2] = 3.291*np.nanstd(O3.T).T/np.sqrt(O3.shape[1])
-                SEM[:,3] = 3.291*np.nanstd(NO2.T).T/np.sqrt(NO2.shape[1])
-                SEM[:,4] = 3.291*np.nanstd(PM10.T).T/np.sqrt(PM10.shape[1])
-                SEM[:,5] = 3.291*np.nanstd(PM25.T).T/np.sqrt(PM25.shape[1])
+                
+                SEM[:,0] = 3.291*np.nanstd(CO.T).T/np.sqrt(CO.shape[1]) #to remove all those outside of the 99.9# confidence limits
+                SEM[:,1] = 3.291*np.nanstd(SO2.T).T/np.sqrt(SO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+                SEM[:,2] = 3.291*np.nanstd(O3.T).T/np.sqrt(O3.shape[1]) #to remove all those outside of the 99.9# confidence limits
+                SEM[:,3] = 3.291*np.nanstd(NO2.T).T/np.sqrt(NO2.shape[1]) #to remove all those outside of the 99.9# confidence limits
+                SEM[:,4] = 3.291*np.nanstd(PM10.T).T/np.sqrt(PM10.shape[1]) #to remove all those outside of the 99.9# confidence limits
+                SEM[:,5] = 3.291*np.nanstd(PM25.T).T/np.sqrt(PM25.shape[1]) #to remove all those outside of the 99.9# confidence limits
                 conc_mean = np.vstack([np.nanmean(CO,axis=1), np.nanmean(SO2,axis=1), np.nanmean(O3,axis=1), np.nanmean(NO2,axis=1), np.nanmean(PM10,axis=1), np.nanmean(PM25,axis=1)]).T
                 th =SEM+conc_mean
-            
+                
                 nTime = CO.shape[1]
                 diff1 = CO - np.tile(th[:,0][:, None],(1,nTime))
                 diff2 = SO2 - np.tile(th[:,1][:, None],(1,nTime))
@@ -110,7 +109,7 @@ for yr in YEARS:
                 if stn_CN is None:
                     stn_CN = ndata_temp
                 else:
-                    stn_CN = np.concatenate((stn_CN, ndata_temp), axis=1)
+                    stn_CN = np.concatenate((stn_CN, ndata_temp), axis=0)
                 
                 tElapsed_doy = time.time()-tStart_doy
                 print (f'{yr}_{doy}--{tElapsed_doy:3.4f} sec')
@@ -121,4 +120,5 @@ for yr in YEARS:
     fname = f'stn_code_data_rm_outlier_{yr}.mat'
     matlab.savemat(os.path.join(path_station, 'Station_CN', 'stn_code_data',fname), {'stn_CN':stn_CN})
     print (yr)
-    
+
+
