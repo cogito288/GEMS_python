@@ -141,31 +141,31 @@ def hdfread(path, dataset): # HDF4
     result = sds_obj.get()
     return result
 
-def loadmat(path, keys=[]):
-    # corresponds to load
-    data = sio.loadmat(path)
-    new_data = []
-    if keys:
-        for key in keys:
-            new_data.append(data[key])
-        return new_data
-    else:
-        return data
-    """
-    # Since we save hdf as scipy mat, we should using scipy.io.loadmat
-    # Otherwise, we should change loadmat and savemat both to use h5py or hdf5storage
-    arr = None
-    with h5py.File(path, 'r') as f:
-        if keys: # not empty
-            arr = dict()
-            for key in keys:
-                data = f.get(key)
-                data = np.array(data)
-                arr[key] = data
-        else: # if key(datasetname) is empty
-            arr = f
-    return arr
-    """
+def h5read(filename, datasetname):
+    with h5py.File(filename, 'r') as f:
+        data = f.get(datasetname)[:]
+    if data.flags['C_CONTIGUOUS'] and (not data.flags['F_CONTIGUOUS']):
+        data = data.T
+    return data
+
+def loadmat(path):
+    # First, try to load using h5py only working for 7.3 mat 
+    # Second, try to load using scipy io working for 5.0 mat
+    result = None
+    try:
+        with h5py.File(path, 'r') as f:
+            if f.keys(): # if key not empty
+                result = dict()
+                for key in f.keys(): 
+                    result[key] = f[key][()] #np.array(f[key])
+                    # Convert to F order
+                    if result[key].flags['C_CONTIGUOUS'] and (not result[key].flags['F_CONTIGUOUS']):
+                        result[key] = result[key].T
+    except OSError:
+        result = sio.loadmat(path)
+    return result
+
+    
 
 ####### Debugging #########
 def check_make_dir(directory):
@@ -173,7 +173,7 @@ def check_make_dir(directory):
         os.makedirs(directory)
 ###########################
 
-def savemat(dirname, fname, data):
+def savemat(fname, data):
     ### Description
     # Matlab: default < 2 GB. More than 2 GB: 7.3v 
     # scipy.io.savemat can save maximally 4 GB.
@@ -181,17 +181,11 @@ def savemat(dirname, fname, data):
     # dirname: directory name for hdf5storage
     # fname: filename
     # data: dictionary
-    check_make_dir(dirname) # debugging
-    sio.savemat(os.path.join(dirname, fname), mdict=data)
-    """
-    For matlab 7.3 mat saving
-    if not isinstance(data, dict):
-        hdf5storage.write(data, dirname, fname, matlab_compatible=True)
-    else:
-        filename = os.path.join(dirname, fname)
-        hdf5storage.writes(data, filename=filename, matlab_compatible=True)
-    """
-
+    check_make_dir(os.path.dirname(fname)) # debugging
+    #sio.savemat(os.path.join(dirname, fname), mdict=data)
+    hdf5storage.writes(mdict=data,
+                      filename=fname,
+                      matlab_compatible=True)
 def datenum(datestr):
     # matlab datenum
     # Ordinal 1:
@@ -224,6 +218,7 @@ def delaunayTriangulation(points):
     options = 'Qt Qbb Qc' if N <= 3 else 'Qt Qbb Qc Qx' # Set the QHull options
     DT = Delaunay(points, qhull_options = options)
     
+    """
     tri = DT.simplices
     keep = np.ones(len(tri), dtype = bool)
     for i, t in enumerate(tri):
@@ -231,7 +226,7 @@ def delaunayTriangulation(points):
             keep[i] = False # Point is coplanar, we don't want to keep it
     tri = tri[keep]
     DT.simplices = tri
-    
+    """
     return DT
 """
 def ind2sub(siz, IND):
@@ -241,17 +236,19 @@ def sub2ind(siz, dim1, dim2):
     return np.ravel_multi_index(siz, (dim1, dim2))
 """
 def ind2sub(array_shape, ind):
-    if len(array_shape) != 2:
+    if len(array_shape) == 2:
+        rows = (ind.astype('int') % array_shape[0]).astype(int)
+        cols = (ind.astype('int') / array_shape[0]).astype(int) # or numpy.mod(ind.astype('int'), array_shape[1])
+        return (rows, cols)
+    else:
         raise NotImplementedError
-    rows = (ind.astype('int') / array_shape[1]).astype(int)
-    cols = (ind.astype('int') % array_shape[1]).astype(int) # or numpy.mod(ind.astype('int'), array_shape[1])
-    return (rows, cols)
-
+        
 def sub2ind(array_shape, rows, cols):
-    if len(array_shape) != 2:
+    if len(array_shape) == 2:
+        return (rows + cols*array_shape[0]).astype(int)
+    else:
         raise NotImplementedError
-    return (rows*array_shape[1] + cols).astype(int)
-
+    
 def length(arr):
     if isinstance(arr, np.ndarray):
         return max(arr.shape)
@@ -262,26 +259,25 @@ def length(arr):
 
 def ismember(A, B):
     return np.nonzero(np.in1d(A,B))[0]
-        
+
+"""
 def repmat(arr, change_size):
     if len(change_size)==2:
-        m, n = rep_size
+        m, n = change_size
         return np.tile(arr, (n, m)).T
     elif len(change_size)==3:
-        m, n, r = rep_size
+        m, n, r = change_size
         return np.tile(arr, (n, r, m))
     else:
         raise NotImplementedError
-        
+"""
+
 def permute(arr, change_size):
     if (len(change_size)!=3) or (len(arr.shape)!=3):
         raise NotImplementedError
     return np.transpose(arr, change_size)
 
-def h5read(filename, datasetname):
-    with h5py.File(filename, 'r') as f:
-        data = f.get(datasetname)[:]
-    return data
+
 
 def get_files_endswith(dirname, pattern):
     # Simple dir 
@@ -292,26 +288,6 @@ def get_files_endswith(dirname, pattern):
         if os.endswith(pattern):
             files.append(file)
     return files
-    
-def dir(dirname, pattern):
-    # Not same .. 
-    #     list_gpm = matlab.dir(str(yr), '.HDF5')  # list_gpm = dir([num2str(yr),'/*/*.HDF5']);
-
-    
-    """
-    # https://wikidocs.net/39
-    full_fname_list = []
-    try:
-        for (path, dirs, files) in os.walk(dirname):
-            for filename in files:
-                ext = os.path.splitext(filename)[-1]
-                if ext == pattern:
-                    full_name_list.extend(list(map(lambda x: os.path.join(path, x), files)))
-                    #print("%s/%s" % (path, filename))
-    except PermissionError:
-        pass
-    return full_fname_list
-    """
 
 def permute(arr, axes):
     if (arr.ndim) == len(axes):
