@@ -1,8 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
+base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -11,14 +11,15 @@ import copy
 import numpy as np
 import pandas as pd
 import glob
+import h5py
 
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 #path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
-#path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
-path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
+path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
+#path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat'))
@@ -67,6 +68,7 @@ stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:,1].argsort()]
 cn_stn_GOCI6km_location = stn_GOCI6km
 cn_dup_scode2_GOCI6km = dup_scode2_GOCI6km
 header_cn_stn_GOCI6km_location = ['scode1','scode2','lat_org','lon_org','pxid','lat_px','lon_px','avgid','dist']
+                                          dtype=h5py.string_dtype(encoding='utf-8'))
 matlab.savemat(os.path.join(path_station,'Station_CN/cn_stn_GOCI6km_location_weight.mat'),
     {'cn_stn_GOCI6km_location':cn_stn_GOCI6km_location, 
      'cn_dup_scode2_GOCI6km':cn_dup_scode2_GOCI6km,
