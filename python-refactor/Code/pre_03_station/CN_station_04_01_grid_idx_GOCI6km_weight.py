@@ -10,6 +10,7 @@ import copy
 import numpy as np
 import pandas as pd
 import glob
+import h5py
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
@@ -61,8 +62,10 @@ for i in range(len(idx)):
 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:,1].argsort()]
 cn_stn_GOCI6km_location = stn_GOCI6km
 cn_dup_scode2_GOCI6km = dup_scode2_GOCI6km
-header_cn_stn_GOCI6km_location = ['scode1','scode2','lat_org','lon_org','pxid','lat_px','lon_px','avgid','dist']
+header_cn_stn_GOCI6km_location = np.array(['scode1','scode2','lat_org','lon_org','pxid','lat_px','lon_px','avgid','dist'],
+                                          dtype=h5py.string_dtype(encoding='utf-8'))
 matlab.savemat(os.path.join(path_station,'Station_CN/cn_stn_GOCI6km_location_weight.mat'),
     {'cn_stn_GOCI6km_location':cn_stn_GOCI6km_location, 
-     'cn_dup_scode2_GOCI6km':cn_dup_scode2_GOCI6km,
-     'header_cn_stn_GOCI6km_location':header_cn_stn_GOCI6km_location})
+     'cn_dup_scode2_GOCI6km':cn_dup_scode2_GOCI6km}),
+with h5py.File(os.path.join(path_station,'Station_CN','cn_stn_GOCI6km_location_weight.mat'), 'a') as dst:
+    dst['header_cn_stn_GOCI6km_location'] = header_cn_stn_GOCI6km_location

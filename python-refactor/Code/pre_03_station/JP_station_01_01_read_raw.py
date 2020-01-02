@@ -13,7 +13,9 @@ import glob
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw') 
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 # header = {'doy','year','month','day','KST','SO2','CO','O3','NO2','PM10','PM25','scode'}
 pcode = [['01','SO2','ppb'],
@@ -41,69 +43,67 @@ pcode = [['01','SO2','ppb'],
 
 # '43','HCL'; '44','HF'; '45','H2S'; '46','SHC'; '47','UHC'
 
-# p=0; varname = 'SO2'
-# p=1; varname = 'NO'
-# p=2; varname = 'NO2'
-# p=3; varname = 'NOX'
-# p=4; varname = 'CO'
-# p=5; varname = 'OX'
-# p=6; varname = 'NMHC'
-# p=7; varname = 'CH4'
-# p=8; varname = 'THC'
-# p=9; varname = 'SPM'
-# p=11; varname = 'PM25'; p=50
-# p=20; varname = 'WD'
-# p=21; varname = 'WS'
-# p=22; varname = 'TEMP'
-# p=23; varname = 'HUM'
-# p=24; varname = 'SUN'
-# p=25; varname = 'RAIN'
-# p=26; varname = 'UV'
-# p=27; varname = 'PRS'
-# p=28; varname = 'NETR'
-# p=40; varname = 'CO2'
-# p=41; varname = 'O3'
-varname = 'PM25'; p=50
+# p=1; varname = 'SO2'
+# p=2; varname = 'NO'
+# p=3; varname = 'NO2'
+# p=4; varname = 'NOX'
+# p=5; varname = 'CO'
+# p=6; varname = 'OX'
+# p=7; varname = 'NMHC'
+# p=8; varname = 'CH4'
+# p=9; varname = 'THC'
+# p=10; varname = 'SPM'
+# p=12; varname = 'PM25'; p=51
+# p=21; varname = 'WD'
+# p=22; varname = 'WS'
+# p=23; varname = 'TEMP'
+# p=24; varname = 'HUM'
+# p=25; varname = 'SUN'
+# p=26; varname = 'RAIN'
+# p=27; varname = 'UV'
+# p=28; varname = 'PRS'
+# p=29; varname = 'NETR'
+# p=41; varname = 'CO2'
+# p=42; varname = 'O3'
+varname = 'PM25'; p=12
 
-header_p = ['doy','year','month','day','scode','ccode','KST', 'stn_{varname}']
+header_p = ['doy','year','month','day','scode','ccode','KST', f'stn_{varname}']
 # '측정년도/측정국코드/시도코드/측정항목코드/측정단위코드/측정월/측정일'
 
 YEARS = [2016] # range(2009, 2009+1)
 for yr in YEARS:
-    file_list = glob.glob(os.path.join(path_station, 'Station_JP', str(yr), f'*_{p:02d}.txt'))
+    file_list = glob.glob(os.path.join(path_in_situ, 'AirQuality_Japan', str(yr), f'*_{p:02d}.txt'))
+    file_list.sort()
+    data = None
     for fname in file_list:
-        data_temp = pd.read_csv(fname)
-        if data is None:
-            data = data_temp
-        else:
-            data = pd.concat([data, data_temp])
-        print (data)
+        data_temp = pd.read_csv(fname, encoding='latin1')
+        if data is None: data = data_temp
+        else: data = pd.concat([data, data_temp])
+    data = data.values
     if varname == 'PM25': #Need to check
-        vv = data[:, data.columns[3]]
-        idx_PM25 = vv.isin(['PM25'])
-        idx_PMBH = vv.isin(['PMBH'])
-        idx_PMFL = vv.isin(['PMFL'])
-        data_PMBH = data[idx_PMBH]
-        data_PMFL = data[idx_PMFL]
+        vv = data[:, 3]
+        idx_PM25 = np.isin(vv, ['PM25'])
+        idx_PMBH = np.isin(vv, ['PMBH'])
+        idx_PMFL = np.isin(vv, ['PMFL'])
+        data_PMBH = data[idx_PMBH, :]
+        data_PMFL = data[idx_PMFL, :]
         data = data[idx_PM25,:]
 
     data = np.delete(data, [3,4], axis=1)
-    data = data.values
     yrmonday = data[:,0]*10000 + data[:,3]*100 + data[:,4]
-    data_datenum = matlab.datenum(str(yrmonday))
+    data_datenum = [matlab.datenum(str(val)) for val in yrmonday]
     doy_000 = matlab.datenum(f'{yr}00000')
-    data_doy = data_datenum-doy_000
+    data_doy = np.array([val-doy_000 for val in data_datenum])
 
-    data_info = np.hstack([data_doy,data[:,0],data[:,3],data[:,4],data[:,1:3]]) # 'doy','year','month','day','scode','ccode'
+    data_info = np.hstack([data_doy.reshape(-1,1),data[:,0].reshape(-1,1),data[:,3].reshape(-1,1),data[:,4].reshape(-1,1),data[:,1:3]]) # 'doy','year','month','day','scode','ccode'
     data_new = None
     for KST in range(1,24+1):
         data_temp = data_info
-        data_temp[:,6]=KST
-        data_temp = np.hstack([data_temp, data[:,4+KST]])
-        if data_new is None:
-            data_new = data_temp
-        else:
-            data_new= np.vstack([data_new, data_temp])
-    vars()[f'stn{varname}_tbl'] = pd.DateFrame(data_new, columns=header_p) 
-    matlab.savemat(os.path.join(path_station, 'Station_JP', f'JP_stn{varname}_{yr}.mat'), 
-                   {col: vars()[f'stn{varname}_tbl'][col].values for col in vars()[f'stn{varname}_tbl'].columns})
+        data_temp = np.hstack([data_temp, np.full([data_temp.shape[0], 1], KST)]) #data_temp[:,6]=KST
+        data_temp = np.hstack([data_temp, data[:,4+KST].reshape(-1,1)])
+        if data_new is None: data_new = data_temp
+        else: data_new= np.vstack([data_new, data_temp])
+    stn_tbl = pd.DataFrame(data_new, columns=header_p)
+    stn_tbl = stn_tbl.apply(pd.to_numeric)
+    matlab.savemat(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.mat'), 
+                   {col: stn_tbl[col].values for col in stn_tbl.columns})

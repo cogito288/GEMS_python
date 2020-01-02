@@ -15,7 +15,6 @@ import glob
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
-import scipy.io as sio
 mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat')) # period_GOCI.csv 사용해서 만든거
 cn_dup_scode2_GOCI6km, cn_stn_GOCI6km_location = mat['cn_dup_scode2_GOCI6km'], mat['cn_stn_GOCI6km_location']
 del mat
@@ -56,7 +55,10 @@ for yr in YEARS:
                             nanidx = not np.isnan(stn_GOCI6km_temp[k,5:20])
                             weight = np.divide(nanidx, stn_GOCI6km_temp[k,22])
                             stn_GOCI6km_temp[k,5:20] = np.multiply(stn_GOCI6km_temp[k,5:20], weight)
-                            weight_sum = np.concatenate((weight_sum, weight), axis=0)
+                            if weight_sum is None:
+                                weight_sum = weight
+                            else:
+                                weight_sum = np.vstack([weight_sum, weight])
                         min_dist = np.min(stn_GOCI6km_temp[:,22])
 
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp[stn_GOCI6km_temp[:,22]==min_dist,:]

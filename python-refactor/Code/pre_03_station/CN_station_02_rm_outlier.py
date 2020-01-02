@@ -22,7 +22,7 @@ for yr in YEARS:
     else: days=365; 
     if yr==2019: days=151;
     
-    ndata = matlab.loadmat(os.path.join(path_station, 'Station_CN', 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_doy']
+    ndata = matlab.loadmat(os.path.join(path_station, 'Station_CN', 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_yr']
     scode = np.unique(ndata[:,-1])
     # CO
     ndata[:,18]=ndata[:,18]/1.15 # (mg/m3) to ppm (1 ppm = 1.15 mg m-3)

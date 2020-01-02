@@ -9,6 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 from pyhdf.SD import SD, SDC ### HDF4 
+from calendar import monthrange
 
 """
 Notes
@@ -89,8 +90,13 @@ dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
 """
 
 
-    
-    
+def histogram_bin_center(x, bin_centers):
+    # https://stackoverflow.com/questions/18065951/why-does-numpy-histogram-python-leave-off-one-element-as-compared-to-hist-in-m
+    bin_edges = np.r_[-np.Inf, 0.5 * (bin_centers[:-1] + bin_centers[1:]), 
+        np.Inf]
+    counts, edges =  np.histogram(x, bin_edges)
+    return counts
+
 # https://stackoverflow.com/questions/620305/convert-year-month-day-to-day-of-year-in-python
 def is_leap_year(year):
     """ if year is a leap year return True
@@ -156,8 +162,8 @@ def loadmat(path):
         with h5py.File(path, 'r') as f:
             if f.keys(): # if key not empty
                 result = dict()
-                for key in f.keys(): 
-                    result[key] = f[key][()] #np.array(f[key])
+                for key in f.keys():
+                    result[key] = np.array(f.get(key)) # num type
                     # Convert to F order
                     if result[key].flags['C_CONTIGUOUS'] and (not result[key].flags['F_CONTIGUOUS']):
                         result[key] = result[key].T
@@ -186,7 +192,9 @@ def savemat(fname, data):
     #sio.savemat(os.path.join(dirname, fname), mdict=data)
     hdf5storage.writes(mdict=data,
                       filename=fname,
-                      matlab_compatible=True)
+                      matlab_compatible=True,)
+                      #compress=True,
+                      #compression_algorithm='gzip')
 def datenum(datestr):
     # matlab datenum
     # Ordinal 1:
@@ -199,11 +207,14 @@ def datenum(datestr):
         year -= 1
         month = 12
         day = 31
-        
+    num_days = monthrange(year, month)[1]
+    if day>num_days:
+        month += 1
+        day = day-num_days
     d = date(year, month, day) # 00:00:00
     result = 366 + d.toordinal() 
     if len(datestr)>8: # suspect yyyymmddHH
-        hour = datestr[8:10]
+        hour = int(datestr[8:10])
         result += (hour/24)
     return result
 

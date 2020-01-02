@@ -10,49 +10,96 @@ import copy
 import numpy as np
 import pandas as pd
 import glob
+import h5py
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-raw_path = os.path.join(data_base_dir, 'Raw') 
-station_path = os.path.join(data_base_dir, 'Station') 
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
-stn_info = pd.read_csv(os.path.join(data_base_dir,'Station/Station_JP/jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'),header=1)
+stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'))
+stn_info = stn_info.values
 # scode1, scode2, lon, lat, op_start, op_
 scode_unq = np.unique(stn_info[:,0])
 del stn_info 
 
-header_ndata = ['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25',
-    'NO','NOX','NMHC','CH4','THC','CO2','scode']
+header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25',
+    'NO','NOX','NMHC','CH4','THC','CO2','scode'],
+                        dtype=h5py.string_dtype(encoding='utf-8'))
 
-YEARS = [2015]
+YEARS = [2016]
 for yr in YEARS: #:2016 #2009:2016
-    stnSO2_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnSO2_{yr}.mat'))['stnSO2_tbl']
-    stnNO_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnNO_{yr}.mat'))['stnNO_tbl']
-    stnNO2_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnNO2_{yr}.mat'))['stnNO2_tbl']
-    stnNOX_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnNOX_{yr}.mat'))['stnNOX_tbl']
-    stnNOX_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnCO_{yr}.mat'))['stnCO_tbl']
-    stnOX_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnOX_{yr}.mat'))['stnOX_tbl']
-    stnNMHC_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnNMHC_{yr}.mat'))['stnNMHC_tbl']
-    stnCH4_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnCH4_{yr}.mat'))['stnCH4_tbl']
-    stnTHC_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnTHC_{yr}.mat'))['stnTHC_tbl']
-    stnSPM_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnSPM_{yr}.mat'))['stnSPM_tbl']
-    stnPM25_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnPM25_{yr}.mat'))['stnPM25_tbl']
-    stnCO2_tbl = matlab.loadmat(os.path.join(path_data,'Station/Station_JP/byPollutant/',f'JP_stnCO2_{yr}.mat'))['stnCO2_tbl']
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSO2_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnSO2 = df[mat['header']].values
     
-    stnSO2 = stnSO2_tbl.values
-    stnNO = stnNO_tbl.values 
-    stnNO2 = stnNO2_tbl.values
-    stnNOX = stnNOX_tbl.values
-    stnCO = stnCO_tbl.values
-    stnOX = stnOX_tbl.values
-    stnNMHC = stnNMHC_tbl.values
-    stnCH4 = stnCH4_tbl.values
-    stnTHC = stnTHC_tbl.values
-    stnSPM = stnSPM_tbl.values
-    stnPM25 = stnPM25_tbl.values
-    stnCO2 = stnCO2_tbl.values
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnNO = df[mat['header']].values
     
-    del stnSO2_tbl, stnNO_tbl, stnNO2_tbl, stnNOX_tbl, stnCO_tbl, stnOX_tbl, stnNMHC_tbl, stnCH4_tbl, stnTHC_tbl, stnSPM_tbl, stnPM25_tbl, stnCO2_tbl
+    mat  = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO2_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnNO2 = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNOX_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnNOX = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnCO = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnOX_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnOX = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNMHC_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnNMHC = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCH4_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnCH4 = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnTHC_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnTHC = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnSPM = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnPM25 = df[mat['header']].values
+    
+    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO2_{yr}.mat'))
+    cols = list(mat.keys())
+    cols.remove('header')
+    df = pd.DataFrame.from_dict(mat)
+    stnCO2 = df[mat['header']].values
     
     if yr%4==0: days = 366
     else: days = 365
@@ -67,18 +114,18 @@ for yr in YEARS: #:2016 #2009:2016
     nanidx = None
     for k in range(np.max(aa.shape)):
         tStart = time.time()
-        aSO1 = stnSO1[stnSO1[:,0]==aa[k,0] & stnSO1[:,6]==aa[k,1] & stnSO1[:,4]==aa[k,2],7]
-        aNO = stnNO[stnNO[:,0]==aa[k,0] & stnNO[:,6]==aa[k,1] & stnNO[:,4]==aa[k,2],7]
-        aNO1 = stnNO1[stnNO1[:,0]==aa[k,0] & stnNO1[:,6]==aa[k,1] & stnNO1[:,4]==aa[k,2],7]
-        aNOX = stnNOX[stnNOX[:,0]==aa[k,0] & stnNOX[:,6]==aa[k,1] & stnNOX[:,4]==aa[k,2],7]
-        aCO = stnCO[stnCO[:,0]==aa[k,0] & stnCO[:,6]==aa[k,1] & stnCO[:,4]==aa[k,2],7]
-        aOX = stnOX[stnOX[:,0]==aa[k,0] & stnOX[:,6]==aa[k,1] & stnOX[:,4]==aa[k,2],7]
-        aNMHC = stnNMHC[stnNMHC[:,0]==aa[k,0] & stnNMHC[:,6]==aa[k,1] & stnNMHC[:,4]==aa[k,2],7]
-        aCH4 = stnCH4[stnCH4[:,0]==aa[k,0] & stnCH4[:,6]==aa[k,1] & stnCH4[:,4]==aa[k,2],7]
-        aTHC = stnTHC[stnTHC[:,0]==aa[k,0] & stnTHC[:,6]==aa[k,1] & stnTHC[:,4]==aa[k,2],7]
-        aSPM = stnSPM[stnSPM[:,0]==aa[k,0] & stnSPM[:,6]==aa[k,1] & stnSPM[:,4]==aa[k,2],7]
-        aPM14 = stnPM14[stnPM14[:,0]==aa[k,0] & stnPM14[:,6]==aa[k,1] & stnPM14[:,4]==aa[k,2],7]
-        aCO1 = stnCO1[stnCO1[:,0]==aa[k,0] & stnCO1[:,6]==aa[k,1] & stnCO1[:,4]==aa[k,2],7]
+        aSO1 = stnSO1[(stnSO1[:,0]==aa[k,0]) & (stnSO1[:,6]==aa[k,1]) & (stnSO1[:,4]==aa[k,2]),7]
+        aNO = stnNO[(stnNO[:,0]==aa[k,0]) & (stnNO[:,6]==aa[k,1]) & (stnNO[:,4]==aa[k,2]),7]
+        aNO1 = stnNO1[(stnNO1[:,0]==aa[k,0]) & (stnNO1[:,6]==aa[k,1]) & (stnNO1[:,4]==aa[k,2]),7]
+        aNOX = stnNOX[(stnNOX[:,0]==aa[k,0]) & (stnNOX[:,6]==aa[k,1]) & (stnNOX[:,4]==aa[k,2]),7]
+        aCO = stnCO[(stnCO[:,0]==aa[k,0]) & (stnCO[:,6]==aa[k,1]) & (stnCO[:,4]==aa[k,2]),7]
+        aOX = stnOX[(stnOX[:,0]==aa[k,0]) & (stnOX[:,6]==aa[k,1]) & (stnOX[:,4]==aa[k,2]),7]
+        aNMHC = stnNMHC[(stnNMHC[:,0]==aa[k,0]) & (stnNMHC[:,6]==aa[k,1]) & (stnNMHC[:,4]==aa[k,2]),7]
+        aCH4 = stnCH4[(stnCH4[:,0]==aa[k,0]) & (stnCH4[:,6]==aa[k,1]) & (stnCH4[:,4]==aa[k,2]),7]
+        aTHC = stnTHC[(stnTHC[:,0]==aa[k,0]) & (stnTHC[:,6]==aa[k,1]) & (stnTHC[:,4]==aa[k,2]),7]
+        aSPM = stnSPM[(stnSPM[:,0]==aa[k,0]) & (stnSPM[:,6]==aa[k,1]) & (stnSPM[:,4]==aa[k,2]),7]
+        aPM14 = stnPM14[(stnPM14[:,0]==aa[k,0]) & (stnPM14[:,6]==aa[k,1]) & (stnPM14[:,4]==aa[k,2]),7]
+        aCO1 = stnCO1[(stnCO1[:,0]==aa[k,0]) & (stnCO1[:,6]==aa[k,1]) & (stnCO1[:,4]==aa[k,2]),7]
         if len(aSO2)!=0: bb[k,0]=aSO2 
         if len(aCO)!=0:  bb[k,1]=aCO 
         if len(aOX)!=0:  bb[k,2]=aOX 
