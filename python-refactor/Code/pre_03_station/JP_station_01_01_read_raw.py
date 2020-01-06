@@ -14,10 +14,13 @@ import glob
 
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_in_situ = os.path.join(data_base_dir, 'Raw') 
 data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
 #data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
+#path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 # header = {'doy','year','month','day','KST','SO2','CO','O3','NO2','PM10','PM25','scode'}
 pcode = [['01','SO2','ppb'],
@@ -27,53 +30,42 @@ pcode = [['01','SO2','ppb'],
          ['10','SPM','ug_m3'],
          ['12','PM25','ug_m3']]
 
-# p=0; varname = 'SO2'
-# p=2; varname = 'NO2'
-# p=4; varname = 'CO'
-# p=5; varname = 'OX'
-# p=9; varname = 'SPM'
-# p=11; varname = 'PM25'; p=50
-
 for p,varname,unit in pcode:
     header_p = ['doy','year','month','day','scode','ccode','KST',f'stn_{varname}']
     # 'yr/scode/ccode/pcode/unit/month/day'
-
+   
     YEARS = [2016] # range(2009, 2009+1)
     for yr in YEARS:
-        file_list = glob.glob(os.path.join(path_in_situ, 'Station_JP', str(yr), f'*_{p:02d}.txt'))
+        file_list = glob.glob(os.path.join(path_in_situ, 'AirQuality_Japan', str(yr), f'*_{p}.txt'))
+        file_list.sort()
+        data = None
         for fname in file_list:
-            data_temp = pd.read_csv(fname)
-            if data is None:
-                data = data_temp
-            else:
-                data = pd.concat([data, data_temp])
-            print (data)
+            data_temp = pd.read_csv(fname, encoding='latin1')
+            if data is None: data = data_temp
+            else: data = pd.concat([data, data_temp])
+        data = data.values
         if varname == 'PM25': #Need to check
-            vv = data[:, data.columns[3]]
-            idx_PM25 = vv.isin(['PM25'])
-            idx_PMBH = vv.isin(['PMBH'])
-            idx_PMFL = vv.isin(['PMFL'])
-            data_PMBH = data[idx_PMBH]
-            data_PMFL = data[idx_PMFL]
+            vv = data[:, 3]
+            idx_PM25 = np.isin(vv, ['PM25'])
             data = data[idx_PM25,:]
     
         data = np.delete(data, [3,4], axis=1)
-        data = data.values
         yrmonday = data[:,0]*10000 + data[:,3]*100 + data[:,4]
-        data_datenum = matlab.datenum(str(yrmonday))
+        data_datenum = [matlab.datenum(str(val)) for val in yrmonday]
         doy_000 = matlab.datenum(f'{yr}00000')
-        data_doy = data_datenum-doy_000
+        data_doy = np.array([val-doy_000 for val in data_datenum])
     
-        data_info = np.hstack([data_doy,data[:,0],data[:,3],data[:,4],data[:,1:3]]) # 'doy','year','month','day','scode','ccode'
+        data_info = np.hstack([data_doy.reshape(-1,1),data[:,0].reshape(-1,1),data[:,3].reshape(-1,1),data[:,4].reshape(-1,1),data[:,1:3]]) # 'doy','year','month','day','scode','ccode'
         data_new = None
         for KST in range(1,24+1):
             data_temp = data_info
-            data_temp[:,6]=KST
-            data_temp = np.hstack([data_temp, data[:,4+KST]])
-            if data_new is None:
-                data_new = data_temp
-            else:
-                data_new= np.vstack([data_new, data_temp])
-        vars()[f'stn{varname}_tbl'] = pd.DateFrame(data_new, columns=header_p) 
-        matlab.savemat(os.path.join(path_station, 'Station_JP', f'JP_stn{varname}_{yr}.mat'), 
-                       {col: vars()[f'stn{varname}_tbl'][col].values for col in vars()[f'stn{varname}_tbl'].columns})
+            data_temp = np.hstack([data_temp, np.full([data_temp.shape[0], 1], KST)]) #data_temp[:,6]=KST
+            data_temp = np.hstack([data_temp, data[:,4+KST].reshape(-1,1)])
+            if data_new is None: data_new = data_temp
+            else: data_new= np.vstack([data_new, data_temp])
+        stn_tbl = pd.DataFrame(data_new, columns=header_p)
+        stn_tbl = stn_tbl.apply(pd.to_numeric)
+        matlab.savemat(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.mat'), 
+                   {col: stn_tbl[col].values for col in stn_tbl.columns})
+        #stn_tbl.to_csv(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.csv'),sep=',',na_rep='NaN')
+        
