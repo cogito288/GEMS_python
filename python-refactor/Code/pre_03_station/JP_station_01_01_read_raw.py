@@ -1,8 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
+base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -15,10 +15,10 @@ import glob
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 #path_in_situ = os.path.join(data_base_dir, 'Raw') 
-data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
-#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-#path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
+#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+#path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
@@ -63,9 +63,25 @@ for p,varname,unit in pcode:
             data_temp = np.hstack([data_temp, data[:,4+KST].reshape(-1,1)])
             if data_new is None: data_new = data_temp
             else: data_new= np.vstack([data_new, data_temp])
+        data_new[data_new[:,7]>=9997,7] = np.nan
+        if yr%4==0:
+            idx = (data_new[:,2]==2) & (data_new[:,3]>29)
+            data_new = data_new[~idx]
+        else:
+            idx = (data_new[:,2]==2) & (data_new[:,3]>28)
+            data_new = data_new[~idx]
+        tmp_idx = (data_new[:,2]==4) & (data_new[:,3]==31)
+        data_new = data_new[~tmp_idx]
+        tmp_idx = (data_new[:,2]==6) & (data_new[:,3]==31)
+        data_new = data_new[~tmp_idx]
+        tmp_idx = (data_new[:,2]==9) & (data_new[:,3]==31)
+        data_new = data_new[~tmp_idx]
+        tmp_idx = (data_new[:,2]==11) & (data_new[:,3]==31)
+        data_new = data_new[~tmp_idx]
+        
         stn_tbl = pd.DataFrame(data_new, columns=header_p)
         stn_tbl = stn_tbl.apply(pd.to_numeric)
-        matlab.savemat(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.mat'), 
+        matlab.savemat(os.path.join(path_stn_jp,'byPollutant',f'JP_stn{varname}_{yr}.mat'), 
                    {col: stn_tbl[col].values for col in stn_tbl.columns})
         #stn_tbl.to_csv(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.csv'),sep=',',na_rep='NaN')
         
