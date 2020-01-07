@@ -29,3 +29,9 @@ for k in range(data.shape[0]):
 a = np.sum(data[:,7:], axis=1)
 aidx = (a==0)
 data2 = np.hstack([data[:,:7],aidx.reshape(-1,1)])
+
+header = np.array(['scode','scode2','lat','lon','installation','abolation'],
+                  dtype=h5py.string_dtype(encoding='utf-8'))
+data2_tbl = pd.DataFrame(data2, columns=header)
+data2_tbl.to_csv(os.path.join(path_stn_jp,'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'),
+                 sep=',',na_rep='NaN',index=False)

@@ -25,17 +25,17 @@ path_in_situ = os.path.join(data_base_dir, 'Raw')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
-# tg = {'SO2','NO','NO2','NOX','CO','OX','NMHC','CH4','THC','SPM','PM25','CO2'}
+#tg = ['SO2','NO','NO2','NOX','CO','OX','NMHC','CH4','THC','SPM','PM25','CO2']
 tg = ['HUM','NETR','PRS','RAIN','SUN','TEMP','UV','WD','WS']
 
 ## 
 # 2012년 CO2 없음.
 YEARS = [2016] #range(2009, 2016+1)
 for yr in YEARS:
-    for i in range(9):
-        stn_tbl = pd.read_csv(os.path.join(path_stn_jp, 'byPollutant', 'fail', f'JP_stn{tg[i]}_{yr}.csv'))
-        header = stn_tbl.columns
-        stn = stn_tbl.values
+    for col in tg:
+        stn_tbl = pd.read_csv(os.path.join(path_stn_jp, 'byPollutant', 'fail', f'JP_stn{col}_{yr}.csv'))
+        header = np.array(stn_tbl.columns, dtype=h5py.string_dtype(encoding='utf-8'))
+        stn = stn_tbl.values.astype('float')
         del stn_tbl
         
         stn[stn[:,7]>=9997,7] = np.nan
@@ -58,9 +58,9 @@ for yr in YEARS:
 
         stn_tbl = pd.DataFrame(stn, columns=header)
         stn_tbl = stn_tbl.apply(pd.to_numeric)
-        matlab.savemat(os.path.join(path_stn_jp, 'byPollutant', f'JP_stn{tg[i]}_{yr}.mat'), 
+        matlab.savemat(os.path.join(path_stn_jp, 'byPollutant', f'JP_stn{col}_{yr}.mat'), 
                        {col: stn_tbl[col].values for col in stn_tbl.columns})
-        with h5py.File(os.path.join(path_stn_jp, 'byPollutant', f'JP_stn{tg[i]}_{yr}.mat'), 'a') as dst:
+        with h5py.File(os.path.join(path_stn_jp, 'byPollutant', f'JP_stn{col}_{yr}.mat'), 'a') as dst:
             dst['header'] = header
-        print (f'{yr}_{tg[i]}')
+        print (f'{yr}_{col}')
     print (yr)

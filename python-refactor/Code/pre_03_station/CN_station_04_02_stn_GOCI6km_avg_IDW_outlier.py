@@ -68,7 +68,7 @@ for yr in YEARS:
                         # 픽셀중심에 더 가까운 관측소의 scode2를 사용하기 위함. 관측값은 가중평균한 값으로 다시 할당될거이므로 신경 쓰지말기
                         weight_sum = np.sum(weight_sum,axis=0)
                         stn_GOCI6km_temp2[0,5:20]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:20], axis=0), weight_sum)
-                        stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2[:,:-2]), axis=0)
+                        stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]), axis=0)
                 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:, 21].argsort()] # sort by scode2
                 if stn_GOCI6km_yr is None:
                     stn_GOCI6km_yr = stn_GOCI6km

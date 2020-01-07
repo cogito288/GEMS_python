@@ -26,93 +26,51 @@ del stn_info
 header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25',
     'NO','NOX','NMHC','CH4','THC','CO2','scode'],
                         dtype=h5py.string_dtype(encoding='utf-8'))
+def read_table_mat(fname):
+    # should contain header column
+    mat = matlab.loadmat(fname)
+    df = pd.DataFrame(columns=mat['header'])
+    for col in mat['header']:
+        df[col] = np.squeeze(mat[col])
+    data = df[mat['header']].values
+    print (os.path.basename(fname))
+    return data
 
 YEARS = [2016]
 for yr in YEARS: #:2016 #2009:2016
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSO2_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnSO2 = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnNO = df[mat['header']].values
-    
-    mat  = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO2_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnNO2 = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNOX_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnNOX = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnCO = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnOX_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnOX = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNMHC_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnNMHC = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCH4_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnCH4 = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnTHC_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnTHC = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnSPM = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnPM25 = df[mat['header']].values
-    
-    mat = matlab.loadmat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO2_{yr}.mat'))
-    cols = list(mat.keys())
-    cols.remove('header')
-    df = pd.DataFrame.from_dict(mat)
-    stnCO2 = df[mat['header']].values
-    
     if yr%4==0: days = 366
     else: days = 365
-    
+        
     a_doy,a_KST,a_scode = np.meshgrid(np.asarray(range(1, days+1)), np.asarray(range(1, 24+1)), scode_unq)
-    aa = np.hstack([a_doy.ravel(order='F'),a_KST.ravel(order='F'),a_scode.ravel(order='F')])
+    aa = np.hstack([a_doy.reshape((-1,1), order='F'), a_KST.reshape((-1,1), order='F'), a_scode.reshape((-1,1), order='F')])
+    print (aa[0,0])
     
-    doy000 = matlab.datenum(f'{yr}00000')   
-    mm = [d[4:6] for d in matlab.datestr(doy000+aa[:,0])] # datestr: yyyymmdd
+    doy000 = matlab.datenum(f'{yr}00000')
+    date_list = map(lambda x: matlab.datestr(doy000+x), aa[:,0])
+    mm = map(lambda x: matlab.datestr(doy000+x), aa[:,0]) # datestr: yyyymmdd
+    dd = map(lambda x: matlab.
     dd = [d[6:] for d in matlab.datestr(doy000+aa[:,0])]    
     bb = np.full((aa.shape[0], 12), np.nan)
+    
+    
+    stnSO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSO2_{yr}.mat'))
+    stnNO = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO_{yr}.mat'))
+    stnNO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO2_{yr}.mat'))
+    stnNOX = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNOX_{yr}.mat'))
+    stnCO = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO_{yr}.mat'))
+    stnOX = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnOX_{yr}.mat'))
+    stnNMHC = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNMHC_{yr}.mat'))
+    stnCH4 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCH4_{yr}.mat'))
+    stnTHC = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnTHC_{yr}.mat'))
+    stnSPM = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
+    stnPM25 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
+    stnCO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO2_{yr}.mat'))
+    print ('Reading done !')
+    
+    
+    
     nanidx = None
-    for k in range(np.max(aa.shape)):
+    for k in range(aa.shape[0]):
         tStart = time.time()
         aSO1 = stnSO1[(stnSO1[:,0]==aa[k,0]) & (stnSO1[:,6]==aa[k,1]) & (stnSO1[:,4]==aa[k,2]),7]
         aNO = stnNO[(stnNO[:,0]==aa[k,0]) & (stnNO[:,6]==aa[k,1]) & (stnNO[:,4]==aa[k,2]),7]
