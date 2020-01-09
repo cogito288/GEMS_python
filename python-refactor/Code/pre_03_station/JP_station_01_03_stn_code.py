@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import glob
 import h5py
+import time
+from numba import njit, prange
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
@@ -29,90 +31,98 @@ header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM1
 def read_table_mat(fname):
     # should contain header column
     mat = matlab.loadmat(fname)
-    df = pd.DataFrame(columns=mat['header'])
-    for col in mat['header']:
+    tmp_cols = ['KST', 'scode', 'doy', mat['header'][-1]]
+    df = pd.DataFrame(columns=tmp_cols)
+    for col in tmp_cols:
         df[col] = np.squeeze(mat[col])
-    data = df[mat['header']].values
+    data = df.set_index(['KST', 'scode', 'doy'])
+    del df
     print (os.path.basename(fname))
     return data
 
 YEARS = [2016]
-for yr in YEARS: #:2016 #2009:2016
+for yr in YEARS:
+    t1 = time.time()
     if yr%4==0: days = 366
     else: days = 365
         
-    a_doy,a_KST,a_scode = np.meshgrid(np.asarray(range(1, days+1)), np.asarray(range(1, 24+1)), scode_unq)
-    aa = np.hstack([a_doy.reshape((-1,1), order='F'), a_KST.reshape((-1,1), order='F'), a_scode.reshape((-1,1), order='F')])
-    print (aa[0,0])
+    idx = pd.MultiIndex.from_product([range(1, 24+1), scode_unq, range(1, days+1)],
+                                 names=['KST', 'scode', 'doy'])
+    cols = header_ndata[5:17]
+    df = pd.DataFrame(np.nan, idx, cols)
     
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSO2_{yr}.mat'))
+    df['SO2'] = tmp_df['stnSO2']
+    del tmp_df
+    
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO_{yr}.mat'))
+    df['NO'] = tmp_df['stnNO']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO2_{yr}.mat'))
+    df['NO2'] = tmp_df['stnNO2']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNOX_{yr}.mat'))
+    df['NOX'] = tmp_df['stnNOX']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO_{yr}.mat'))
+    df['CO'] = tmp_df['stnCO']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnOX_{yr}.mat'))
+    df['OX'] = tmp_df['stnOX']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNMHC_{yr}.mat'))
+    df['NMHC'] = tmp_df['stnNMHC']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCH4_{yr}.mat'))
+    df['CH4'] = tmp_df['stnCH4']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnTHC_{yr}.mat'))
+    df['THC'] = tmp_df['stnTHC']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
+    df['SPM'] = tmp_df['stnSPM']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
+    df['PM25'] = tmp_df['stnPM25']
+    del tmp_df
+    
+    tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO2_{yr}.mat'))
+    df['CO2'] = tmp_df['stnCO2']
+    del tmp_df
+    print ('Reading done !')   
+    
+    aa = np.array(list(df.index)) # KST, scode, doy
+    df['KST'] = aa[:, 0]
+    df['scode'] = aa[:, 1]
+    df['doy'] = aa[:, 2]
+
     doy000 = matlab.datenum(f'{yr}00000')
-    date_list = map(lambda x: matlab.datestr(doy000+x), aa[:,0])
-    mm = map(lambda x: matlab.datestr(doy000+x), aa[:,0]) # datestr: yyyymmdd
-    dd = map(lambda x: matlab.
-    dd = [d[6:] for d in matlab.datestr(doy000+aa[:,0])]    
-    bb = np.full((aa.shape[0], 12), np.nan)
-    
-    
-    stnSO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSO2_{yr}.mat'))
-    stnNO = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO_{yr}.mat'))
-    stnNO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNO2_{yr}.mat'))
-    stnNOX = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNOX_{yr}.mat'))
-    stnCO = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO_{yr}.mat'))
-    stnOX = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnOX_{yr}.mat'))
-    stnNMHC = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnNMHC_{yr}.mat'))
-    stnCH4 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCH4_{yr}.mat'))
-    stnTHC = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnTHC_{yr}.mat'))
-    stnSPM = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
-    stnPM25 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
-    stnCO2 = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnCO2_{yr}.mat'))
-    print ('Reading done !')
-    
-    
-    
-    nanidx = None
-    for k in range(aa.shape[0]):
-        tStart = time.time()
-        aSO1 = stnSO1[(stnSO1[:,0]==aa[k,0]) & (stnSO1[:,6]==aa[k,1]) & (stnSO1[:,4]==aa[k,2]),7]
-        aNO = stnNO[(stnNO[:,0]==aa[k,0]) & (stnNO[:,6]==aa[k,1]) & (stnNO[:,4]==aa[k,2]),7]
-        aNO1 = stnNO1[(stnNO1[:,0]==aa[k,0]) & (stnNO1[:,6]==aa[k,1]) & (stnNO1[:,4]==aa[k,2]),7]
-        aNOX = stnNOX[(stnNOX[:,0]==aa[k,0]) & (stnNOX[:,6]==aa[k,1]) & (stnNOX[:,4]==aa[k,2]),7]
-        aCO = stnCO[(stnCO[:,0]==aa[k,0]) & (stnCO[:,6]==aa[k,1]) & (stnCO[:,4]==aa[k,2]),7]
-        aOX = stnOX[(stnOX[:,0]==aa[k,0]) & (stnOX[:,6]==aa[k,1]) & (stnOX[:,4]==aa[k,2]),7]
-        aNMHC = stnNMHC[(stnNMHC[:,0]==aa[k,0]) & (stnNMHC[:,6]==aa[k,1]) & (stnNMHC[:,4]==aa[k,2]),7]
-        aCH4 = stnCH4[(stnCH4[:,0]==aa[k,0]) & (stnCH4[:,6]==aa[k,1]) & (stnCH4[:,4]==aa[k,2]),7]
-        aTHC = stnTHC[(stnTHC[:,0]==aa[k,0]) & (stnTHC[:,6]==aa[k,1]) & (stnTHC[:,4]==aa[k,2]),7]
-        aSPM = stnSPM[(stnSPM[:,0]==aa[k,0]) & (stnSPM[:,6]==aa[k,1]) & (stnSPM[:,4]==aa[k,2]),7]
-        aPM14 = stnPM14[(stnPM14[:,0]==aa[k,0]) & (stnPM14[:,6]==aa[k,1]) & (stnPM14[:,4]==aa[k,2]),7]
-        aCO1 = stnCO1[(stnCO1[:,0]==aa[k,0]) & (stnCO1[:,6]==aa[k,1]) & (stnCO1[:,4]==aa[k,2]),7]
-        if len(aSO2)!=0: bb[k,0]=aSO2 
-        if len(aCO)!=0:  bb[k,1]=aCO 
-        if len(aOX)!=0:  bb[k,2]=aOX 
-        if len(aNO2)!=0:  bb[k,3]=aNO2 
-        if len(aSPM)!=0:  bb[k,4]=aSPM 
-        if len(aSPM)!=0:  bb[k,5]=aPM25 
-        if len(aNO)!=0:  bb[k,6]=aNO 
-        if len(aNOX)!=0:  bb[k,7]=aNOX 
-        if len(aSaNMHCO2)!=0:  bb[k,8]=aNMHC 
-        if len(aCH4)!=0:  bb[k,9]=aCH4 
-        if len(aTHC)!=0:  bb[k,10]=aTHC 
-        if len(aCO2)!=0:  bb[k,11]=aCO2 
-        
-        bb_temp = bb[k,:]
-        bb_temp[bb_temp>=9997]= np.nan
-        bb[k,:]=bb_temp
-        
-        nanidx_temp = np.sum(np.isnan(bb_temp))
-        if nanidx_temp == 12:
-            if nanidx is None:
-                nanidx = k
-            else:
-                nanidx = np.vstack([nanidx, k])
-        
-        tElapsed = time.time() - tStart
-        print (f'{yr}_{aa[k,0]:03d}_{aa[k,1]:02d}---{tElapsed} sec')
-    
-    ndata = np.hstack([aa[:,0], np.multiply(yr, np.ones((aa.shape[0], 1))), mm, dd, aa[:,1], bb, aa[:,2]])
-    ndata = np.delete(ndata, nanidx, axis=0)
-    matlab.savemat(os.path.join(path_data,'Station/Station_JP/stn_code_data', f'stn_code_data_all_{yr}.mat'),
-                   {'ndata':ndata, 'header_ndata':header_ndata})
-    print (yr)
+    date_list = dict()
+    for x in range(1, days+1):
+        date_list[x] = matlab.datestr(doy000+x)
+
+    dates = df['doy'].apply(lambda x: date_list[x])
+    dates = pd.DatetimeIndex(dates)
+    df['yr'] = dates.year
+    df['mon'] = dates.month
+    df['day'] = dates.day
+
+    df.reset_index(drop=True, inplace=True)
+    for col in cols:
+        df.loc[df[col]>9997, col] = np.nan
+    df.dropna(axis=0, subset=cols, how='all', inplace=True) # axis=0: row, subset: 기준 
+    ndata = df[header_ndata].values
+    matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_all_{yr}.mat'),
+                       {'ndata':ndata, 'header_ndata':header_ndata})
+    t2 = time.time() - t1
+    print (f'time taken : {t2:.3f}')
