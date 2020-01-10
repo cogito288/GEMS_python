@@ -19,7 +19,7 @@ path_read = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI_tempConv')
 pname_list = ['OMNO2d_trop_CS','OMSO2e_m','OMDOAO3e_m','OMHCHOG']
 
 mask = np.zeros((720, 1440))
-mask[340:552, 1020:1308] = 1
+mask[340:560, 1020:1320] = 1
 mask = mask.ravel(order='F')
 
 ### Temporal convolution with gaussian

@@ -17,12 +17,12 @@ path = os.path.join('/', 'share', 'irisnas5', 'Data', 'EA_GOCI6km')
 #% addpath(genpath([path_data,'/matlab_func/']))  % Add the path of external function (matlab_func) folder with subfolders
 
 matlab.loadmat(os.path.join(path_data, 'grid', 'grid_goci.mat')
-mat = matlab.loadmat(os.path.join(path_data, 'grid', 'grid_omi_25.mat')
+mat = matlab.loadmat(os.path.join(path_data, 'grid', 'grid_omi_25.mat'))
 lon_omi = mat['lon_omi'] 
 lat_omi = mat['lat_omi']
 
-lon_omi = lon_omi[340:552, 1020:1308]
-lat_omi = lat_omi[340:552, 1020,1308]
+lon_omi = lon_omi[340:560, 1020:1320]
+lat_omi = lat_omi[340:560, 1020,1320]
 
 dlist = map(lambda x: x+matlab.datenum('20050000'), list(range(1, 5478+1)))
 dvec = map(lambda x: matlab.datestr(x), dlist) 
@@ -42,8 +42,8 @@ for p in [1] # [1,2,3,4]
         pname = 'OMHCHOG'
 		matlab.loadmat(os.path.join(path_data, 'pre', 'OMI_tempConv'), f'tempConv_{pname}_sigma1_2005_2019.mat')
     
-    #%     data2 = reshape(data,[212,288,5478]);
-    data_conv_all = data_conv.reshape(212, 288, 5478)
+    #%     data2 = reshape(data,[220,300,5478]);
+    data_conv_all = data_conv.reshape(220, 300, 5478)
    	YEARS = list(range(2017, 2019+1))
 	for yr in YEARS:
 		tStart = time.time()
