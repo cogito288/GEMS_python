@@ -1,8 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
+base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -14,8 +14,8 @@ import glob
 
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat'))
@@ -52,11 +52,11 @@ for yr in YEARS:
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp
                         stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2), axis=0)
                     elif stn_GOCI6km_temp.shape[0]!=0:
-                        weight_sum = []
+                        weight_sum = None
                         stn_GOCI6km_temp = np.hstack([stn_GOCI6km_temp, np.zeros([stn_GOCI6km_temp.shape[0], 1])])
                         for k in range(stn_GOCI6km_temp.shape[0]):
                             stn_GOCI6km_temp[k,22] = dup_dist[dup_dist[:,0]==stn_GOCI6km_temp[k,21],1]
-                            nanidx = not np.isnan(stn_GOCI6km_temp[k,5:20])
+                            nanidx = ~np.isnan(stn_GOCI6km_temp[k,5:20])
                             weight = np.divide(nanidx, stn_GOCI6km_temp[k,22])
                             stn_GOCI6km_temp[k,5:20] = np.multiply(stn_GOCI6km_temp[k,5:20], weight)
                             if weight_sum is None:
@@ -67,11 +67,12 @@ for yr in YEARS:
 
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp[stn_GOCI6km_temp[:,22]==min_dist,:]
                         if stn_GOCI6km_temp2.shape[0]!=1:
-                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[1, :]
+                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[0, :].reshape(1,-1)
                         
                         weight_sum = np.sum(weight_sum,axis=0)
-                        stn_GOCI6km_temp2[0,5:20]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:20], axis=0), weight_sum)
-                        stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]), axis=0)
+                        stn_GOCI6km_temp2[:,5:20]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:20], axis=0), weight_sum)
+                        stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]])
+                        
                 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:, 21].argsort()] # sort by scode2
                 if stn_GOCI6km_yr is None:
                     stn_GOCI6km_yr = stn_GOCI6km
