@@ -15,7 +15,6 @@ from calendar import monthrange
 Notes
 [A, B]  -> np.concatenate((A,B),axis=1)
 [A; B]  -> np.concatenate((A,B),axis=0)
-
 [b,I] = sortrows(a,i)  ->       I = argsort(a[:,i]), b=a[I,:]
 """
 
@@ -46,7 +45,6 @@ def csvwrite_with_headers(path, data, header):
 	#if ~ischar(filename)
     #	error('FILENAME must be a string');
 	#end
-
 	#% the r and c inputs are optional and need to be filled in if they are
 	#% missing
 	#if nargin < 4
@@ -55,11 +53,9 @@ def csvwrite_with_headers(path, data, header):
 	# if nargin < 5
     #	c = 0;
 	#end
-
 	#if ~iscellstr(headers)
     #	error('Header must be cell array of strings')
 	#end
-
 	if len(header) != data.shape[1]:	#if length(headers) ~= size(m,2)
 		raise ValueError('number of header entries must match the number of columns in the data')
 	#%% write the header string to the file
@@ -75,14 +71,11 @@ def csvwrite_with_headers(path, data, header):
         header_string = [',',header_string];
     end
 end
-
 %write the string to a file
 fid = fopen(filename,'w');
 fprintf(fid,'%s\r\n',header_string);
 fclose(fid);
-
 %% write the append the data to the file
-
 %
 % Call dlmwrite with a comma as the delimiter
 %
@@ -243,7 +236,6 @@ def delaunayTriangulation(points):
 """
 def ind2sub(siz, IND):
     return np.unravel_index(IND, siz)
-
 def sub2ind(siz, dim1, dim2):
     return np.ravel_multi_index(siz, (dim1, dim2))
 """
@@ -341,7 +333,7 @@ def m_kor(lon, lat, data):
     ax = fig.add_subplots(1,1,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
     ax.set_extent([west, east, south, north])
     ax.gridlines()
-    ax.contourf(lons, lats, data)
+    ax.contourf(lon, lat, data)
     ax.set_title(f"{yr}/{mm:02d}", fontsize=25)
     #plt.show()   
     return fig
