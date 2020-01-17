@@ -31,7 +31,7 @@ pcode = [['01','SO2','ppb'],
          ['12','PM25','ug_m3']]
 
 for p,varname,unit in pcode:
-    header_p = ['doy','year','month','day','scode','ccode','KST',f'stn_{varname}']
+    header_p = ['doy','year','month','day','scode','ccode','KST',f'stn{varname}']
     # 'yr/scode/ccode/pcode/unit/month/day'
    
     YEARS = [2016] # range(2009, 2009+1)
