@@ -33,7 +33,7 @@ header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM1
 def read_table_mat(fname):
     # should contain header column
     mat = matlab.loadmat(fname)
-    tmp_cols = ['KST', 'scode', 'doy', mat['header'][-1]]
+    tmp_cols = ['KST', 'scode', 'doy', list(mat.keys())[-2]]
     df = pd.DataFrame(columns=tmp_cols)
     for col in tmp_cols:
         df[col] = np.squeeze(mat[col])
@@ -70,7 +70,7 @@ for yr in YEARS:
     del tmp_df
         
     tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnSPM_{yr}.mat'))
-    df['SPM'] = tmp_df['stnSPM']
+    df['PM10'] = tmp_df['stnSPM']
     del tmp_df
     
     tmp_df = read_table_mat(os.path.join(path_stn_jp, 'byPollutant/',f'JP_stnPM25_{yr}.mat'))
@@ -97,10 +97,11 @@ for yr in YEARS:
 
     df.reset_index(drop=True, inplace=True)
     for col in cols:
-        df.loc[df[col]>9997, col] = np.nan
+        df.loc[df[col]>=9997, col] = np.nan
+        df.loc[df[col]==-9999, col] = np.nan
     df.dropna(axis=0, subset=cols, how='all', inplace=True) # axis=0: row, subset: 기준 
     ndata = df[header_ndata].values
-    matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_all_{yr}.mat'),
+    matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_{yr}.mat'),
                        {'ndata':ndata, 'header_ndata':header_ndata})
     t2 = time.time() - t1
     print (f'time taken : {t2:.3f}')
