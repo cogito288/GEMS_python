@@ -135,6 +135,6 @@ for yr in YEARS:
             print (f'{yr}_{doy} -- {tElapsed_doy:3.4f} sec')
         else:
             print (f'Less than 4 hourly data in {doy:03d} (DOY) \n')   
-    matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_rm_outlier_{yr}_rm.mat'), {'stn_JP':stn_JP})
+    matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_rm_outlier_{yr}.mat'), {'stn_JP':stn_JP})
     print (yr)
     
