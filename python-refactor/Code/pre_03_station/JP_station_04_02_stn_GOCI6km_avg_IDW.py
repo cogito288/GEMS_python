@@ -1,7 +1,8 @@
 ### Package Import
 import sys
 import os
-base_dir = os.environ['GEMS_HOME']
+#base_dir = os.environ['GEMS_HOME']
+base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -12,19 +13,34 @@ import pandas as pd
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 ## Japan
-matlab.loadmat(os.path.join(path_data,'Station/Station_JP/jp_stn_GOCI6km_location_weight.mat'))
-jp_stn_GOCI6km_location = jp_stn_GOCI6km_location.sort(axis=1)
+mat = matlab.loadmat(os.path.join(path_stn_jp, 'jp_stn_GOCI6km_location_weight_v2017.mat'))
+jp_dup_scode2_GOCI6km, jp_stn_GOCI6km_location = mat['jp_dup_scode2_GOCI6km'], mat['jp_stn_GOCI6km_location']
+del mat
 
 dup_scode2 = jp_dup_scode2_GOCI6km[:,1:]
 unq_scode2 = jp_stn_GOCI6km_location[jp_stn_GOCI6km_location[:,8]==0,1]
-dup_dist = jp_stn_GOCI6km_location[np.isin(jp_stn_GOCI6km_location[:,1], dup_scode2),[2,8]] # scode2랑 픽셀 중심과의 거리
+idx = [val in dup_scode2 for val in jp_stn_GOCI6km_location[:,1]]
+dup_dist = jp_stn_GOCI6km_location[idx][:, [1,7]]
 
-YEARS = [2017, 2019+1]
+YEARS = [2016]
 for yr in YEARS:
     tStart = time.time()
+    if os.path.isfile(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_{yr}.mat')):
+        ndata_scode = matlab.loadmat(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_{yr}.mat'))['ndata_scode']
+        fname_save = f'jp_stn_scode_data_{yr}.mat'
+    else:
+        ndata = matlab.loadmat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_rm_outlier_{yr}.mat'))['stn_JP']
+        fname_save = f'jp_stn_scode_data_rm_outlier_{yr}.mat'
+    
+    
+    
     #     matlab.loadmat(os.path.join(path_data,'Station/Station_JP/jp_stn_scode_data_',str(yr),'.mat'])
     matlab.loadmat(os.path.join(data_base_dir,'Station/Station_JP', f'jp_stn_scode_data_rm_outlier_{yr}.mat'))
     ind = np.lexsort((ndata_scode[:, 12], ndata_scode[:,0], ndata_scode[:,4]))

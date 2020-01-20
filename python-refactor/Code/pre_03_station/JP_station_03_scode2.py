@@ -22,7 +22,7 @@ path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
 stn_info = stn_info.values
-# scode1, scode2, lat, lat, installation, abolation
+# scode1, scode2, lat, lon, installation, abolation
 
 ## read stn_code_data file
 header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25','scode','scode2'],
