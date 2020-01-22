@@ -1,8 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
+base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -15,8 +15,8 @@ import h5py
 
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
@@ -48,7 +48,7 @@ for yr in YEARS:
         if yr==2019: mm = 5
         else: mm = 12
         for k in range(1,mm+1): 
-            for dd in range(1,31+1): # 1:31
+            for dd in range(1,31+1):
                 ndata_temp2 = ndata_temp[(ndata_temp[:,2]==k) & (ndata_temp[:,3]==dd),:]
                 if len(ndata_temp2)!=0:
                     yyyymmdd = yr*10000+k*100+dd
