@@ -13,24 +13,23 @@ import pandas as pd
 import random
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
+### Setting path
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+path_stn_kr = os.path.join(path_station, 'Station_Korea')
+
+
 write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
 
-# path_nas4 = '//10.72.26.54/irisnas4/Data/Aerosol_Work/'
-# path_nas6 = '//10.72.26.46/irisnas6/Data/Aerosol/'
-# addpath(genpath('//10.72.26.46/irisnas6/Work/Aerosol/matlab_func/'))
-path_nas4 = '/share/irisnas4/Data/Aerosol_Work/'
-path_nas6 = '//share/irisnas6/Data/Aerosol/'
-#addpath(genpath('/share/irisnas6/Work/Aerosol/matlab_func/'))
-
 ## Station index
-matlab.loadmat(os.path.join(path_nas6,'grid/grid_korea.mat'))
-matlab.loadmat(os.path.join(path_nas6,'Station_Korea/stn_1km_location_weight.mat'))
+mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_korea.mat'))
+lat_kor, lon_kor = mat['lat_kor'], mat['lon_kor']
+del mat
+
+matlab.loadmat(os.path.join(path_stn_kr, 'stn_1km_location_weight.mat'))
 
 ## Read data
 target = ['PM10','PM25']
-# cd([path_nas4,'cases/RTT/'])
 
 i=1 #1:2 # target  ########################################
 header = ['NDVI','AOD','AE','FMF','SSA','RSDN','Precip','DEM','LC_ratio', # satellite data(9)
@@ -39,23 +38,21 @@ header = ['NDVI','AOD','AE','FMF','SSA','RSDN','Precip','DEM','LC_ratio', # sate
     'DOY','PopDens','RoadDens'] #, etc data(23)
 
 nvar = 23
-if i==1:
-    header2 = header+['PM10','stn_num','doy_num','time','yr','ovr','k_ind']
-else
-    header2 = header+['PM25','stn_num','doy_num','time','yr','ovr','k_ind']
+if i==1: header2 = header+['PM10','stn_num','doy_num','time','yr','ovr','k_ind']
+else: header2 = header+['PM25','stn_num','doy_num','time','yr','ovr','k_ind']
 
-
-data_stn=[]
-high=[]
-low=[]
-YEARS = [2015,2016]
+data_stn = []
+high = []
+low = []
+YEARS = [2016]
 for yr in YEARS:
     if yr%4==0: days = 366
     else: days = 365
     
     fname = f'Station_1km_rm_outlier_{yr}_weight.mat'
-    matlab.loadmat(os.path.join(path_nas6,'Station_Korea', fname))
-    stn = stn_1km_yr
+    mat = matlab.loadmat(os.path.join(path_stn_kr, fname))
+    stn = mat['stn_1km_yr']
+    del mat
     
     for doy in range(1, days+1):
         if doy <=30 && yr == 2015:
