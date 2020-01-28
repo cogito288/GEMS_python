@@ -19,7 +19,7 @@ path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station')
 path_stn_kr = os.path.join(path_station, 'Station_KR')
 
 path_ea_goci = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km')
-path_rtt = os.path.join(path_ea_goci, 'RTT') # path_save 
+path_rtt = os.path.join(data_base_dir, 'Preprocessed_raw', 'RTT') # path_save 
 
 ## Station index
 mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_korea.mat'))

@@ -42,5 +42,5 @@ for yr in YEARS:
             print (utc)
         print (doy)
     fname = f'nanidx_EA6km_{yr}.mat'
-    matlab.savemat(os.path.join(path_nas6,'EA_GOCI6km', fname), {'nanidx':nanidx})
+    matlab.savemat(os.path.join(path_ea_goci, fname), {'nanidx':nanidx})
     print (yr)

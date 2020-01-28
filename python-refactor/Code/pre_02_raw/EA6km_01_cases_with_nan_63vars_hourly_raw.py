@@ -9,6 +9,7 @@ from Code.utils import matlab
 import time
 import numpy as np
 import pandas as pd
+import h5py
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
@@ -212,8 +213,11 @@ for yr in YEARS:
             data[data==-9999] = np.nan
             data_tbl = pd.DataFrame(data,columns=header_temp)
             print (data_tbl.to_dict('list').keys())
+            header_temp = np.array(data_tbl.columns, dtype=h5py.string_dtype(encoding='utf-8'))
             matlab.savemat(os.path.join(path_ea_goci, 'cases_mat', str(yr), f'cases_EA6km_{yr}_{doy:03d}_{utc:02d}.mat'), 
                            {col: data_tbl[col].values for col in data_tbl.columns})
+            with h5py.File(os.path.join(path_ea_goci, 'cases_mat', str(yr), f'cases_EA6km_{yr}_{doy:03d}_{utc:02d}.mat'), 'a') as dst:
+                dst['header'] = header_temp
             tElapsed = time.time() - tStart
             print (f'{yr}_{doy:03d}_{utc:02d} ... {tElapsed} sec')            
         print (doy) 

@@ -16,13 +16,14 @@ from scipy.spatial.distance import pdist, squareform
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
 path_ea_goci = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km')
+path_rtt = os.path.join(data_base_dir, 'Preprocessed_raw', 'RTT') # path_save 
+path_roo = os.path.join(data_base_dir, 'Preprocessed_raw', 'LOO')
 
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 path_stn_cn = os.path.join(path_station, 'Station_CN')
 path_stn_kr = os.path.join(path_station, 'Station_KR')
 
-path_rtt = os.path.join(path_ea_goci, 'RTT') # path_save 
 
 ## Station index
 mat = matlab.loadmat(os.path.join(path_stn_cn, 'cn_stn_GOCI6km_location_weight.mat'))
@@ -121,7 +122,7 @@ for t in [1]:
                                     val_10_fold = val[ii,:]
                                     cal_10_fold = np.concatenate((data[idx_val,:], val[np.isin(num_tmp,[ii])==0,:]), axis=0)
                                     
-                                    temp_path = os.path.join(path_ea_goci,'LOO/',type_list[t],'/dataset/',target[i])
+                                    temp_path = os.path.join(path_roo,type_list[t],'/dataset/',target[i])
                                     fname = f'{target[i]}_RTT_EA6km_{yr}_{doy:03d}_{utc:02d}'
                                     matlab.savemat(temp_path, fname+f'_LOO_{ii:03d}_cal_doy_stn_ovr.mat',{'cal_10_fold':cal_10_fold})
                                     matlab.savemat(temp_path, fname+f'_LOO_{ii:03d}_val_doy_stn_ovr.mat',{'val_10_fold':val_10_fold})

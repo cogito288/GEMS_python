@@ -10,24 +10,34 @@ import copy
 import numpy as np
 import pandas as pd
 import glob
+import time
 
 ### Setting path
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 ## Japan
-matlab.loadmat(os.path.join(path_data,'Station/Station_JP/jp_stn_GOCI6km_location_weight.mat'))
-jp_stn_GOCI6km_location = jp_stn_GOCI6km_location.sort(axis=1)
+mat = matlab.loadmat(os.path.join(path_stn_jp, 'jp_stn_GOCI6km_location_weight_v2017.mat'))
+jp_dup_scode2_GOCI6km, jp_stn_GOCI6km_location = mat['jp_dup_scode2_GOCI6km'], mat['jp_stn_GOCI6km_location']
+del mat
 
 dup_scode2 = jp_dup_scode2_GOCI6km[:,1:]
 unq_scode2 = jp_stn_GOCI6km_location[jp_stn_GOCI6km_location[:,8]==0,1]
-dup_dist = jp_stn_GOCI6km_location[np.isin(jp_stn_GOCI6km_location[:,1], dup_scode2),[2,8]] # scode2랑 픽셀 중심과의 거리
+idx = [val in dup_scode2 for val in jp_stn_GOCI6km_location[:,1]]
+dup_dist = jp_stn_GOCI6km_location[idx][:, [1,7]]
 
-YEARS = [2017, 2019+1]
+YEARS = [2016]
 for yr in YEARS:
     tStart = time.time()
-    #     matlab.loadmat(os.path.join(path_data,'Station/Station_JP/jp_stn_scode_data_',str(yr),'.mat'])
-    matlab.loadmat(os.path.join(data_base_dir,'Station/Station_JP', f'jp_stn_scode_data_rm_outlier_{yr}.mat'))
-    ind = np.lexsort((ndata_scode[:, 12], ndata_scode[:,0], ndata_scode[:,4]))
+    if os.path.isfile(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_{yr}.mat')):
+        ndata_scode = matlab.loadmat(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_{yr}.mat'))['ndata_scode']
+        fname_save = f'jp_Station_GOCI6km_{yr}_weight.mat'
+    else:
+        ndata_scode = matlab.loadmat(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_rm_outlier_{yr}.mat'))['ndata_scode']
+        fname_save = f'jp_Station_GOCI6km_rm_outlier_{yr}_weight.mat'    
+    
+    ind = np.lexsort((ndata_scode[:, 4], ndata_scode[:,0], ndata_scode[:,12]))
     ndata_scode = ndata_scode[ind]
 
     if yr%4==0: days=366
@@ -37,38 +47,47 @@ for yr in YEARS:
     for doy in range(1,days+1):
         stn_temp = ndata_scode[ndata_scode[:,0]==doy,:]
         for KST in range(9, 16+1): # 9:16 #1:24  #####
-                stn_temp2 = stn_temp[stn_temp[:,4]==KST,:]
+            stn_temp2 = stn_temp[stn_temp[:,4]==KST,:]
             if len(stn_temp2)!=0:
-                stn_GOCI6km = stn_temp2[np.isin(stn_temp2[:,12],unq_scode2),:]
+                idx = [val in unq_scode2 for val in stn_temp2[:,12]]
+                stn_GOCI6km = stn_temp2[idx, :]
+                
                 for j in range(dup_scode2.shape[0]):
-                    stn_GOCI6km_temp = stn_temp2[np.isin(stn_temp2[:,12],dup_scode2[j,:]),:]
+                    idx = [val in dup_scode2[j,:] for val in stn_temp2[:,12]]
+                    stn_GOCI6km_temp = stn_temp2[idx,:]
+                    
                     if stn_GOCI6km_temp.shape[0]==1:
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp
                         stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2])
-                    else:
+                    elif stn_GOCI6km_temp.shape[0]!=0:
                         weight_sum = None
+                        stn_GOCI6km_temp = np.hstack([stn_GOCI6km_temp, np.zeros([stn_GOCI6km_temp.shape[0], 1])])
                         for k in range(stn_GOCI6km_temp.shape[0]):
-                            stn_GOCI6km_temp[k,13] = dup_dist[dup_dist[:,1]==stn_GOCI6km_temp[k,12],1]
-                            nanidx = np.isnan(stn_GOCI6km_temp[k,5:11])==0
-                            weight = np.divide(nanidx, stn_GOCI6km_temp[k, 13])
-                            stn_GOCI6km_temp[k,5:11] = np.multiply(stn_GOCI6km_temp[k, 5:11], weight)
+                            stn_GOCI6km_temp[k,13] = dup_dist[dup_dist[:,0]==stn_GOCI6km_temp[k,12],1]
+                            nanidx = ~np.isnan(stn_GOCI6km_temp[k,5:11])
+                            weight = np.divide(nanidx, stn_GOCI6km_temp[k,13])
+                            stn_GOCI6km_temp[k,5:11] = np.multiply(stn_GOCI6km_temp[k,5:11], weight)
                             if weight_sum is None:
                                 weight_sum = weight
                             else:
                                 weight_sum = np.vstack([weight_sum, weight])
                         min_dist = np.min(stn_GOCI6km_temp[:,13])
+                        
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp[stn_GOCI6km_temp[:,13]==min_dist,:]
                         if stn_GOCI6km_temp2.shape[0]!=1:
-                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[0,:]
-                        # 픽셀중심에 더 가까운 관측소의 scode2를 사용하기 위함. 관측값은 가중평균한 값으로 다시 할당될거이므로 신경 쓰지말기
+                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[0,:].reshape(1,-1)
+                        
                         weight_sum = np.sum(weight_sum, axis=0)
-                        stn_GOCI6km_temp2[5:11]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:11],axis=0), weight_sum)
+                        stn_GOCI6km_temp2[:,5:11]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:11],axis=0), weight_sum)
                         stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]])
+
                 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:,12].argsort()] # sort by scode2
-                stn_GOCI6km_yr = np.vstack([stn_GOCI6km_yr, stn_GOCI6km])
+                if stn_GOCI6km_yr is None:
+                    stn_GOCI6km_yr = stn_GOCI6km
+                else:
+                    stn_GOCI6km_yr = np.vstack([stn_GOCI6km_yr, stn_GOCI6km])
         print (doy)
-    #     matlab.savemat(os.path.join(path_data,'Station/Station_JP/jp_Station_GOCI6km_',str(yr),'_weight'],'jp_stn_GOCI6km_yr','-v7.3')
-    fname = f'jp_Station_GOCI6km_rm_outlier_{yr}_weight.mat'
-    matlab.savemat(os.path.join(data_base_dir,'Station/Station_JP', fname),
+    jp_stn_GOCI6km_yr=stn_GOCI6km_yr 
+    matlab.savemat(os.path.join(path_stn_jp, fname_save),
                    {'jp_stn_GOCI6km_yr':jp_stn_GOCI6km_yr})
     tElapsed = time.time() - tStart

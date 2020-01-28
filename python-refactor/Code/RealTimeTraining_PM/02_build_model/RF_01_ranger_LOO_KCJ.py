@@ -6,7 +6,6 @@ project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import scipy.io as sio
 import numpy as np
 import glob
 import pandas as pd
@@ -14,38 +13,40 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 
 ### Setting path
-data_base_dir = os.path.join('/', 'media', 'sf_GEMS_1', 'Data')
-raw_data_path = os.path.join(data_base_dir, 'Raw', 'GOCI_AOD') 
-write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'GOCI_AOD')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+path_ea_goci = os.path.join(data_base_dir, 'Preprocessed_raw', 'EA_GOCI6km')
+path_rtt = os.path.join(data_base_dir, 'Preprocessed_raw', 'RTT')
+path_loo = os.path.join(data_base_dir, 'Preprocessed_raw', 'LOO')
 
 target = ["PM10", "PM25"] ## Enter the name of dataset (Please use file names with the unified prefix)
 type_list = ["conc","time","time_conc","cloud"]
 # pathname<-"//10.72.26.56/irisnas5/GEMS/PM/"  # Nas5/GEMS
-pathname = "/share/irisnas5/GEMS/PM/"  # Nas5/GEMS
 
 num_tree = 500
-YEARS = [2015,2016,2017]
-for t in [1]:
-    for i in [1]: # Target type
+YEARS = [2016]
+for t in [0]: # type
+    for i in [0]: # Target 
         for yr in YEARS:
-            if yr==2015: days = 365
+            if yr%4==0: days = 365
             else: days = 366
             
             for doy in range(1, days+1): # 321-323 80
                 try:
                     fname = f'{target[i]}_RTT_EA6km_{yr}_{doy:03d}*_LOO_*_cal.csv'
-                    cal_list = glob.glob(os.path.join(pathname, "00_EA6km/LOO/",type_list[t],"/dataset/",target[i],fname))
+                    cal_list = glob.glob(os.path.join(path_roo,type_list[t],"/dataset/",target[i],fname))
                     fname = f'{target[i]}_RTT_EA6km_{yr}_{doy:03d}*_LOO_*_val.csv'
-                    val_list = glob.glob(os.path.join(pathname, "00_EA6km/LOO/",type_list[t],"/dataset/",target[i],fname))
+                    val_list = glob.glob(os.path.join(path_roo,type_list[t],"/dataset/",target[i],fname))
                     
                     for c in range(len(cal_list)): # 820 985
                         try:
                             cal = pd.read_csv(cal_list[c])
                             val = pd.read_csv(val_list[c])
-                            cal = cal[cal[:, 23]>0, :]
-                            val = val[val[:, 23]>0, :]
-                            cal[:, 23] = np.log(cal[:, 23])
-                            val[:, 23] = np.log(val[:, 23])
+
+                            cal = cal.loc[cal.iloc[:, 23]>0, :]
+                            val = val.loc[val.iloc[:, 23]>0, :]
+                            cal.iloc[:, 23] = np.log(cal.iloc[:, 23])
+                            val.iloc[:, 23] = np.log(val.iloc[:, 23])
                             
                             ## Mask Random Forest model using ranger
                             ti = time.time()
@@ -63,39 +64,38 @@ for t in [1]:
                                     #scale.permutation.importance = TRUE, 
                                     #save.memory = FALSE, 
                             }
-                            if i==1:
-                                rf_model = RandomForestRegressor(params)
-                                rf_model.fit(cal)
-                            else:
-                                rf_model = RandomForestRegressor(params)
-                                rf_model.fit(cal)
+                            rf_model = RandomForestRegressor(**params)
+                            rf_model.fit(cal)
                             t2 = time.time()
                             print (t2-t1)
                             
                             if t==3:
-                                name = cal_list[c][36:70]
+                                name = os.path.basenanme(cal_list[c])[36:70]
                             elif t==4:
-                                name = cal_list[c][32:66]
+                                name = os.path.basenanme(cal_list[c])[32:66]
                             else:
-                                name = cal_list[c][31:65]
+                                name = os.path.basenanme(cal_list[c])[31:65]
                             
                             # Validation reslut
-                            pred_val = rf_model.predict(val)
+                            pred_val = rf_model.predict(val.drop([target[i]]), val[target[i]])
                             pred_val = np.exp(pre_val)
                             
                             # save vali pred
                             fname = f'rf_{name}_val_ranger.csv'
                             pred_val = pd.DataFrame(pred_val)
-                            pred_val.to_csv(os.path.join(pathname, "00_EA6km/LOO/",type[t],"/RF/",target[i], fname), sep=",")
-                            # print('Predicted val result is saved')
+                            matlab.check_make_dir(os.path.join(paht_loo, type_list[t],"/RF/",target[i]))
+                            pred_val.to_csv(os.path.join(paht_loo, type_list[t],"/RF/",target[i], fname), sep=",")
+                            print('Predicted val result is saved')
+                        except:
+                            pass
                     # LOO list
                     print (doy)
+                except:
+                    pass
                 # doy
                 print (yr)
             # yr
             print (target[i])
         # target
         print (type_list[t])
-    # type           
-                                  
-                                  
+    # type                          
