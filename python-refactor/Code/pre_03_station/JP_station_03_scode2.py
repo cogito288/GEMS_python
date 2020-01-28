@@ -60,7 +60,7 @@ for yr in YEARS:
                         else:
                             ndata_scode=np.vstack([ndata_scode,ndata_temp2])
         if (j+1)%50==0:
-            fname = f'stn_scode_data_{yr}_{j-98:04d}.mat'
+            fname = f'stn_scode_data_{yr}_{j-48:04d}.mat'
             matlab.savemat(os.path.join(path_stn_jp, fname), {'ndata_scode':ndata_scode})
             ndata_scode = None
         elif (j+1)==stn_info.shape[0]:
