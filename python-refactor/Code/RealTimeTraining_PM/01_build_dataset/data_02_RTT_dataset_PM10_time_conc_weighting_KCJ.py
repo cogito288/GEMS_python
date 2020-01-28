@@ -51,10 +51,6 @@ del df, mat
 stn_6km_location = np.concatenate([stn_GOCI6km_location, jp_stn_GOCI6km_location, cn_stn_GOCI6km_location], axis=0)
 cn_dup_scode2_GOCI6km = np.concatenate([cn_dup_scode2_GOCI6km, np.zeros((cn_dup_scode2_GOCI6km.shape[0], jp_dup_scode2_GOCI6km.shape[1]))], axis=1)
 dup_scode2_GOCI6km = np.concatenate([dup_scode2_GOCI6km, np.zeros((dup_scode2_GOCI6km.shape[0], jp_dup_scode2_GOCI6km.shape[1]))], axis=1)
-
-dup_scode2_GOCI6km = np.ones((102,15))
-cn_dup_scode2_GOCI6km = np.ones((100,15))
-jp_dup_scode2_GOCI6km = np.ones((240, 15))
 dup_scode2_6km = np.concatenate((dup_scode2_GOCI6km, cn_dup_scode2_GOCI6km, jp_dup_scode2_GOCI6km), axis=0)
 
 del stn_GOCI6km_location, cn_stn_GOCI6km_location, jp_stn_GOCI6km_location, cn_dup_scode2_GOCI6km, dup_scode2_GOCI6km, jp_dup_scode2_GOCI6km, header_cn_stn_GOCI6km_location, header_jp_stn_GOCI6km_location
@@ -76,7 +72,7 @@ YEARS = [2016]
 for yr in YEARS:
     if yr%4==0: days = 366
     else: days = 365
-    """
+    
     fname = f'Station_GOCI6km_{yr}_weight.mat'
     mat = matlab.loadmat(os.path.join(path_stn_kr, fname))
     stn_GOCI6km_yr = mat['stn_GOCI6km_yr']
@@ -93,10 +89,7 @@ for yr in YEARS:
     mat = matlab.loadmat(os.path.join(path_stn_jp, fname))
     jp_stn_GOCI6km_yr = mat['jp_stn_GOCI6km_yr']
     del mat
-    """
-    jp_stn_GOCI6km_yr = np.ones((9361536, 13))
-    stn_GOCI6km_yr = np.ones((9361536, 13))
-    cn_stn_GOCI6km_yr = np.ones((9361536, 25))
+    
     
     jp_stn_GOCI6km_yr = jp_stn_GOCI6km_yr[(jp_stn_GOCI6km_yr[:,4]>=9) & (jp_stn_GOCI6km_yr[:,4]<=16),0:13]
     stn_GOCI6km_yr = stn_GOCI6km_yr[(stn_GOCI6km_yr[:,4]>=9) & (stn_GOCI6km_yr[:,4]<=16),:]
@@ -111,7 +104,9 @@ for yr in YEARS:
         if len(data_stn)==0: # empty
             None # Do nothing
         elif data_stn[data_stn[:,28]==1,:].shape[0]>1:
-            rmovr = random.sample(data_stn[data_stn[:,-2]==1,:], np.round(data_stn[data_stn[:,-2]==1,:].shape[0]*0.9))
+            tmp_data = data_stn[data_stn[:,-2]==1,:]
+            mask = np.random.choice(tmp_data.shape[0], np.round(tmp_data.shape[0]*0.9).astype(int), replace=False)
+            rmovr = tmp_data[mask, :]
             idx = (data_stn[:, -2]!=1)
             data_stn = data_stn[idx, :] #data_stn[data_stn[:,-1]==1,:]=[]
             data_stn = np.concatenate([data_stn, rmovr], axis=0)
@@ -125,7 +120,9 @@ for yr in YEARS:
                 if len(data_stn)==0: # etmpty
                     None # Do nothing
                 elif data_stn[data_stn[:,28]==1,:].shape[0]>1:
-                    rmovr = random.sample(data_stn[data_stn[:,-2]==1,:], np.round(data_stn[data_stn[:,-2]==1,:].shape[0]*0.99))
+                    tmp_data = data_stn[data_stn[:,-2]==1,:]
+                    mask = np.random.choice(tmp_data.shape[0], np.round(tmp_data.shape[0]*0.99).astype(int), replace=False)
+                    rmovr = tmp_data[mask, :]
                     idx = (data_stn[:, -2]!=1)
                     data_stn = data_stn[idx, :]
                     data_stn = np.concatenate((data_stn, rmovr), axis=0)
@@ -135,15 +132,14 @@ for yr in YEARS:
                 
                 fname = f'cases_EA6km_{yr}_{doy:03d}_{utc:02d}.mat'
                 mat = matlab.loadmat(os.path.join(path_ea_goci, 'cases_mat',str(yr), fname)) # data_tbl
-                print (mat.keys())
                 df = pd.DataFrame(columns = mat['header'])
                 for col in mat['header']:
                     df[col] = mat[col]
                 data = df.values
                 del df, mat
-                                
+                
                 # Load station data
-                stn_6km = stn[stn[:,0] == doy & stn[:,1] ==yr & stn[:,4]== utc,:]
+                stn_6km = stn[(stn[:,0]==doy) & (stn[:,1] ==yr) & (stn[:,4]==utc),:]
                 
                 if len(stn_6km)!=0: # no observation data in some utc
                     stn_idx = np.isin(stn_6km_location[:,1], stn_6km[:,12])
@@ -153,15 +149,15 @@ for yr in YEARS:
                     stn_conc[:,6] = stn_6km_location[stn_idx,4]# PM10, stn_num, doy_num,time,yr, ovr, stn_location
                    
                     data_1 = stn_conc[stn_conc[:,0]<=20,:]            # (x0.03)
-                    data_2 = stn_conc[stn_conc[:,0]>20 & stn_conc[:,0]<=40,:] # (x0.07)
-                    data_3 = stn_conc[stn_conc[:,0]>40 & stn_conc[:,0]<=60,:] # (x0.1)
-                    data_4 = stn_conc[stn_conc[:,0]>60 & stn_conc[:,0]<=80,:]  # (x0.2)
-                    data_5 = stn_conc[stn_conc[:,0]>80 & stn_conc[:,0]<=100,:]  # (x0.4)
-                    data_6 = stn_conc[stn_conc[:,0]>100 & stn_conc[:,0]<=120,:]  # (x0.6)
-                    data_7 = stn_conc[stn_conc[:,0]>120 & stn_conc[:,0]<=180,:]  # (x1)
-                    data_8 = stn_conc[stn_conc[:,0]>180 & stn_conc[:,0]<=270,:]  # (x3)
-                    data_9 = stn_conc[stn_conc[:,0]>270 & stn_conc[:,0]<=360,:] # (x9)
-                    data_10 = stn_conc[stn_conc[:,0]>360 & stn_conc[:,0]<=540,:] # (x16)
+                    data_2 = stn_conc[(stn_conc[:,0]>20) & (stn_conc[:,0]<=40),:] # (x0.07)
+                    data_3 = stn_conc[(stn_conc[:,0]>40) & (stn_conc[:,0]<=60),:] # (x0.1)
+                    data_4 = stn_conc[(stn_conc[:,0]>60) & (stn_conc[:,0]<=80),:]  # (x0.2)
+                    data_5 = stn_conc[(stn_conc[:,0]>80) & (stn_conc[:,0]<=100),:]  # (x0.4)
+                    data_6 = stn_conc[(stn_conc[:,0]>100) & (stn_conc[:,0]<=120),:]  # (x0.6)
+                    data_7 = stn_conc[(stn_conc[:,0]>120) & (stn_conc[:,0]<=180),:]  # (x1)
+                    data_8 = stn_conc[(stn_conc[:,0]>180) & (stn_conc[:,0]<=270),:]  # (x3)
+                    data_9 = stn_conc[(stn_conc[:,0]>270) & (stn_conc[:,0]<=360),:] # (x9)
+                    data_10 = stn_conc[(stn_conc[:,0]>360) & (stn_conc[:,0]<=540),:] # (x16)
                     data_11 = stn_conc[stn_conc[:,0]>540,:]            # (x37)
                     
                     data_1 = data_1[~np.isnan(data_1).any(axis=1)] # delete row if any of element is nan
@@ -171,23 +167,33 @@ for yr in YEARS:
                     data_5 = data_1[~np.isnan(data_5).any(axis=1)]
                     data_6 = data_1[~np.isnan(data_6).any(axis=1)]
                     if data_1.shape[0]>1:
-                        data_1 = random.sample(data_1, np.round(data_1.shape[0]*0.03))
+                        mask = np.random.choice(data_1.shape[0], np.round(data_1.shape[0]*0.03).astype(int), replace=False)
+                        data_1 = data_1[mask, :]
                     if data_2.shape[0]>1:
-                        data_2 = random.sample(data_2, np.round(data_2.shape[0]*0.07))
+                        mask = np.random.choice(data_2.shape[0], np.round(data_2.shape[0]*0.07).astype(int), replace=False)
+                        data_2 = data_2[mask, :]                        
                     if data_3.shape[0]>1:
-                        data_3 = random.sample(data_3, np.round(data_3.shape[0]*0.1))
+                        mask = np.random.choice(data_3.shape[0], np.round(data_3.shape[0]*0.1).astype(int), replace=False)
+                        data_3 = data_3[mask, :]
                     if data_4.shape[0]>1:
-                        data_4 = random.sample(data_4, np.round(data_4.shape[0]*0.2))
+                        mask = np.random.choice(data_4.shape[0], np.round(data_4.shape[0]*0.2).astype(int), replace=False)
+                        data_4 = data_4[mask, :]
                     if data_5.shape[0]>1:
-                        data_5 = random.sample(data_5, np.round(data_5.shape[0]*0.4))
+                        mask = np.random.choice(data_5.shape[0], np.round(data_5.shape[0]*0.4).astype(int), replace=False)
+                        data_5 = data_5[mask, :]
                     if data_6.shape[0]>1:
-                        data_6 = random.sample(data_6, np.round(data_6.shape[0]*0.6))
+                        mask = np.random.choice(data_6.shape[0], np.round(data_6.shape[0]*0.6).astype(int), replace=False)
+                        data_6 = data_6[mask, :]
                     
                     nndata = np.concatenate((data_1,data_2,data_3,data_4,data_5,data_6,data_7,data_8,data_9,data_10,data_11), axis=0)
-                    ndata_8 = matlab.oversampling_sh(data_8[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],2)
-                    ndata_9 = matlab.oversampling_sh(data_9[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],8)
-                    ndata_10 = matlab.oversampling_sh(data_10[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],15)
-                    ndata_11 = matlab.oversampling_sh(data_11[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],36)
+                    ndata_8 = matlab.oversampling_sh(data_8[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],2,
+                                                     patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_9 = matlab.oversampling_sh(data_9[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],8,
+                                                     patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_10 = matlab.oversampling_sh(data_10[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],15,
+                                                      patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_11 = matlab.oversampling_sh(data_11[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],36,
+                                                      patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
                     ndata = np.concatenate((nndata, ndata_8,ndata_9,ndata_10,ndata_11), axis=0)
                     del nndata, data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, data_9, data_10, data_11, ndata_8, ndata_9, ndata_10, ndata_11
                                         
@@ -205,7 +211,7 @@ for yr in YEARS:
                     data_tmp[:,nvar+6] = k #k_idx
                                             
                     data_tmp[data_tmp==-9999] = np.nan
-                    data_tmp = data_1[~np.isnan(data_tmp).any(axis=1)]
+                    data_tmp = data_tmp[~np.isnan(data_tmp).any(axis=1)]
                                                             
                     data_stn = np.concatenate((data_stn, data_tmp), axis=0)
                     data_stn = matlab.sortrows(data_stn,[29])
@@ -222,12 +228,11 @@ for yr in YEARS:
                 # leave the high concentration samples
                 print (data_stn)
                 extra_samples = data_stn[data_stn[:,-1]==1,:]
-                
                 high_tmp = extra_samples[extra_samples[:,23]>=400,:]
                 low_tmp = extra_samples[extra_samples[:,23]<=100,:]
                     
                 if len(high_tmp)==0: #empty
-                    high = high
+                    None
                 else:
                     high = np.concatenate((high, high_tmp), axis=0)
                     high[:,-1] = high[:,-1]+1
@@ -236,7 +241,7 @@ for yr in YEARS:
                     high = high_uniq
                 
                 if len(low_tmp)==0: #empty
-                    low = low
+                    None
                 else:
                     low = np.concatenate((low, low_tmp), axis=0)
                     low[:,-1] = low[:,-1]+1                    
@@ -253,7 +258,7 @@ for yr in YEARS:
                 if len(data_stn)==0: # etmpty
                     None # Do nothing
                 elif data_stn[data_stn[:,28]==1,:].shape[0]>1:
-                    rmovr = random.sample(data_stn[data_stn[:,-2]==1,:], np.round(data_stn[data_stn[:,-2]==1,:].shape[0]*0.99))
+                    rmovr = random.sample(data_stn[data_stn[:,-2]==1,:], np.round(data_stn[data_stn[:,-2]==1,:].shape[0]*0.99).astype(int))
                     idx = (data_stn[:, -2]!=1)
                     data_stn = data_stn[idx, :]
                     data_stn = np.concatenate((data_stn, rmovr), axis=0)
@@ -270,7 +275,7 @@ for yr in YEARS:
                 del df, mat
                 
                 # Load station data
-                stn_6km = stn[stn[:,0] == doy & stn[:,1] ==yr & stn[:,4]== utc,:]
+                stn_6km = stn[(stn[:,0] == doy) & (stn[:,1] ==yr) & (stn[:,4]== utc),:]
                 
                 if len(stn_6km)!=0: # no observation data in some utc
                     stn_idx = np.isin(stn_6km_location[:,1], stn_6km[:,12])
@@ -280,16 +285,17 @@ for yr in YEARS:
                     stn_conc[:,6] = stn_6km_location[stn_idx,4]# PM10, stn_num, doy_num,time,yr, ovr, stn_location
                    
                     data_1 = stn_conc[stn_conc[:,0]<=20,:]            # (x0.03)
-                    data_2 = stn_conc[stn_conc[:,0]>20 & stn_conc[:,0]<=40,:] # (x0.07)
-                    data_3 = stn_conc[stn_conc[:,0]>40 & stn_conc[:,0]<=60,:] # (x0.1)
-                    data_4 = stn_conc[stn_conc[:,0]>60 & stn_conc[:,0]<=80,:]  # (x0.2)
-                    data_5 = stn_conc[stn_conc[:,0]>80 & stn_conc[:,0]<=100,:]  # (x0.4)
-                    data_6 = stn_conc[stn_conc[:,0]>100 & stn_conc[:,0]<=120,:]  # (x0.6)
-                    data_7 = stn_conc[stn_conc[:,0]>120 & stn_conc[:,0]<=180,:]  # (x1)
-                    data_8 = stn_conc[stn_conc[:,0]>180 & stn_conc[:,0]<=270,:]  # (x3)
-                    data_9 = stn_conc[stn_conc[:,0]>270 & stn_conc[:,0]<=360,:] # (x9)
-                    data_10 = stn_conc[stn_conc[:,0]>360 & stn_conc[:,0]<=540,:] # (x16)
+                    data_2 = stn_conc[(stn_conc[:,0]>20) & (stn_conc[:,0]<=40),:] # (x0.07)
+                    data_3 = stn_conc[(stn_conc[:,0]>40) & (stn_conc[:,0]<=60),:] # (x0.1)
+                    data_4 = stn_conc[(stn_conc[:,0]>60) & (stn_conc[:,0]<=80),:]  # (x0.2)
+                    data_5 = stn_conc[(stn_conc[:,0]>80) & (stn_conc[:,0]<=100),:]  # (x0.4)
+                    data_6 = stn_conc[(stn_conc[:,0]>100) & (stn_conc[:,0]<=120),:]  # (x0.6)
+                    data_7 = stn_conc[(stn_conc[:,0]>120) & (stn_conc[:,0]<=180),:]  # (x1)
+                    data_8 = stn_conc[(stn_conc[:,0]>180) & (stn_conc[:,0]<=270),:]  # (x3)
+                    data_9 = stn_conc[(stn_conc[:,0]>270) & (stn_conc[:,0]<=360),:] # (x9)
+                    data_10 = stn_conc[(stn_conc[:,0]>360) & (stn_conc[:,0]<=540),:] # (x16)
                     data_11 = stn_conc[stn_conc[:,0]>540,:]            # (x37)
+                    
                     
                     data_1 = data_1[~np.isnan(data_1).any(axis=1)] # delete row if any of element is nan
                     data_2 = data_1[~np.isnan(data_2).any(axis=1)]
@@ -298,24 +304,34 @@ for yr in YEARS:
                     data_5 = data_1[~np.isnan(data_5).any(axis=1)]
                     data_6 = data_1[~np.isnan(data_6).any(axis=1)]
                     if data_1.shape[0]>1:
-                        data_1 = random.sample(data_1, np.round(data_1.shape[0]*0.03))
+                        mask = np.random.choice(data_1.shape[0], np.round(data_1.shape[0]*0.03).astype(int), replace=False)
+                        data_1 = data_1[mask, :]
                     if data_2.shape[0]>1:
-                        data_2 = random.sample(data_2, np.round(data_2.shape[0]*0.07))
+                        mask = np.random.choice(data_2.shape[0], np.round(data_2.shape[0]*0.07).astype(int), replace=False)
+                        data_2 = data_2[mask, :]                        
                     if data_3.shape[0]>1:
-                        data_3 = random.sample(data_3, np.round(data_3.shape[0]*0.1))
+                        mask = np.random.choice(data_3.shape[0], np.round(data_3.shape[0]*0.1).astype(int), replace=False)
+                        data_3 = data_3[mask, :]
                     if data_4.shape[0]>1:
-                        data_4 = random.sample(data_4, np.round(data_4.shape[0]*0.2))
+                        mask = np.random.choice(data_4.shape[0], np.round(data_4.shape[0]*0.2).astype(int), replace=False)
+                        data_4 = data_4[mask, :]
                     if data_5.shape[0]>1:
-                        data_5 = random.sample(data_5, np.round(data_5.shape[0]*0.4))
+                        mask = np.random.choice(data_5.shape[0], np.round(data_5.shape[0]*0.4).astype(int), replace=False)
+                        data_5 = data_5[mask, :]
                     if data_6.shape[0]>1:
-                        data_6 = random.sample(data_6, np.round(data_6.shape[0]*0.6))
-
+                        mask = np.random.choice(data_6.shape[0], np.round(data_6.shape[0]*0.6).astype(int), replace=False)
+                        data_6 = data_6[mask, :]
+                        
                     nndata = np.concatenate((data_1,data_2,data_3,data_4,data_5,data_6,data_7,data_8,data_9,data_10,data_11), axis=0)
                     
-                    ndata_8 = matlab.oversampling_sh(data_8[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],2)
-                    ndata_9 = matlab.oversampling_sh(data_9[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],8)
-                    ndata_10 = matlab.oversampling_sh(data_10[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],15)
-                    ndata_11 = matlab.oversampling_sh(data_11[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],36)
+                    ndata_8 = matlab.oversampling_sh(data_8[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],2,
+                                                     patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_9 = matlab.oversampling_sh(data_9[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],8,
+                                                     patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_10 = matlab.oversampling_sh(data_10[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],15,
+                                                      patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
+                    ndata_11 = matlab.oversampling_sh(data_11[:,:6],stn_6km_location,lon_goci.shape[0],lon_goci.shape[1],36,
+                                                      patch_path=os.path.join(path_grid_raw, 'ovr_patch_order.mat'))
                     ndata = np.concatenate((nndata, ndata_8,ndata_9,ndata_10,ndata_11), axis=0)
                     del nndata, data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, data_9, data_10, data_11, ndata_8, ndata_9, ndata_10, ndata_11
                     # remove station pixel among oversampled pixels
@@ -332,7 +348,7 @@ for yr in YEARS:
                     data_tmp[:,nvar+6] = k #k_idx
                                             
                     data_tmp[data_tmp==-9999] = np.nan
-                    data_tmp = data_1[~np.isnan(data_tmp).any(axis=1)]
+                    data_tmp = data_tmp[~np.isnan(data_tmp).any(axis=1)]
                     idx = data_tmp[:, 23]>10000
                     data_tmp = data_tmp[~idx, :] #data_tmp[data_tmp[:,23]>1000,:] =[]
                     data_stn = np.concatenate((data_stn, data_tmp), axis=0)
@@ -348,11 +364,11 @@ for yr in YEARS:
                     low_rate_pre = data_stn[data_stn[:,23]<=100,:].shape[0]/data_stn[:,23].shape[0]*100
                     # sample adjustment part1 -> remove the oversampled data
                     if high_rate_pre>30:
-                        print ('high_rate_pre = {high_rate_pre:3.2f} & remove the stacked samples \n')
+                        print (f'high_rate_pre = {high_rate_pre:3.2f} & remove the stacked samples \n')
                         idx = data_stn[:,-1]==1 & data_stn[:,-2]==1 & data_stn[:,23]>=400
                         data_stn = data_stn[~idx,:]
                     if low_rate_pre>30:
-                        print ('low_rate_pre = {low_rate_pre:3.2f} & remove stacked samples \n')
+                        print (f'low_rate_pre = {low_rate_pre:3.2f} & remove stacked samples \n')
                         idx = data_stn[:,-1]==1 & data_stn[:,-2]==1 & data_stn[:,23]<=100
                         data_stn = data_stn[~idx,:]
                         
@@ -360,28 +376,28 @@ for yr in YEARS:
                     low_rate_pre = data_stn[data_stn[:,23]<=100,:].shape[0]/data_stn[:,23].shape[0]*100
                     
                     # sample adjustment
-                    if high_rate<30 &low_rate>30:
-                        print ('high_rate = {high_rate:3.2f} & stack more \n')
-                        print ('low_rate = {low_rate:3.2f} & remove stacked samples \n')
+                    if high_rate<30 & low_rate>30:
+                        print (f'high_rate = {high_rate:3.2f} & stack more \n')
+                        print (f'low_rate = {low_rate:3.2f} & remove stacked samples \n')
                         # remove the low concentration samples
                         if len(low)!=0:
                             idx_low = np.where(data_stn[:,25] <= low[-1,25] & data_stn[:,23]<=100 & data_stn[:,-1]==1)[0] # remove the low concentration samples under than doy
                             data_stn = data_stn[~idx_low,:]
                     elif high_rate<30 & low_rate<30:
-                        print ('high_rate = {high_rate:3.2f} & stack more \n')
-                        print ('low_rate = {low_rate:3.2f} & stack more \n')
+                        print (f'high_rate = {high_rate:3.2f} & stack more \n')
+                        print (f'low_rate = {low_rate:3.2f} & stack more \n')
                         
-                    elif high_rate>30 &low_rate<30:
-                        print ('high_rate = {high_rate:3.2f} & remove stacked samples \n')
-                        print ('low_rate = {low_rate:3.2f} & stack more \n')
+                    elif high_rate>30 & low_rate<30:
+                        print (f'high_rate = {high_rate:3.2f} & remove stacked samples \n')
+                        print (f'low_rate = {low_rate:3.2f} & stack more \n')
                         # remove the high concentration samples
                         if len(high)!=0:
                             idx_high = np.where(data_stn[:,25] <= high[-1,25] & data_stn[:,23]>=400 & data_stn[:,-1]==1)[0]
                             data_stn = data_stn[~idx_high,:] 
                             
                     elif high_rate>30 & low_rate>30:
-                        print ('high_rate = {high_rate:3.2f}\n')
-                        print ('low_rate = {low_rate:3.2f}\n')
+                        print (f'high_rate = {high_rate:3.2f}\n')
+                        print (f'low_rate = {low_rate:3.2f}\n')
                         # remove the high concentration samples
                         idx_high = np.where(data_stn[:,25] <= high[-1,25] & data_stn[:,23]>=400 & data_stn[:,-1]==1)[0]
                         data_stn = data_stn[~idx_high,:]
@@ -395,4 +411,5 @@ for yr in YEARS:
                     temp_df.to_csv(os.path.join(path_rrt,'time_conc/dataset/PM10', fname), float_format='%7.7f')
                     print (utc)
             print (doy)
+            
     print (yr)
