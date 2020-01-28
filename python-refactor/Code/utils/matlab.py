@@ -82,7 +82,60 @@ fclose(fid);
 dlmwrite(filename, m,'-append','delimiter',',','roffset', r,'coffset',c);
 """
 
-
+def oversampling_sh(data, stn_location, dim1, dim2, nover, patch_path):
+    """
+    Input
+    data = [stn_conc,scode2,doy_num,time,yr,ovr]
+    
+    Output
+    ndata : stn_conc, scode2, doy_num, time, yr, ovr, pid
+    """
+    if data.shape[1]!=6:
+        raise ValueError("The number of columns should be six.")
+    if nover>36:
+        raise ValueError("The maximum value of nover is 36")
+    
+    data = np.hstack([data, np.zeros((data.shape[0], 1))])
+    for k in range(data.shape[0]):
+        data[k,6] = stn_location[stn_location[:,1]==data[k,1], 4]
+    x,y = ind2sub([dim1, dim2], data[:, 6])
+    data = np.hstack([data, x.reshape((-1,1), order='F'), y.reshape((-1,1), order='F')])
+    conc = data[:, 0]
+    nr, nc = data.shape
+    
+    patch = loadmat(patch_path)['patch']
+    op = patch[:, :, :nover]
+    
+    ndata = np.tile(data, (1,1,nover))
+    ndata[:,7:9,:] = ndata[:,7:9,:] + op
+    ndata = np.transpose(ndata, (2,0,1)).reshape(-1, nc)
+    ndata[:,5] = 1
+    
+    idx = (ndata[:, 7]<=0)
+    ndata = ndata[~idx, :]
+    
+    idx = (ndata[:, 8]<=0)
+    ndata = ndata[~idx, :]
+    
+    idx = ndata[:, 7]>dim1
+    ndata = ndata[~idx, :]
+    
+    idx = ndata[:, 8]>dim2
+    ndata = ndata[~idx, :]
+    
+    ndata[:, 6] = sub2ind([dim1, dim2], ndata[:, 7], ndata[:, 8])
+    #% ndata: [stn_conc,scode2,doy,utc,yr,ovr,pxid,stn_x,stn_y];
+    ndata[ndata[:, 5]==1, 0] = np.multiply(ndata[ndata[:, 5]==1, 0], 
+                                           (0.1*np.random.random(size=(np.sum(ndata[:, 5]).astype(int)))+0.95))
+    
+    #% remove station pixel among oversampled pixels
+    dup_idx = np.isin(ndata[:, 6], stn_location[:, 4])
+    dup_idx = np.multiply(dup_idx, ndata[:, 5])
+    ndata = ndata[dup_idx==0, :]
+    
+    ndata = ndata[:, :7]
+    return ndata
+                                                         
 def histogram_bin_center(x, bin_centers):
     # https://stackoverflow.com/questions/18065951/why-does-numpy-histogram-python-leave-off-one-element-as-compared-to-hist-in-m
     bin_edges = np.r_[-np.Inf, 0.5 * (bin_centers[:-1] + bin_centers[1:]), 
@@ -185,9 +238,9 @@ def savemat(fname, data):
     #sio.savemat(os.path.join(dirname, fname), mdict=data)
     hdf5storage.writes(mdict=data,
                       filename=fname,
-                      matlab_compatible=True,)
-                      #compress=True,
-                      #compression_algorithm='gzip')
+                      matlab_compatible=True,
+                      compress=True,
+                      compression_algorithm='gzip')
 def datenum(datestr):
     # matlab datenum
     # Ordinal 1:
@@ -282,7 +335,6 @@ def permute(arr, change_size):
     return np.transpose(arr, change_size)
 
 
-
 def get_files_endswith(dirname, pattern):
     # Simple dir 
     # e.g. dir('*.tif')
@@ -337,3 +389,279 @@ def m_kor(lon, lat, data):
     ax.set_title(f"{yr}/{mm:02d}", fontsize=25)
     #plt.show()   
     return fig
+
+def heatscatter_paper(X, Y, outpath, outname, numbins=120, markersize=20, marker='o', plot_colorbar=1, plot_lsf=True, xlab=None, ylab=None, titl=None):
+    """
+    %% heatscatter(X, Y, outpath, outname, numbins, markersize, marker, plot_colorbar, plot_lsf, xlab, ylab, title)
+    % mandatory:
+    %            X                  [x,1] array containing variable X
+    %            Y                  [y,1] array containing variable Y
+    %            outpath            path where the output-file should be saved.
+    %                                leave blank for current working directory
+    %            outname            name of the output-file. if outname contains
+    %                                filetype (e.g. png), this type will be used.
+    %                                Otherwise, a pdf-file will be generated
+    % optional:
+    %            numbins            [double], default 50
+    %                                number if bins used for the
+    %                                heat3-calculation, thus the coloring
+    %            markersize         [double], default 10
+    %                                size of the marker used in the scatter-plot
+    %            marker             [char], default 'o'
+    %                                type of the marker used in the scatter-plot
+    %            plot_colorbar      [double], boolean 0/1, default 1
+    %                                set whether the colorbar should be plotted
+    %                                or not
+    %            plot_lsf           [boolean], boolean False/True, default True
+    %                                set whether the least-square-fit line
+    %                                should be plotted or not (together with
+    %                                the correlation/p-value of the data
+    %            xlab               [char], default ''
+    %                                lable for the x-axis
+    %            ylab               [char], default ''
+    %                                lable for the y-axis
+    %            title              [char], default ''
+    %                                title of the figure
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    """
+    hist, xedges, yedges = np.histogram2d(X, Y, bins=(numbins,numbins))
+    xpos, ypos = np.meshgrid(xedges[:-1]+xedges[1:], yedges[:-1]+yedges[1:])
+
+    xpos = xpos.flatten()/2.
+    ypos = ypos.flatten()/2.
+    zpos = np.zeros_like(xpos)
+
+    dx = xedges [1] - xedges [0]
+    dy = yedges [1] - yedges [0]
+    dz = hist.flatten()
+
+    cmap = cm.get_cmap('jet') # Get desired colormap - you can change this!
+    max_height = np.max(dz)   # get range of colorbars so we can normalize
+    min_height = np.min(dz)
+    # scale each z to [0,1], and get their rgb values
+    rgba = [cmap((k-min_height)/max_height) for k in dz] 
+    
+    fig, ax = plt.subplots(1,1)
+    ax.scatter(X, Y, s=markersize, c=rgba, marker=marker)
+    
+    from sklearn.metrics import mean_squared_error
+    if (plot_lsf):
+        OLS = np.polyfit(X,Y,1)
+        correlation_coeff = np.corr(X,Y)
+        R_squre = np.power(correlation_coeff,2)
+        RMSE = np.sqrt(mean_squared_error(X, Y));
+        rRMSE = 100*RMSE/mean(X);
+        RMSE_unit = '(\mug/m^3)'; #%'(ppm)';
+        unit = '(%)';
+        
+        annotation = f'Y: {OLS[0]:.2f} x + {OLS[1]:.2f} \n R^2 : {R_squre:.2f} \n RMSE : {RMSE:.2f} {RMSE_unit} \n rRMSE: {rRMSE:.1f} {unit}'
+        l = lsline;
+        set(l, 'Color', 'k');
+
+        ax.annotate(annotation, xy=(0.25, 0.80), xytext=(0.1, 0.1), 
+                     bbox=dict(boxstyle='square', color=None), 
+                     )
+        plt.rc('font', size=12) 
+        Max = np.max(X)
+        Max = Max/100;
+        MM = np.ceil(Max)
+        MM = MM*100;
+        ax.set_xlim(0, MM)
+        ax.set_ylim(0, MM)
+        
+        #line([0 MM],[0 MM],'Color','k','LineStyle',':');
+        
+        if xlab is not None:
+            ax.set_xlabel(xlab, fontsize=13)
+        if ylab is not None:
+            ax.set_ylabel(ylab, fontsize=13)
+        if titl is not None:
+            ax.set_title(titl, fontsize=16)
+
+    fname, ext = os.path.splitext(outname)
+    if exe=='':
+        outname += '.pdf'
+    outfile = os.path.join(outpath, outname)
+    
+    #%     print('-djpeg','-r1000',outfile);
+    #%     saveas(f, outfile);
+    print (' Done!\n');
+    plt.show()
+    
+def m_kor(lon,lat,data,*args):
+    numarg = 3+len(args)
+
+    if numarg == 3:
+        numplot = 1
+    elif numarg == 6:
+        numplot = 2
+    elif numarg == 9:
+        numplot = 3
+    elif numarg == 12:
+        numplot = 4
+    else:
+        raise ValueError('Please enter the command correctly.')
+
+    east = 131.5
+    west = 124
+    north = 39
+    south = 33
+    if numarg == 3:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,1,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        plt.show()   
+        
+    elif numarg == 6:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,2,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,2,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+       
+
+    elif numarg == 9:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,numplot,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,3, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[3], args[4], args[5]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+
+    elif numarg == 12:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,numplot,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,3, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[3], args[4], args[5]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,4, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[6], args[7], args[8]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+    return fig, fig.axes
+
+def m_kc(lon,lat,data,*args):
+    numarg = 3+len(args)
+
+    if numarg == 3:
+        numplot = 1
+    elif numarg == 6:
+        numplot = 2
+    elif numarg == 9:
+        numplot = 3
+    elif numarg == 12:
+        numplot = 4
+    else:
+        raise ValueError('Please enter the command correctly.')
+                          
+    east = 131.5
+    west = 113
+    north = 48
+    south = 24
+    if numarg == 3:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,1,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        plt.show()   
+        
+    elif numarg == 6:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,2,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,2,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+       
+
+    elif numarg == 9:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,numplot,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,3, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[3], args[4], args[5]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+
+    elif numarg == 12:
+        fig = plt.figure(figsize=(10,5))
+        ax = fig.add_subplots(1,numplot,1, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(lon, lat, data) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,2, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[0], args[1], args[2]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,3, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[3], args[4], args[5]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+        
+        ax = fig.add_subplots(1,numplot,4, projection=ccrs.LambertConformal(central_longitude=(east+west)/2))
+        ax.set_extent([west, east, south, north])
+        ax.gridlines()  # m_grid('box','fancy','tickdir','in','fontsize',20);
+        ax.contourf(args[6], args[7], args[8]) # m_pcolor(lon,lat,data); shading flat
+        ax.coastlines() #  m_gshhs_i('color','k','linewidth',2);
+    return fig, fig.axes
