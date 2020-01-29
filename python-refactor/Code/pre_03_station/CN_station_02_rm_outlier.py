@@ -13,8 +13,13 @@ import glob
 import time
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_station = os.path.join(data_base_dir,'Preprocessed_raw', 'Station')
 
 YEARS = [2016] # range(2015, 2019+1)
 for yr in YEARS:
@@ -28,13 +33,13 @@ for yr in YEARS:
     ndata[:,18]=ndata[:,18]/1.15 # (mg/m3) to ppm (1 ppm = 1.15 mg m-3)
     ndata[ndata[:,18]>20,18]= np.nan
     # SO2 
-    ndata[:,10]=ndata[:,10]/2.62; # (?g/m3) to ppb (1 ppb = 2.62 ?g m-3)
+    ndata[:,10]=ndata[:,10]/2.62; # (ug/m3) to ppb (1 ppb = 2.62 ug m-3)
     ndata[ndata[:,10]>400,10]=np.nan
     # NO2
-    ndata[:,12]=ndata[:,12]/1.88; # (?g/m3) to ppb (1 ppb = 1.88 ?g m-3)
+    ndata[:,12]=ndata[:,12]/1.88; # (ug/m3) to ppb (1 ppb = 1.88 ug m-3)
     ndata[ndata[:,12]>400,12]=np.nan
     # O3
-    ndata[:,14]=ndata[:,14]/1.96; # (?g/m3) to ppb (1 ppb = 1.96 ?g m-3)
+    ndata[:,14]=ndata[:,14]/1.96; # (ug/m3) to ppb (1 ppb = 1.96 ug m-3)
     ndata[ndata[:,14]>400,14]=np.nan
     # PM25 (ug/m3)
     ndata[ndata[:,6]>600,6]=np.nan

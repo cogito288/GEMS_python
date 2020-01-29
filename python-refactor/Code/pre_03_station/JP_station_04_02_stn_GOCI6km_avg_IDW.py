@@ -2,6 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -13,7 +14,9 @@ import glob
 import time
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
@@ -91,3 +94,4 @@ for yr in YEARS:
     matlab.savemat(os.path.join(path_stn_jp, fname_save),
                    {'jp_stn_GOCI6km_yr':jp_stn_GOCI6km_yr})
     tElapsed = time.time() - tStart
+    

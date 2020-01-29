@@ -2,6 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -12,10 +13,16 @@ import pandas as pd
 import glob
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+
+#mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat')) # period_GOCI.csv 사용해서 만든거
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
-mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat')) # period_GOCI.csv 사용해서 만든거
+mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat'))
 cn_dup_scode2_GOCI6km, cn_stn_GOCI6km_location = mat['cn_dup_scode2_GOCI6km'], mat['cn_stn_GOCI6km_location']
 del mat
 
@@ -49,10 +56,11 @@ for yr in YEARS:
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp
                         stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2), axis=0)
                     elif stn_GOCI6km_temp.shape[0]!=0:
-                        weight_sum = []
+                        weight_sum = None
+                        stn_GOCI6km_temp = np.hstack([stn_GOCI6km_temp, np.zeros([stn_GOCI6km_temp.shape[0], 1])])
                         for k in range(stn_GOCI6km_temp.shape[0]):
                             stn_GOCI6km_temp[k,22] = dup_dist[dup_dist[:,0]==stn_GOCI6km_temp[k,21],1]
-                            nanidx = not np.isnan(stn_GOCI6km_temp[k,5:20])
+                            nanidx = ~np.isnan(stn_GOCI6km_temp[k,5:20])
                             weight = np.divide(nanidx, stn_GOCI6km_temp[k,22])
                             stn_GOCI6km_temp[k,5:20] = np.multiply(stn_GOCI6km_temp[k,5:20], weight)
                             if weight_sum is None:
@@ -63,12 +71,11 @@ for yr in YEARS:
 
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp[stn_GOCI6km_temp[:,22]==min_dist,:]
                         if stn_GOCI6km_temp2.shape[0]!=1:
-                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[1, :]
+                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[0, :].reshape(1,-1)
                         
-                        # 픽셀중심에 더 가까운 관측소의 scode2를 사용하기 위함. 관측값은 가중평균한 값으로 다시 할당될거이므로 신경 쓰지말기
                         weight_sum = np.sum(weight_sum,axis=0)
-                        stn_GOCI6km_temp2[0,5:20]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:20], axis=0), weight_sum)
-                        stn_GOCI6km = np.concatenate((stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]), axis=0)
+                        stn_GOCI6km_temp2[:,5:20]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:20], axis=0), weight_sum)
+                        stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]])
                 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:, 21].argsort()] # sort by scode2
                 if stn_GOCI6km_yr is None:
                     stn_GOCI6km_yr = stn_GOCI6km

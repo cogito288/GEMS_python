@@ -14,6 +14,12 @@ import time
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 path_omi_raw = os.path.join(data_base_dir, 'Raw', 'OMI') 
 path_omi_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI')
+#data_base_dir = os.path.join(project_path, 'Data')
+#path_read = os.path.join(data_base_dir, 'Raw', 'OMI') 
+#path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI')
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#path_read = os.path.join('/','share','irisnas6','Data','OMI','00raw')
+#path_write = os.path.join(data_base_dir, 'Preprocessed_raw', 'OMI_tempConv')
 
 ### Setting period
 YEARS = [2016]
@@ -23,7 +29,7 @@ print ('OMNO2d')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_omi_raw, 'L3', 'OMNO2d', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMNO2d', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -40,14 +46,14 @@ for yr in YEARS:
         data[data<=-1.2676506e+30] = np.nan # Assign NaN value to pixel that is out of valid range
         data = data * 3.7216e-17   
         data_yr[:, doy-1] = data.ravel(order='F')
-        del data
-    out_fname = os.path.join(path_omi_processed, f'OMNO2d_{yr}_DU.mat')
+
+    out_fname = os.path.join(path_write, f'OMNO2d_trop_CS_{yr}_DU.mat')
     matlab.check_make_dir(os.path.dirname(out_fname))
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
     tElapsed = time.time() - tStart
     print (f'{tElapsed} second')
-    del data_yr
+    del data, data_yr
 print ('==========================================================')
 
 
@@ -56,7 +62,7 @@ print ('OMSO2e')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_omi_raw, 'L3', 'OMSO2e', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMSO2e', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -80,14 +86,13 @@ for yr in YEARS:
         data[rcf>=0.3]=np.nan
         data[sza>=78]=np.nan
         data_yr[:, doy-1] = data.ravel(order='F')
-        del data, rcf, sza
-    out_fname = os.path.join(path_omi_processed, f'OMSO2d_{yr}.mat')
+    out_fname = os.path.join(path_write, f'OMSO2e_m_{yr}.mat')
     matlab.check_make_dir(os.path.dirname(out_fname))
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
     tElapsed = time.time() - tStart
     print (f'{tElapsed} second')
-    del data_yr
+    del data, rcf, sza, data_yr
 print ('==========================================================')    
 
 ### OMDOAO3e
@@ -95,7 +100,7 @@ print ('OMDOAO3e')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_omi_raw, 'L3', 'OMDOAO3e', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L3_grid', 'OMDOAO3e', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
@@ -118,14 +123,13 @@ for yr in YEARS:
         data[rcf>=0.3]=np.nan
         data[sza>=78]=np.nan
         data_yr[:, doy-1] = data.ravel(order='F')
-        del data, rcf, sza
-    out_fname = os.path.join(path_omi_processed, f'OMDOAO3e_m_{yr}.mat')
+    out_fname = os.path.join(path_write, f'OMDOAO3e_m_{yr}.mat')
     matlab.check_make_dir(os.path.dirname(out_fname))
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
     tElapsed = time.time() - tStart
     print (f'{tElapsed} second')
-    del data_yr
+    del data, rcf, sza, data_yr
 print ('==========================================================')
 
 ### OMHCHOG
@@ -133,12 +137,11 @@ print ('OMHCHOG')
 for yr in YEARS:
     tStart = time.time()
     doy_000 = matlab.datenum(f'{yr}0000')
-    file_list = glob.glob(os.path.join(path_omi_raw, 'L2', 'OMHCHOG', str(yr), '*.he5'))
+    file_list = glob.glob(os.path.join(path_read, 'L2_grid', 'OMHCHOG', str(yr), '*.he5'))
     file_list.sort()
     
     if yr%4==0: days = 366
     else: days = 365
-
     data_yr = np.ones((1036800, days))*np.nan        
     for read_fname in file_list:
         temp = os.path.basename(read_fname)
@@ -165,7 +168,6 @@ for yr in YEARS:
             VCD_temp = VCD[:,:,k]
             QA_temp = QA[:,:,k]
             sza_temp = sza[:,:,k]
-
             VCD_temp[QA_temp!=0] = np.nan #  Good columns (0) / Suspect columns (1) / Bad columns (2) / missing (<0)
             VCD_temp[sza_temp>88] = np.nan
             VCD_filtered[:,:,k] = VCD_temp
@@ -173,7 +175,7 @@ for yr in YEARS:
         VCD_avg = np.nanmean(VCD_filtered, axis=2)
         data_yr[:, doy-1] = VCD_avg.ravel(order='F')
         del data, VCD, QA, sza
-    out_fname = os.path.join(path_omi_processed, f'OMHCHOG_{yr}.mat')
+    out_fname = os.path.join(path_write, f'OMHCHOG_{yr}_DU.mat')
     data_yr[np.isnan(data_yr)] = -9999 
     matlab.savemat(out_fname, {'data_yr':data_yr})
     tElapsed = time.time() - tStart

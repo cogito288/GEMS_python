@@ -24,8 +24,10 @@ del mat
 mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_omi_25.mat'))
 lon_omi, lat_omi = mat['lon_omi'], mat['lat_omi']
 del mat
-lon_omi = lon_omi[340:552, 1020:1308]
-lat_omi = lat_omi[340:552, 1020:1308]
+
+lon_omi = lon_omi[340:560, 1020:1320]
+lat_omi = lat_omi[340:560, 1020,1320]
+
 points = np.array([lon_omi.ravel(order='F'), lat_omi.ravel(order='F')]).T
 del lon_omi, lat_omi
 print (f'points shape : {points.shape}')
@@ -44,13 +46,15 @@ for pname in pname_list:
     elif pname == 'OMHCHOG':
         data_conv = matlab.loadmat(os.path.join(path_omi_processed, f'tempConv_{pname}_sigma1_2005_2019.mat'))['data_conv']
     
-    data_conv_all = data_conv.reshape(212, 288, 5478)
+    data_conv_all = data_conv.reshape(220, 300, 5478)
     YEARS = [2016]
     for yr in YEARS:
         if yr%4==0: days = 366
         else: days = 365
         
-        data_conv_yr = data_conv_all[:, :, [val.astype(object).year==yr for val in dvec]]
+        #data_conv_yr = data_conv_all[:, :, [val.astype(object).year==yr for val in dvec]]       
+        data_conv_yr = data_conv_all[:, :, map(lambda x: x.astpye(object).year==yr)]
+        #data_conv_yr = data_conv_all(:,:,dvec(:,1)==yr);
         
         for doy in range(1, days+1):
             tStart = time.time()

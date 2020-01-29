@@ -2,6 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -13,7 +14,11 @@ import glob
 import h5py
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 # scode1, scode2, lon, lat, op_start, op_
@@ -34,7 +39,12 @@ for yr in YEARS:
     # Assign scode2
     for j in range(stn_info_cn.shape[0]):
         ndata_temp = ndata[ndata[:,-2]==stn_info_cn[j,0],:]
-        for k in range(1,5+1): 
+
+        if yr==2019:
+            mm = 5
+        else:
+            mm = 12
+        for k in range(1,mm+1): 
             ndata_temp2 = ndata_temp[ndata_temp[:,2]==k,:]
             if len(ndata_temp2)!=0:
                 yrmon = yr*100+k
@@ -51,7 +61,7 @@ for yr in YEARS:
             ndata_scode = None
         elif (j+1)==stn_info_cn.shape[0]:
             if ndata_scode is not None:
-                fname = f'stn_scode_data_{yr}_1501.mat'
+                fname = f'stn_scode_data_{yr}_{np.int((j+1)/100)*100+1:04d}.mat'
                 matlab.savemat(os.path.join(path_station,'Station_CN', fname), {'ndata_scode':ndata_scode})
         print (f'{j+1} / {stn_info_cn.shape[0]}')
     

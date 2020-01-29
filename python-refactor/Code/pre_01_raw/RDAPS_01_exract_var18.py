@@ -12,16 +12,32 @@ import pygrib
 import time
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-path_rdaps_raw = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
-path_rdaps_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_rdaps_raw = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
+#path_rdaps_processed = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+#data_base_dir = os.path.join('/', 'media', 'sf_GEMS', 'Data')
+#rdaps_path = os.path.join(data_base_dir, 'Raw', 'RDAPS') 
+#write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') 
+
+data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')  # revised
+rdaps_path = os.path.join('/', 'share', 'irisnas8', 'Data', 'NWP', 'UM', 'RDAPS', 'analysis')  # revised
+write_path = os.path.join(data_base_dir, 'Preprocessed_raw', 'RDAPS') # revised
+
 
 ### Setting period
 YEARS = [2016] #, 2018, 2019
 
 for yr in YEARS:
-    file_list = glob.glob(os.path.join(path_rdaps_raw, str(yr), '*000.*.gb2'))
-    file_list.sort()
+    #file_list = glob.glob(os.path.join(path_rdaps_raw, str(yr), '*000.*.gb2'))
+    #file_list.sort()
+
+    curr_path = os.path.join(rdaps_path, str(yr))
+    list_char = glob.glob(os.path.join(curr_path, '*000.*.gb2'))
+    list_char = [os.path.basename(f) for f in list_char]
+    list_char.sort(); # revised
+    list_date = [x[21:29] for x in list_char]
+    list_dnum = [matlab.datenum(date) for date in list_date]
+
     doy_000 = matlab.datenum(f'{yr}0101')-1
     rdaps = np.full((419,491,18), np.nan) 
     

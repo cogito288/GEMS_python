@@ -2,6 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -13,8 +14,14 @@ import glob
 import h5py
 
 ### Setting path
-data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+#path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
+#path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 
 mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat'))
@@ -38,7 +45,6 @@ for i in range(stn_info_cn.shape[0]):
 new_station[:,1:3]=latlon_data[new_station[:,0].astype('int'),:]
 stn = np.hstack([stn_info_cn[:,[0,1,3,2]], new_station]) # scode1,scode2, lat_org, lon_org, pxid, lat_px, lon_px, dist_btw_org_px
 # new_station = stn
-# matlab.savemat(os.path.join(station_path,'Station_CN/cn_GOCI6km_new_station.mat'),{'new_station':new_station})
 
 
 stn_unq = np.unique(stn[:,4])
@@ -69,3 +75,4 @@ matlab.savemat(os.path.join(path_station,'Station_CN/cn_stn_GOCI6km_location_wei
      'cn_dup_scode2_GOCI6km':cn_dup_scode2_GOCI6km}),
 with h5py.File(os.path.join(path_station,'Station_CN','cn_stn_GOCI6km_location_weight.mat'), 'a') as dst:
     dst['header_cn_stn_GOCI6km_location'] = header_cn_stn_GOCI6km_location
+
