@@ -11,16 +11,17 @@ import copy
 import numpy as np
 import pandas as pd
 import glob
+import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#path_in_situ = os.path.join(data_base_dir, 'Raw') 
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#path_in_situ = os.path.join(data_base_dir, 'Raw') 
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw') 
+
 #data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 #path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
+
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
@@ -85,5 +86,6 @@ for p,varname,unit in pcode:
         stn_tbl = stn_tbl.apply(pd.to_numeric)
         matlab.savemat(os.path.join(path_stn_jp,'byPollutant',f'JP_stn{varname}_{yr}.mat'), 
                    {col: stn_tbl[col].values for col in stn_tbl.columns})
+        with h5py.File(os.path.join(path_stn_jp,'byPollutant',f'JP_stn{varname}_{yr}.mat'), 'a') as dst:
+            dst['header'] = np.array(header_p, dtype=h5py.string_dtype(encoding='utf-8'))
         #stn_tbl.to_csv(os.path.join(path_stn_jp, f'JP_stn{varname}_{yr}.csv'),sep=',',na_rep='NaN')
-        
