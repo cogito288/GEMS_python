@@ -19,7 +19,7 @@ path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station')
 path_stn_kor = os.path.join(path_station, 'Station_KR')
 
 mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat'))
-latlon_data = np.array([mat['lon_goci'].ravel(order='F'),mat['lat_goci'].ravel(order='F')]).T
+latlon_data = np.array([mat['lat_goci'].ravel(order='F'),mat['lon_goci'].ravel(order='F')]).T
 del mat
 
 ## South Korea
@@ -47,7 +47,7 @@ temp_list = stn_unq[unqidx==0]
 stn_GOCI6km = stn[[val in temp_list for val in stn[:, 4]], :]
 stn_GOCI6km = np.hstack([stn_GOCI6km, np.zeros([stn_GOCI6km.shape[0], 1])])
 
-idx = stn_unq[unqidx]
+idx = stn_unq[unqidx].ravel(order='F')
 dup_scode2_GOCI6km = np.zeros((len(idx),np.max(unq_cnt)+1))
 dup_scode2_GOCI6km[:,0]=idx
 
@@ -58,7 +58,8 @@ for i in range(len(idx)):
     stn_GOCI6km_temp = np.hstack([stn_GOCI6km_temp, np.ones([stn_GOCI6km_temp.shape[0], 1])])
     stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp])
 
-stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:,1].argsort()]
+#stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:,1].argsort()]
+stn_GOCI6km = matlab.sortrows(stn_GOCI6km, [1])
 stn_GOCI6km_location = stn_GOCI6km
 header_stn_GOCI6km_location = np.array(['scode1','scode2','lat_org','lon_org','pxid','lat_px','lon_px','avgid','dist'],
                                        dtype=h5py.string_dtype(encoding='utf-8'))
@@ -67,4 +68,4 @@ matlab.savemat(os.path.join(path_stn_kor, fname),
     {'stn_GOCI6km_location':stn_GOCI6km_location,
     'dup_scode2_GOCI6km':dup_scode2_GOCI6km})
 with h5py.File(os.path.join(path_stn_kor, fname), 'a') as dst:
-        dst['header_stn_GOCI6km_location'] = header_stn_GOCI6km_location
+    dst['header_stn_GOCI6km_location'] = header_stn_GOCI6km_location

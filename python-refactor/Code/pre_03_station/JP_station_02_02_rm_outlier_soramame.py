@@ -1,8 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
+base_dir = os.environ['GEMS_HOME']
+#base_dir = 'D:\github\GEMS_python'
 project_path = os.path.join(base_dir, 'python-refactor')
 sys.path.insert(0, project_path)
 from Code.utils import matlab
@@ -14,8 +14,8 @@ import glob
 import time
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
 #data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
@@ -25,7 +25,7 @@ path_stn_jp = os.path.join(path_station, 'Station_JP')
 header = ['doy','yr','mon','day','KST','SO2','CO','OX','NO2','PM10','PM25','scode']
 
 ##
-YEARS = [2017]
+YEARS = [2016]
 for yr in YEARS:
     if yr%4==0: days= 366; 
     else: days=365; 
@@ -34,7 +34,7 @@ for yr in YEARS:
     ndata = matlab.loadmat(os.path.join(path_stn_jp, 'stn_code_data', f'stn_code_data_{yr}_soramame.mat'))['stn_yr']
     ndata = ndata.astype('float')
     scode = np.unique(ndata[:,-1])
-
+    print (ndata.shape)
     # SO2
     ndata[:,5]=ndata[:,5]*1000; # ppm to ppb
     ndata[ndata[:,5]>400,5]=np.nan 

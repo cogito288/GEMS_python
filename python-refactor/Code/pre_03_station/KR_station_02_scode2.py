@@ -40,18 +40,18 @@ for yr in YEARS:
     for j in range(stn_info.shape[0]): 
         ndata_temp = ndata[ndata[:,11]==stn_info[j,0],:]
         for k in range(1,12+1):
-            ndata_temp2 = ndata_temp[ndata_temp[:,3]==k,:]
+            ndata_temp2 = ndata_temp[ndata_temp[:,2]==k,:]
             if len(ndata_temp2)!=0:
                 yrmon = yr*100+k
                 idx = (stn_info[j,4]<=yrmon)&(stn_info[j,5]>yrmon)
-                if idx==1:
+                if idx:
                     ndata_temp2[:,12]=stn_info[j,1]
                     if ndata_scode is None:
                         ndata_scode = ndata_temp2
                     else:
                         ndata_scode=np.vstack([ndata_scode,ndata_temp2])
         print (f'{j} / {stn_info.shape[0]}')
-    fname = f'stn_code_data_{yr}.mat'
-    matlab.savemat(os.path.join(path_stn_kor, fname), {'ndata_scode':ndata_scode})
-    with h5py.File(os.path.join(path_stn_kor, fname), 'a') as dst:
-            dst['header_ndata'] = header_ndata
+    fname = f'stn_scode_data_{yr}.mat'
+    matlab.savemat(os.path.join(path_stn_kor, 'stn_scode_data', fname), {'ndata_scode':ndata_scode})
+    with h5py.File(os.path.join(path_stn_kor, 'stn_scode_data', fname), 'a') as dst:
+        dst['header_ndata'] = header_ndata

@@ -13,9 +13,9 @@ import glob
 import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
-#path_stn_jp = os.path.join(path_station, 'Station_JP')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 #data_tbl = pd.read_csv(os.path.join(path_stn_jp, 'stn_code_ing/jp_stn_code_lonlat_period_year.csv'))
 #data = data_tbl.values
@@ -25,11 +25,12 @@ import h5py
 ### Setting path
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 #data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
-path_stn_jp = os.path.join(path_station, 'Station_JP')
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+#path_stn_jp = os.path.join(path_station, 'Station_JP')
 
-data_tbl = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_year_v2017.csv'))
+data_tbl = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'))
+#data_tbl = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_year_v2017.csv'))
 data = data_tbl.values
 info_tbl = pd.read_csv(os.path.join(path_stn_jp, 'measured_pollutant_by_stn_v2017.csv'), encoding='latin1')
 info_tbl = info_tbl.loc[:, ['Year','scode','SO2','CO','OX','NO2','SPM','PM25']]

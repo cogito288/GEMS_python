@@ -17,6 +17,8 @@ import xlrd
 data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 path_in_situ = os.path.join(data_base_dir, 'Raw') 
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+path_stn_kor = os.path.join(path_station, 'Station_KR')
+
 """
 ## 2005-2013 (xlsx, PM2.5없음)
 YEARS = range(2005, 2013+1)
@@ -55,7 +57,7 @@ for yr in YEARS:
     dvec = np.array(dvec)
     ndata = np.hstack([data_doy.reshape(-1,1),dvec[:,:4],data[:,2:],np.full([len(data_doy),1])*np.nan, data[:,0].reshape(-1,1)])
     # doy, yr, mon, day, time, SO2, CO, O3, NO2, PM10, (PM25), scode
-    matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data',f'stn_code_data_{yr}.mat'), 
+    matlab.savemat(os.path.join(path_stn_kor,'stn_code_data',f'stn_code_data_{yr}.mat'), 
                    {'ndata':ndata})
 """
 ## 2014-2016 (csv, PM2.5 컬럼 있음)
@@ -96,7 +98,7 @@ for yr in [2016]:
     dvec = np.array(dvec)
     ndata = np.hstack([data_doy.reshape(-1,1),dvec[:,:4],data[:,2:],data[:,0].reshape(-1,1)])
     # doy, yr, mon, day, time, SO2, CO, O3, NO2, PM10, (PM25), scode
-    matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data',f'stn_code_data_{yr}.mat'), 
+    matlab.savemat(os.path.join(path_stn_kor,'stn_code_data',f'stn_code_data_{yr}.mat'), 
                    {'ndata':ndata})
 """
 ## 2017-2018 2분기 (xlsx, PM2.5 있음)
@@ -141,7 +143,7 @@ for yr in YEARS:
     dvec = np.array(dvec)
     ndata = np.hstack([data_doy.reshape(-1,1),dvec[:,:4],data[:,2:],data[:,0].reshape(-1,1)])
     # doy, yr, mon, day, time, SO2, CO, O3, NO2, PM10, (PM25), scode
-    matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data',f'stn_code_data_{yr}.mat'), 
+    matlab.savemat(os.path.join(path_stn_kor,'stn_code_data',f'stn_code_data_{yr}.mat'), 
                    {'ndata':ndata})
 
 ## 2018 3분기 - 4분기 (xlsx, PM2.5있음.. 근데 중간에 망 정보가 들어가면서 컬럼 위치가 변경됨)
@@ -191,7 +193,7 @@ doy_000 = matlab.datenum(f'{yr}00000')
 data_doy = np.array([np.floor(val-doy_000) for val in data_datenum])
 ndata = np.hstack([data_doy.reshape(-1,1),dvec[:,:4],data[:,2:],data[:,0].reshape(-1,1)])
 # doy, yr, mon, day, time, SO2, CO, O3, NO2, PM10, (PM25), scode
-matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data',f'stn_code_data_{yr}.mat'), 
+matlab.savemat(os.path.join(path_stn_kor,'stn_code_data',f'stn_code_data_{yr}.mat'), 
                {'ndata':ndata})
 
 
@@ -200,7 +202,7 @@ matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data',f'stn_code
 
 yr=2005
 fname = f'stn_code_data_{yr}.mat'
-ndata = matlab.loadmat(os.path.join(path_station,'Station_KR','stn_code_data', fname))['ndata']
+ndata = matlab.loadmat(os.path.join(path_stn_kor,'stn_code_data', fname))['ndata']
 data_mv = ndata[ndata[:,1]==(yr+1),:]
 doy_unq = np.unique(data_mv[:,0])
 
@@ -212,12 +214,12 @@ data_mv[:,0]=1
 
 ndata[ndata[:,1]==(yr+1),:]=[]
 fname = f'stn_code_data_{yr}.mat'
-matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data'), fname, {'ndata':ndata})
+matlab.savemat(os.path.join(path_stn_kor,'stn_code_data'), fname, {'ndata':ndata})
 
 YEARS = [2016, 2017]
 for yr in YEARS: #2006:2017
     fname = f'stn_code_data_{yr}.mat'
-    ndata = matlab.loadmat(os.path.join(path_station,'Station_KR','stn_code_data', fname)['ndata']
+    ndata = matlab.loadmat(os.path.join(path_stn_kor,'stn_code_data', fname)['ndata']
     ndata = np.vstack([data_mv, ndata])
     data_mv = ndata[ndata[:,1]==(yr+1),:]
     doy_unq = np.unique(data_mv[:,0])
@@ -226,10 +228,10 @@ for yr in YEARS: #2006:2017
         data_mv[:,0]=1
         ndata = np.delete(ndata, ndata[:,1]==(yr+1), axis=0)
         fname = f'stn_code_data_{yr}.mat'
-        matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data', fname), {'ndata':ndata})
+        matlab.savemat(os.path.join(path_stn_kor,'stn_code_data', fname), {'ndata':ndata})
     else:
         raise ValueError('len(doy_unq)!=1')
 
     fname = f'stn_code_data_{yr}_001_00.mat'
-    matlab.savemat(os.path.join(path_station,'Station_KR','stn_code_data', fname), {'data_mv':data_mv})
+    matlab.savemat(os.path.join(path_stn_kor,'stn_code_data', fname), {'data_mv':data_mv})
 """

@@ -21,6 +21,8 @@ mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat')) # lon_goci, l
 lon_goci, lat_goci = mat['lon_goci'], mat['lat_goci']
 del mat
 
+nn = lat_goci.shape[0]*lat_goci.shape[1]
+
 #%% header
 hd_sat = ['OMNO2d_tc','OMSO2e_tc','OMDOAO3e_tc','OMHCHOG_tc', 'AOD','AE','FMF','SSA','NDVI','RSDN','Precip','DEM'] ## satellite data(12)
 hd_rdaps = ['Temp','Dew','RH','P_srf','MaxWS','PBLH','Visibility','Tsrf','Tmax','Tmin',
@@ -56,96 +58,250 @@ for yr in YEARS:
     if yr%4==0: days = 366
     else: days = 365
     if yr==2019: days = 114
+        
     # ==== Yearly data ====
     # Read population density
-    popDens = matlab.loadmat(os.path.join(path_ea_goci, 'PopDens', f'EA6km_popDens_{yr}.mat'))['popDens']
-    
+    try:
+        popDens = matlab.loadmat(os.path.join(path_ea_goci, 'PopDens', f'EA6km_popDens_{yr}.mat'))['popDens']
+    except FileNotFoundError:
+        popDens = np.full((nn, 1), np.nan)
+        pass
+        
     for doy in range(1, days+1):
         # ==== Daily data ====
         # Read MODIS(AQUA) 16-days NDVI (ndvi)
         doy = 9
         if doy<9:
-            ndvi = matlab.loadmat(os.path.join(path_ea_goci, 'MODIS_NDVI',str(yr-1),f'EA_MODIS_NDVI_{yr-1}_361.mat'))['ndvi']
+            try:
+                ndvi = matlab.loadmat(os.path.join(path_ea_goci, 'MODIS_NDVI',str(yr-1),f'EA_MODIS_NDVI_{yr-1}_361.mat'))['ndvi']
+            except FileNotFoundError:
+                ndvi = np.full((nn,1), np.nan)
+                pass
         else:
             num = int(np.ceil((doy-8)/16)*16-7)
-            ndvi = matlab.loadmat(os.path.join(path_ea_goci, 'MODIS_NDVI',str(yr),f'EA_MODIS_NDVI_{yr}_{num:03d}.mat'))['ndvi']
+            try:
+                ndvi = matlab.loadmat(os.path.join(path_ea_goci, 'MODIS_NDVI',str(yr),f'EA_MODIS_NDVI_{yr}_{num:03d}.mat'))['ndvi']
+            except FileNotFoundError:
+                ndvi = np.full((nn,1), np.nan)
+                pass
         
         if yr<2019:
             ndvi = ndvi.astype('float64')
             ndvi[ndvi==-32768] = np.nan
             ndvi = np.divide(ndvi, 10000)
             ndvi[np.abs(ndvi)>=0.99] = np.nan
+            
         # Load OMI temporal convolutioned data
-        omno2d = matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv','OMNO2d',str(yr),f'EA6km_OMNO2d_{yr}_{doy:03d}.mat'))['omno2d']
+        try:
+            omno2d = matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv','OMNO2d',str(yr),f'EA6km_OMNO2d_{yr}_{doy:03d}.mat'))['omno2d']
+        except FileNotFoundError:
+            omno2d = np.full((nn,1), np.nan)
+            pass
         omno2d[omno2d<0]=np.nan
 
-        omno2d_trop=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv','OMNO2d_trop_CS',str(yr),f'EA6km_OMNO2d_trop_CS_{yr}_{doy:03d}.mat'))['omno2d']
+        try:
+            omno2d_trop=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv','OMNO2d_trop_CS',str(yr),f'EA6km_OMNO2d_trop_CS_{yr}_{doy:03d}.mat'))['omno2d']
+        except FileNotFoundError:
+            omno2d_trop = np.full((nn,1), np.nan)
+            pass
         omno2d_trop[omno2d_trop<0]=np.nan
         
-
-        omso2e_m=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMSO2e_m/',str(yr),f'EA6km_OMSO2e_m_{yr}_{doy:03d}.mat'))['omso2e_m']
+        try:
+            omso2e_m=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMSO2e_m/',str(yr),f'EA6km_OMSO2e_m_{yr}_{doy:03d}.mat'))['omso2e_m']
+        except FileNotFoundError:
+            omso2e_m = np.full((nn,1), np.nan)
+            pass
         omso2e_m[omso2e_m<0]=np.nan
         
-        omdoao3e_m=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMDOAO3e_m/',str(yr),f'EA6km_OMDOAO3e_m_{yr}_{doy:03d}.mat'))['omdoao3e_m']
+        try:
+            omdoao3e_m=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMDOAO3e_m/',str(yr),f'EA6km_OMDOAO3e_m_{yr}_{doy:03d}.mat'))['omdoao3e_m']
+        except FileNotFoundError:
+            omdoao3e_m = np.full((nn,1), np.nan)
+            pass
         omdoao3e_m[omdoao3e_m<0]=np.nan
         
-        omhchog=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMHCHOG/',str(yr),f'EA6km_OMHCHOG_{yr}_{doy:03d}.mat'))['omhchog']
+        try:
+            omhchog=matlab.loadmat(os.path.join(path_ea_goci,'OMI_tempConv/OMHCHOG/',str(yr),f'EA6km_OMHCHOG_{yr}_{doy:03d}.mat'))['omhchog']
+        except FileNotFoundError:
+            omhchog = np.full((nn,1), np.nan)
+            pass
         omhchog[omhchog<0]=np.nan
 
         # Read BESS soalr radiation at 13:30 (RSDN)
         if yr==2017:
-            RSDN = matlab.loadmat(os.path.join(path_ea_goci,'BESS/',str(yr),f'EA6km_BESS_RSDN_{yr_doy}'))['RSDN']
-       	for utc in range(7+1): 
+            try:
+                RSDN = matlab.loadmat(os.path.join(path_ea_goci,'BESS/',str(yr),f'EA6km_BESS_RSDN_{yr_doy}'))['RSDN']
+            except FileNotFoundError:
+                RSDN = np.full((nn,1), np.nan)
+                pass
+        for utc in range(7+1): 
             tStart = time.time()
             # ===== Hourly data =====
             # Read GOCI AOD products (GOCI_aod, GOCI_ae, GOCI_fmf, GOCI_ssa)
-            GOCI_aod = matlab.loadmat(os.path.join(path_goci_filter,'AOD/',str(yr),f'GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_aod']
-            GOCI_ae = matlab.loadmat(os.path.join(path_goci_filter,'AE/',str(yr),f'GOCI_AE_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_ae']
-            GOCI_fmf = matlab.loadmat(os.path.join(path_goci_filter,'FMF/',str(yr),f'GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_fmf']
-            GOCI_ssa = matlab.loadmat(os.path.join(path_goci_filter,'SSA/',str(yr),f'GOCI_SSA_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_ssa']
-
+            try:
+                GOCI_aod = matlab.loadmat(os.path.join(path_goci_filter,'AOD/',str(yr),f'GOCI_AOD_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_aod']
+            except FileNotFoundError:
+                GOCI_aod = np.full((nn,1), np.nan)
+                pass
+            try:
+                GOCI_ae = matlab.loadmat(os.path.join(path_goci_filter,'AE/',str(yr),f'GOCI_AE_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_ae']
+            except FileNotFoundError:
+                GOCI_ae = np.full((nn,1), np.nan)
+                pass
+            try:
+                GOCI_fmf = matlab.loadmat(os.path.join(path_goci_filter,'FMF/',str(yr),f'GOCI_FMF_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_fmf']
+            except FileNotFoundError:
+                GOCI_fmf = np.full((nn,1), np.nan)
+                pass
+            try:
+                GOCI_ssa = matlab.loadmat(os.path.join(path_goci_filter,'SSA/',str(yr),f'GOCI_SSA_{yr}_{doy:03d}_{utc:02d}.mat'))['GOCI_ssa']
+            except FileNotFoundError:
+                GOCI_ssa = np.full((nn,1), np.nan)
+                pass
             # Read GPM accumulated precipitation (precip)
             try:
                 precip = matlab.loadmat(os.path.join(path_ea_goci,'GPM_AP/',str(yr),f'EA6km_gpm_AP_{yr}_{doy:03d}_UTC{utc:02d}.mat'))['precip']
             except FileNotFoundError:
-                precip = matlab.loadmat(os.path.join(path_ea_goci,'GPM_AP/',str(yr),f'EA6km_gpm_AP_{yr}_{doy:03d}_UTC{utc:02d}_early.mat'))['precip']
-                pass
-            doy =1
+                try:
+                    precip = matlab.loadmat(os.path.join(path_ea_goci,'GPM_AP/',str(yr),f'EA6km_gpm_AP_{yr}_{doy:03d}_UTC{utc:02d}_early.mat'))['precip']
+                except FileNotFoundError:
+                    precip = np.full((nn,1), np.nan)
+                    pass
+                
             # Read UM (RDAPS) data
-            T = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp/',str(yr),f'EA6km_T_{yr}_{doy:03d}_{utc:02d}.mat'))['T'] # T
-            D = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Dew/',str(yr),f'EA6km_D_{yr}_{doy:03d}_{utc:02d}.mat'))['D'] # D
-            RH = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/RH/',str(yr),f'EA6km_RH_{yr}_{doy:03d}_{utc:02d}.mat'))['RH'] # RH
-            P_srf = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Pressure/',str(yr),f'EA6km_Pressure_srf_{yr}_{doy:03d}_{utc:02d}.mat'))['P_srf'] # P_srf
-            maxWS = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/MaxWS/',str(yr),f'EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['maxWS'] # maxWS
-            PBLH = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/PBLH/',str(yr),f'EA6km_PBLH_{yr}_{doy:03d}_{utc:02d}.mat'))['PBLH'] # PBLH
-            Visibility = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Visibility/',str(yr),f'EA6km_Visibility_{yr}_{doy:03d}_{utc:02d}.mat'))['Visibility'] # Visibility
+            try:
+                T = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp/',str(yr),f'EA6km_T_{yr}_{doy:03d}_{utc:02d}.mat'))['T'] # T
+            except FileNotFoundError:
+                T = np.full((nn,1), np.nan)
+                pass
+            try:
+                D = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Dew/',str(yr),f'EA6km_D_{yr}_{doy:03d}_{utc:02d}.mat'))['D'] # D
+            except FileNotFoundError:
+                D = np.full((nn,1), np.nan)
+                pass
+            try:
+                RH = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/RH/',str(yr),f'EA6km_RH_{yr}_{doy:03d}_{utc:02d}.mat'))['RH'] # RH
+            except FileNotFoundError:
+                RH= np.full((nn,1), np.nan)
+                pass
+            try:
+                P_srf = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Pressure/',str(yr),f'EA6km_Pressure_srf_{yr}_{doy:03d}_{utc:02d}.mat'))['P_srf'] # P_srf
+            except FileNotFoundError:
+                P_srf = np.full((nn,1), np.nan)
+                pass
             
-            Tsrf = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_surface/',str(yr),f'EA6km_Tsrf_{yr}_{doy:03d}_{utc:02d}.mat'))['Tsrf'] # Tsrf
-            Tmax = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_max/',str(yr),f'EA6km_Tmax_{yr}_{doy:03d}_{utc:02d}.mat'))['Tmax'] # Tmax
-            Tmin = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_min/',str(yr),f'EA6km_Tmin_{yr}_{doy:03d}_{utc:02d}.mat'))['Tmin'] # Tmin
-            FrictionalVelocity = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/FrictionalVelocity/',str(yr),f'EA6km_FrictionalVelocity_{yr}_{doy:03d}_{utc:02d}.mat'))['FrictionalVelocity'] # 'FrictionalVelocity'
-            PotentialEnergy = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/PotentialEnergy/',str(yr),f'EA6km_PotentialEnergy_{yr}_{doy:03d}_{utc:02d}.mat'))['PotentialEnergy'] # 'PotentialEnergy'
-            SurfaceRoughness = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/SurfaceRoughness/',str(yr),f'EA6km_SurfaceRoughness_{yr}_{doy:03d}_{utc:02d}.mat'))['SurfaceRoughness'] # 'SurfaceRoughness'
-            LatentHeatFlux = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/LatentHeatFlux/',str(yr),f'EA6km_LatentHeatFlux_{yr}_{doy:03d}_{utc:02d}.mat'))['LatentHeatFlux'] # 'LatentHeatFlux'
-            SpecificHumidity = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/SpecificHumidity/',str(yr),f'EA6km_SpecificHumidity_{yr}_{doy:03d}_{utc:02d}.mat'))['SpecificHumidity'] # 'SpecificHumidity'
-            U = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Uwind/',str(yr),f'EA6km_U_{yr}_{doy:03d}_{utc:02d}.mat'))['U'] # 'U'
-            V = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Vwind/',str(yr),f'EA6km_V_{yr}_{doy:03d}_{utc:02d}.mat'))['V'] # 'V'
-            stack1 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack1_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack1'] # 'stack1'
-            stack3 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack3_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack3'] # 'stack3'
-            stack5 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack5_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack5'] # 'stack5'
-            stack7 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack7_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack7'] # 'stack7'
-            AP3h = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/AP3h/',str(yr),f'EA6km_AP3h_{yr}_{doy:03d}_{utc:02d}.mat'))['AP3h']
+            try:
+                maxWS = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/MaxWS/',str(yr),f'EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['maxWS'] # maxWS['P_srf'] # P_srf
+            except FileNotFoundError:
+                maxWS = np.full((nn,1), np.nan)
+                pass
+
+            try:
+                P_srf = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Pressure/',str(yr),f'EA6km_Pressure_srf_{yr}_{doy:03d}_{utc:02d}.mat'))['P_srf'] # P_srf
+            except FileNotFoundError:
+                P_srf = np.full((nn,1), np.nan)
+                pass
+            try:
+                PBLH = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/PBLH/',str(yr),f'EA6km_PBLH_{yr}_{doy:03d}_{utc:02d}.mat'))['PBLH'] # PBLH['P_srf'] # P_srf
+            except FileNotFoundError:
+                PBLH = np.full((nn,1), np.nan)
+                pass
+
+            try:
+                Visibility = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Visibility/',str(yr),f'EA6km_Visibility_{yr}_{doy:03d}_{utc:02d}.mat'))['Visibility'] # Visibility
+            except FileNotFoundError:
+                Visibility = np.full((nn,1), np.nan)
+                pass
+            try:
+                Tsrf = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_surface/',str(yr),f'EA6km_Tsrf_{yr}_{doy:03d}_{utc:02d}.mat'))['Tsrf'] # Tsrf
+            except FileNotFoundError:
+                Tsrf = np.full((nn,1), np.nan)
+                pass
+            
+            try:
+                Tmax = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_max/',str(yr),f'EA6km_Tmax_{yr}_{doy:03d}_{utc:02d}.mat'))['Tmax'] # Tmax
+            except FileNotFoundError:
+                Tmax = np.full((nn,1), np.nan)
+                pass
+            
+            try:
+                Tmin = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Temp_min/',str(yr),f'EA6km_Tmin_{yr}_{doy:03d}_{utc:02d}.mat'))['Tmin'] # Tmin
+            except FileNotFoundError:
+                Tmin = np.full((nn,1), np.nan)
+                pass
+            try:
+                FrictionalVelocity = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/FrictionalVelocity/',str(yr),f'EA6km_FrictionalVelocity_{yr}_{doy:03d}_{utc:02d}.mat'))['FrictionalVelocity'] # 'FrictionalVelocity'
+            except FileNotFoundError:
+                FrictionalVelocity = np.full((nn,1), np.nan)
+                pass
+            try:
+                PotentialEnergy = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/PotentialEnergy/',str(yr),f'EA6km_PotentialEnergy_{yr}_{doy:03d}_{utc:02d}.mat'))['PotentialEnergy'] # 'PotentialEnergy'
+            except FileNotFoundError:
+                PotentialEnergy = np.full((nn,1), np.nan)
+                pass
+            try:
+                urfaceRoughness = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/SurfaceRoughness/',str(yr),f'EA6km_SurfaceRoughness_{yr}_{doy:03d}_{utc:02d}.mat'))['SurfaceRoughness'] # 'SurfaceRoughness'
+            except FileNotFoundError:
+                urfaceRoughness = np.full((nn,1), np.nan)
+                pass
+            try:
+                LatentHeatFlux = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/LatentHeatFlux/',str(yr),f'EA6km_LatentHeatFlux_{yr}_{doy:03d}_{utc:02d}.mat'))['LatentHeatFlux'] # 'LatentHeatFlux'
+            except FileNotFoundError:
+                LatentHeatFlux = np.full((nn,1), np.nan)
+                pass
+            try:
+                SpecificHumidity = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/SpecificHumidity/',str(yr),f'EA6km_SpecificHumidity_{yr}_{doy:03d}_{utc:02d}.mat'))['SpecificHumidity'] # 'SpecificHumidity'
+            except FileNotFoundError:
+                SpecificHumidity = np.full((nn,1), np.nan)
+                pass
+            try:
+                U = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Uwind/',str(yr),f'EA6km_U_{yr}_{doy:03d}_{utc:02d}.mat'))['U'] # 'U'
+            except FileNotFoundError:
+                U = np.full((nn,1), np.nan)
+                pass
+            try:
+                V = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/Vwind/',str(yr),f'EA6km_V_{yr}_{doy:03d}_{utc:02d}.mat'))['V'] # 'V'
+            except FileNotFoundError:
+                V = np.full((nn,1), np.nan)
+                pass
+            try:
+                stack1 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack1_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack1'] # 'stack1'
+            except FileNotFoundError:
+                stack1 = np.full((nn,1), np.nan)
+                pass
+            try:
+                stack3 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack3_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack3'] # 'stack3'
+            except FileNotFoundError:
+                stack3 = np.full((nn,1), np.nan)
+                pass
+            try:
+                stack5 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack5_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack5'] # 'stack5'
+            except FileNotFoundError:
+                stack5 = np.full((nn,1), np.nan)
+                pass
+            try:
+                stack7 = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/stackMaxWS/',str(yr),f'stack7_EA6km_maxWS_{yr}_{doy:03d}_{utc:02d}.mat'))['stack7'] # 'stack7'
+            except FileNotFoundError:
+                stack7 = np.full((nn,1), np.nan)
+                pass
+            try:
+                AP3h = matlab.loadmat(os.path.join(path_ea_goci,'RDAPS/AP3h/',str(yr),f'EA6km_AP3h_{yr}_{doy:03d}_{utc:02d}.mat'))['AP3h']
+            except FileNotFoundError:
+                AP3h = np.full((nn,1), np.nan)
+                pass
             
             WS = np.sqrt(np.power(U, 2) + np.power(V,2))
             Wcos = np.divide(U, WS)
             Wsin = np.divide(V, WS)
             
             # Load SMOKE emission data
-            EA_emis = matlab.loadmat(os.path.join(path_ea_goci,'EMIS/',str(yr),f'EA6km_EMIS_{yr}_{doy:03d}_{utc:02d}.mat'))['EA_emis'] # EA_emis
+            try:
+                EA_emis = matlab.loadmat(os.path.join(path_ea_goci,'EMIS/',str(yr),f'EA6km_EMIS_{yr}_{doy:03d}_{utc:02d}.mat'))['EA_emis'] # EA_emis
+            except FileNotFoundError:
+                EA_emis = np.full((nn,1), np.nan)
             EA_emis = EA_emis.reshape(-1,14)
             
             # Assign loaded data into matrix
-            nn = lat_goci.shape[0]*lat_goci.shape[1]
             data = np.zeros((nn,nvar))
             
             # satellite data(12)

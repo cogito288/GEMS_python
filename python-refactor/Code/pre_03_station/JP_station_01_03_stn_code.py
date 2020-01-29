@@ -117,6 +117,8 @@ for yr in YEARS:
     ind = np.lexsort((ndata[:,4],ndata[:,0],ndata[:,11]))    # sort 11->0->4. 0 is primary
     ndata = ndata[ind]    
     matlab.savemat(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_{yr}.mat'),
-                       {'ndata':ndata, 'header_ndata':header_ndata})
+                       {'ndata':ndata})
+    with h5py.File(os.path.join(path_stn_jp,'stn_code_data', f'stn_code_data_{yr}.mat'), 'a') as dst:
+            dst['header_ndata'] = header_ndata
     t2 = time.time() - t1
     print (f'time taken : {t2:.3f}')

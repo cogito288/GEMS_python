@@ -14,12 +14,12 @@ import glob
 import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 #data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-#path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
 #path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
-path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
+#path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
@@ -29,7 +29,8 @@ del mat
                      
 ## Japan
 # scode1, scode2, lat, lon, installation, abolation
-stn_info_jp = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
+stn_info_jp = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'))
+#stn_info_jp = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
 stn_info_jp = stn_info_jp.values
 
 new_station = np.zeros((stn_info_jp.shape[0],4))
@@ -72,5 +73,6 @@ header_jp_stn_GOCI6km_location = np.array(['scode1','scode2','lat_org','lon_org'
                                           dtype=h5py.string_dtype(encoding='utf-8'))
 matlab.savemat(os.path.join(path_stn_jp,'jp_stn_GOCI6km_location_weight_v2017.mat'),
     {'jp_stn_GOCI6km_location':jp_stn_GOCI6km_location, 
-     'jp_dup_scode2_GOCI6km':jp_dup_scode2_GOCI6km,
-     'header_jp_stn_GOCI6km_location':header_jp_stn_GOCI6km_location})
+     'jp_dup_scode2_GOCI6km':jp_dup_scode2_GOCI6km})
+with h5py.File(os.path.join(path_stn_jp,'jp_stn_GOCI6km_location_weight_v2017.mat'), 'a') as dst:
+        dst['header_jp_stn_GOCI6km_location'] = header_jp_stn_GOCI6km_location

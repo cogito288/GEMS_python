@@ -44,19 +44,19 @@ for yr in YEARS:
             if len(stn_temp2)!=0:
                 idx = [val in unq_scode2 for val in stn_temp2[:,12]]
                 stn_GOCI6km = stn_temp2[idx, :]
-                
                 for j in range(dup_scode2.shape[0]):
                     idx = [val in dup_scode2[j,:] for val in stn_temp2[:,12]]
                     stn_GOCI6km_temp = stn_temp2[idx,:]
-
                     if stn_GOCI6km_temp.shape[0]==1:
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp
                         stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2])
                     elif stn_GOCI6km_temp.shape[0]!=0:
                         weight_sum = None
+                        if stn_GOCI6km_temp.shape[1]!=14:
+                            stn_GOCI6km_temp = np.hstack([stn_GOCI6km_temp, np.zeros((stn_GOCI6km_temp.shape[0],1))])
                         for k in range(stn_GOCI6km_temp.shape[0]):
-                            stn_GOCI6km_temp[k,13] = dup_dist[dup_dist[:,1]==stn_GOCI6km_temp[k,12],1]
-                            nanidx = not np.isnan(stn_GOCI6km_temp[k,5:11])
+                            stn_GOCI6km_temp[k,13] = dup_dist[dup_dist[:,0]==stn_GOCI6km_temp[k,12],1]
+                            nanidx = ~np.isnan(stn_GOCI6km_temp[k,5:11])
                             weight = np.divide(nanidx, stn_GOCI6km_temp[k, 13])
                             stn_GOCI6km_temp[k,5:11] = np.multiply(stn_GOCI6km_temp[k, 5:11], weight)
                             if weight_sum is None:
@@ -67,11 +67,11 @@ for yr in YEARS:
                         
                         stn_GOCI6km_temp2 = stn_GOCI6km_temp[stn_GOCI6km_temp[:,13]==min_dist,:]
                         if stn_GOCI6km_temp2.shape[0]!=1:
-                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[1, :]
+                            stn_GOCI6km_temp2 = stn_GOCI6km_temp2[0, :]
                             
                         # 픽셀중심에 더 가까운 관측소의 scode2를 사용하기 위함. 관측값은 가중평균한 값으로 다시 할당될거이므로 신경 쓰지말기
-                        weight_sum = np.sum(weight_sum, axis=0)
-                        stn_GOCI6km_temp2[5:11]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:11],axis=0), weight_sum)
+                        weight_sum = np.sum(weight_sum, axis=0)                        
+                        stn_GOCI6km_temp2[0, 5:11]=np.divide(np.nansum(stn_GOCI6km_temp[:,5:11],axis=0), weight_sum)
                         stn_GOCI6km = np.vstack([stn_GOCI6km, stn_GOCI6km_temp2[:,:-1]])
                 stn_GOCI6km = stn_GOCI6km[stn_GOCI6km[:, 12].argsort()] # sort by scode2
                 if stn_GOCI6km_yr is None:

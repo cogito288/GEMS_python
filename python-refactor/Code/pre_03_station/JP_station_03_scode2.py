@@ -14,21 +14,22 @@ import glob
 import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
+data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 #path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 #path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 #stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'))
 #stn_info = stn_info.values
-# scode1, scode2, lon, lat, op_start, op_
+# scode1, scode2, lhon, lat, op_start, op_
 
 #data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
 #data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
+#data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
 path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
-stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
+stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd.csv'))
+#stn_info = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
 stn_info = stn_info.values
 # scode1, scode2, lat, lon, installation, abolation
 
