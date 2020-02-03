@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 from pyhdf.SD import SD, SDC ### HDF4 
 from calendar import monthrange
-
+import pandas as pd
 """
 Notes
 [A, B]  -> np.concatenate((A,B),axis=1)
@@ -180,7 +180,7 @@ def sortrows(arr, columns):
     # np.lexsort ? 
     # Should test performance 
     # columns : list
-    tmp_df = pd.DataFram(arr, columns=list(range(arr.ndim)))
+    tmp_df = pd.DataFrame(arr, columns=list(range(arr.shape[1])))
     tmp_df.sort_values(by=columns, inplace=True)
     data = tmp_df.values
     del tmp_df
@@ -238,6 +238,7 @@ def savemat(fname, data):
     #sio.savemat(os.path.join(dirname, fname), mdict=data)
     hdf5storage.writes(mdict=data,
                       filename=fname,
+                      truncate_existing=True,
                       matlab_compatible=True,
                       compress=True,
                       compression_algorithm='gzip')
