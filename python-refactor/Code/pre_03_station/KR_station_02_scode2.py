@@ -1,9 +1,8 @@
 ### Package Import
 import sys
 import os
-#base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+base_dir = os.environ['GEMS_HOME']
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -14,13 +13,12 @@ import glob
 import h5py
 
 ### Setting path
-# data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-# data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_station = os.path.join(data_base_dir, 'Station') 
 path_stn_kr = os.path.join(path_station, 'Station_KR')
 
-stn_info = pd.read_csv(os.path.join(path_stn_kr, 'stn_code_lonlat_period_2005_201904.csv'))
+stn_info = pd.read_csv(os.path.join(path_in_situ,'AirQuality_SouthKorea', 'stn_code_lonlat_period_2005_201904.csv'))
 stn_info = stn_info.values
 # scode1, scode2, lon, lat, installation, abolation
 
@@ -28,7 +26,7 @@ stn_info = stn_info.values
 header_ndata = np.array(['doy','yr','mon','day','KST','SO2','CO','O3','NO2','PM10','PM25','scode','scode2'], 
                         dtype=h5py.string_dtype(encoding='utf-8'))
 ## stn_scode_data for South Korea
-YEARS = [2016]
+YEARS = range(2014,2018+1)
 for yr in YEARS: 
     if yr==2019:
         ndata=matlab.loadmat(os.path.join(path_stn_kr,'stn_code_data', 'stn_code_data_2019_010100_042300.mat'))['ndata']

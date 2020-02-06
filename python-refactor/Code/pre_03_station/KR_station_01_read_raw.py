@@ -2,8 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -13,13 +12,9 @@ import pandas as pd
 import glob
 
 ### Setting path
-# data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-# data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-# path_in_situ = os.path.join(data_base_dir, 'Raw')
-# path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
-path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_station = os.path.join(data_base_dir, 'Station') 
 path_stn_kr = os.path.join(path_station, 'Station_KR')
 
 cols=['측정소코드','측정일시','SO2','CO','O3','NO2','PM10','PM25']
@@ -62,14 +57,14 @@ for yr in YEARS:
     ndata = np.hstack([data_doy.reshape(-1,1),dvec,data[:,2:],data[:,0].reshape(-1,1)])
     # doy, yr, mon, day, time, SO2, CO, O3, NO2, PM10, PM25, scode
     matlab.savemat(os.path.join(path_stn_kr,'stn_code_data',f'stn_code_data_{yr}.mat'), 
-                   {'ndata':ndata})
-    
-## 12월 31일 24시 -> 1월 1일 00시 
+                    {'ndata':ndata})
+
+## Dec 31 24:00 KST -> Jan 1 00:00 KST
 for yr in YEARS:
     fname = f'stn_code_data_{yr}.mat'
     ndata = matlab.loadmat(os.path.join(path_stn_kr,'stn_code_data', fname))['ndata']
+    fname_mv = f'stn_code_data_{yr}_001_00.mat'
     if yr!=YEARS[0]:
-        fname_mv = f'stn_code_data_{yr}_001_00.mat'
         data_mv = matlab.loadmat(os.path.join(path_stn_kr,'stn_code_data', fname_mv))['data_mv']
         ndata = np.vstack([data_mv, ndata])
         del data_mv
@@ -81,6 +76,8 @@ for yr in YEARS:
         idx= ndata[:,1]==(yr+1)
         ndata = ndata[~idx]
         matlab.savemat(os.path.join(path_stn_kr,'stn_code_data', fname), {'ndata':ndata})
+        if yr!=YEARS[0]:
+            os.remove(os.path.join(path_stn_kr,'stn_code_data', fname_mv))
     else:
         raise ValueError('len(doy_unq)!=1')
 

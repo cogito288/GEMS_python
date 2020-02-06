@@ -2,8 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -14,10 +13,8 @@ import glob
 import time
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir,'Data')
+path_station = os.path.join(data_base_dir, 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 ## Japan
@@ -30,7 +27,7 @@ unq_scode2 = jp_stn_GOCI6km_location[jp_stn_GOCI6km_location[:,8]==0,1]
 idx = [val in dup_scode2 for val in jp_stn_GOCI6km_location[:,1]]
 dup_dist = jp_stn_GOCI6km_location[idx][:, [1,7]]
 
-YEARS = [2016]
+YEARS = range(2015,2019+1)
 for yr in YEARS:
     tStart = time.time()
     if os.path.isfile(os.path.join(path_stn_jp,'stn_scode_data', f'jp_stn_scode_data_{yr}.mat')):

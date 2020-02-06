@@ -2,8 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -13,13 +12,9 @@ import pandas as pd
 import glob
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#path_in_situ = os.path.join(data_base_dir, 'Raw') 
-#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-#path_in_situ = os.path.join('//','10.72.26.46','irisnas6','Data','In_situ')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_station = os.path.join(data_base_dir, 'Station')
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
 # header = {'doy','year','month','day','KST','SO2','CO','O3','NO2','PM10','PM25','scode'}
@@ -34,7 +29,7 @@ for p,varname,unit in pcode:
     header_p = ['doy','year','month','day','scode','ccode','KST',f'stn{varname}']
     # 'yr/scode/ccode/pcode/unit/month/day'
    
-    YEARS = [2016] # range(2009, 2009+1)
+    YEARS = range(2015, 2017+1)
     for yr in YEARS:
         file_list = glob.glob(os.path.join(path_in_situ, 'AirQuality_Japan', str(yr), f'*_{p}.txt'))
         file_list.sort()

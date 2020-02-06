@@ -2,8 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -14,22 +13,19 @@ import glob
 import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-#path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
-#path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
-path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_grid = os.path.join(data_base_dir, 'grid')
+path_station = os.path.join(data_base_dir, 'Station') 
 path_stn_jp = os.path.join(path_station, 'Station_JP')
 
-mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat'))
+mat = matlab.loadmat(os.path.join(path_grid, 'grid_goci.mat'))
 latlon_data = np.array([mat['lat_goci'].ravel(order='F'),mat['lon_goci'].ravel(order='F')]).T
 del mat
                      
 ## Japan
 # scode1, scode2, lat, lon, installation, abolation
-stn_info_jp = pd.read_csv(os.path.join(path_stn_jp, 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
+stn_info_jp = pd.read_csv(os.path.join(path_in_situ,'AirQuality_Japan', 'jp_stn_code_lonlat_period_filtered_yyyymmdd_v2017.csv'))
 stn_info_jp = stn_info_jp.values
 
 new_station = np.zeros((stn_info_jp.shape[0],4))

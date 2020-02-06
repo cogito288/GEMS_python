@@ -1,9 +1,8 @@
 ### Package Import
 import sys
 import os
-# base_dir = os.environ['GEMS_HOME']
-base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+base_dir = os.environ['GEMS_HOME']
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -14,10 +13,8 @@ import glob
 import time
 
 ### Setting path
-# data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('//', '10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-# data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_station = os.path.join(data_base_dir, 'Station') 
 path_stn_kr = os.path.join(path_station, 'Station_KR')
 
 ## South Korea
@@ -30,7 +27,7 @@ unq_scode2 = stn_GOCI6km_location[stn_GOCI6km_location[:,8]==0,1]
 idx = [val in dup_scode2 for val in stn_GOCI6km_location[:,1]]
 dup_dist = stn_GOCI6km_location[idx][:, [1,7]]
 
-YEARS = [2016] #2005:2019
+YEARS = range(2014,2018+1)
 for yr in YEARS:
     tStart = time.time()
     ndata_scode = matlab.loadmat(os.path.join(path_stn_kr,'stn_scode_data', f'stn_scode_data_{yr}.mat'))['ndata_scode']

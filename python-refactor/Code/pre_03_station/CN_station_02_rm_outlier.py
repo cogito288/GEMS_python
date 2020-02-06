@@ -2,7 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -13,18 +13,17 @@ import glob
 import time
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir,'Preprocessed_raw', 'Station')
+data_base_dir = os.path.join(base_dir, 'Data')
+path_station = os.path.join(data_base_dir, 'Station')
+path_stn_cn = os.path.join(path_station, 'Station_CN')
 
-YEARS = [2016] # range(2015, 2019+1)
+YEARS = range(2015, 2019+1)
 for yr in YEARS:
+    tStart_yr = time.time()
     if yr%4==0: days= 366; 
     else: days=365; 
-    if yr==2019: days=151;
     
-    ndata = matlab.loadmat(os.path.join(path_station, 'Station_CN', 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_yr']
+    ndata = matlab.loadmat(os.path.join(path_stn_cn, 'stn_code_data', f'stn_code_data_{yr}.mat'))['stn_yr']
     scode = np.unique(ndata[:,-1])
     # CO
     ndata[:,18]=ndata[:,18]/1.15 # (mg/m3) to ppm (1 ppm = 1.15 mg m-3)
@@ -49,11 +48,15 @@ for yr in YEARS:
     
     stn_CN = None
     for doy in range(1,days+1):
-        tStart_doy = time.time()
+        # tStart_doy = time.time()
         ndata_temp = ndata[ndata[:,0]==doy,:]
         scode_temp = np.unique(ndata_temp[:,-1])
         nstn_temp = scode_temp.shape[0]
-        if (ndata_temp.shape[0]%nstn_temp==0) and (ndata_temp.shape[0]>=(nstn_temp*4)):
+        
+        if nstn_temp==0:
+            print ('No data in {doy:03d} (DOY)')
+            
+        elif (ndata_temp.shape[0]%nstn_temp==0) and (ndata_temp.shape[0]>=(nstn_temp*4)):
             CO = ndata_temp[:, 18].reshape((nstn_temp, -1), order='F')
             SO2 = ndata_temp[:,10].reshape((nstn_temp, -1), order='F')
             O3 = ndata_temp[:,14].reshape((nstn_temp, -1), order='F')
@@ -114,10 +117,12 @@ for yr in YEARS:
             else:
                 stn_CN = np.vstack([stn_CN, ndata_temp])
 
-            tElapsed_doy = time.time()-tStart_doy
-            print (f'{yr}_{doy}--{tElapsed_doy:3.4f} sec')
+            # tElapsed_doy = time.time()-tStart_doy
+            print (doy)
         else:
             print ('Less than 4 hourly data in {doy:03d} (DOY) \n')
+            
     fname = f'stn_code_data_rm_outlier_{yr}.mat'
-    matlab.savemat(os.path.join(path_station, 'Station_CN', 'stn_code_data',fname), {'stn_CN':stn_CN})
-    print (yr)
+    matlab.savemat(os.path.join(path_stn_cn, 'stn_code_data',fname), {'stn_CN':stn_CN})
+    tElapsed_yr = time.time()-tStart_yr
+    print (f'{yr}--{tElapsed_yr:3.4f} sec')

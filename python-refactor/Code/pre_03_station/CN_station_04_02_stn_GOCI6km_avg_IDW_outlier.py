@@ -2,8 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -13,12 +12,11 @@ import pandas as pd
 import glob
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
-#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_station = os.path.join(data_base_dir, 'Station') 
+path_stn_cn = os.path.join(path_station, 'Station_CN')
 
-mat = matlab.loadmat(os.path.join(path_station,'Station_CN', f'cn_stn_GOCI6km_location_weight.mat'))
+mat = matlab.loadmat(os.path.join(path_stn_cn, f'cn_stn_GOCI6km_location_weight.mat'))
 cn_dup_scode2_GOCI6km, cn_stn_GOCI6km_location = mat['cn_dup_scode2_GOCI6km'], mat['cn_stn_GOCI6km_location']
 del mat
 
@@ -27,10 +25,10 @@ unq_scode2 = cn_stn_GOCI6km_location[cn_stn_GOCI6km_location[:,8]==0, 1]
 idx = [val in dup_scode2 for val in cn_stn_GOCI6km_location[:,1]]
 dup_dist = cn_stn_GOCI6km_location[idx][:, [1,7]]
 
-YEARS = [2016] # range(2015, 2019+1)
+YEARS = range(2015, 2019+1)
 for yr in YEARS:
     fname = f'cn_stn_scode_data_rm_outlier_{yr}.mat'
-    ndata_scode = matlab.loadmat(os.path.join(path_station,'Station_CN/stn_scode_data/', fname))['ndata_scode']
+    ndata_scode = matlab.loadmat(os.path.join(path_stn_cn,'stn_scode_data', fname))['ndata_scode']
 
     if yr%4==0: days=366; 
     else: days=365; 
@@ -81,4 +79,4 @@ for yr in YEARS:
         print (doy)
     cn_stn_GOCI6km_yr=stn_GOCI6km_yr 
     fname = f'cn_Station_GOCI6km_rm_outlier_{yr}_weight.mat'
-    matlab.savemat(os.path.join(path_station,'Station_CN', fname),{'cn_stn_GOCI6km_yr':cn_stn_GOCI6km_yr})
+    matlab.savemat(os.path.join(path_stn_cn, fname),{'cn_stn_GOCI6km_yr':cn_stn_GOCI6km_yr})

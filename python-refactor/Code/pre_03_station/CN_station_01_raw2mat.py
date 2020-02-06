@@ -2,7 +2,7 @@
 import sys
 import os
 base_dir = os.environ['GEMS_HOME']
-project_path = os.path.join(base_dir, 'python-refactor')
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -12,22 +12,19 @@ import pandas as pd
 import glob
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-#raw_path = os.path.join(data_base_dir, 'Raw') 
-#station_path = os.path.join(data_base_dir, 'Station') 
-data_base_dir = os.path.join('/', 'share', 'irisnas5', 'GEMS', 'GEMS_python')
-path_in_situ = os.path.join('/','share','irisnas6','Data','In_situ')
-path_station = os.path.join(data_base_dir,'Preprocessed_raw', 'Station')
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_station = os.path.join(data_base_dir, 'Station')
+path_stn_cn = os.path.join(path_station, 'Station_CN')
 
 ### Setting period
-YEARS = [2016] #, 2018, 2019]
+YEARS = range(2015,2019+1)
 
 for yr in YEARS: 
     if yr%4==0: days= 366
     else: days=365
-    if yr==2019: days=151
         
-    flist = glob.glob(os.path.join(path_in_situ, 'AirQuality_China', 'china_sites', str(yr),'*.csv'))
+    flist = glob.glob(os.path.join(path_in_situ, 'AirQuality_China', str(yr),'*.csv'))
     flist = [os.path.basename(fname) for fname in flist]
     
     stn_yr = None
@@ -38,7 +35,7 @@ for yr in YEARS:
         print (fname)
         #print (fname in flist)
         if fname in flist: 
-            stn_tmp = pd.read_csv(os.path.join(path_in_situ, 'AirQuality_China', 'china_sites', str(yr), fname))
+            stn_tmp = pd.read_csv(os.path.join(path_in_situ, 'AirQuality_China', str(yr), fname))
             
             # observation matrix
             stn_value = stn_tmp.iloc[:,3:].values
@@ -78,7 +75,7 @@ for yr in YEARS:
                 else:
                     stn_doy = np.concatenate((stn_doy, stn), axis=0)
         else:
-            stn_doy = np.full((len(scode_unq)*24, 21), np.nan)
+            stn_doy = np.full((0, 21), np.nan)
             print(f'NO file in {doy:03d} (DOY)')
         if stn_yr is None:
             stn_yr = stn_doy
@@ -86,6 +83,5 @@ for yr in YEARS:
             stn_yr=np.concatenate((stn_yr, stn_doy), axis=0)
         
     fname = f'stn_code_data_{yr}.mat'
-    matlab.savemat(os.path.join(path_station,'Station_CN','stn_code_data', fname), {'stn_yr':stn_yr})
+    matlab.savemat(os.path.join(path_stn_cn,'stn_code_data', fname), {'stn_yr':stn_yr})
     print (yr)
-    

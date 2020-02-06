@@ -1,9 +1,8 @@
 ### Package Import
 import sys
 import os
-base_dir = os.environ['GEMS_HOME']
-#base_dir = 'D:\github\GEMS_python'
-project_path = os.path.join(base_dir, 'python-refactor')
+base_dir = os.environ['GEMS_HOME'] 
+project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
@@ -14,21 +13,19 @@ import glob
 import h5py
 
 ### Setting path
-#data_base_dir = os.path.join('/data2', 'sehyun', 'Data')
-data_base_dir = os.path.join('/','share', 'irisnas5', 'GEMS', 'GEMS_python')
-#data_base_dir = os.path.join('//','10.72.26.56','irisnas5', 'GEMS', 'GEMS_python')
-#path_grid_raw = os.path.join(data_base_dir, 'Raw', 'grid')
-path_grid_raw = os.path.join('/', 'share', 'irisnas5', 'Data', 'grid')
-#path_grid_raw = os.path.join('//','10.72.26.56','irisnas5','Data','grid')
-path_station = os.path.join(data_base_dir, 'Preprocessed_raw', 'Station') 
+data_base_dir = os.path.join(base_dir, 'Data')
+path_in_situ = os.path.join(data_base_dir, 'Raw', 'In_situ')
+path_grid = os.path.join(data_base_dir, 'grid')
+path_station = os.path.join(data_base_dir, 'Station') 
+path_stn_cn = os.path.join(path_station, 'Station_CN')
 
-mat = matlab.loadmat(os.path.join(path_grid_raw, 'grid_goci.mat'))
+mat = matlab.loadmat(os.path.join(path_grid, 'grid_goci.mat'))
 latlon_data = np.array([mat['lat_goci'].ravel(order='F'),mat['lon_goci'].ravel(order='F')]).T
 del mat
                    
 ## China
 # scode1, scode2, lon, lat, op_start, op_
-stn_info_cn = pd.read_csv(os.path.join(path_station, 'Station_CN', 'cn_stn_code_lonlat_period_GOCI.csv'))
+stn_info_cn = pd.read_csv(os.path.join(path_in_situ, 'AirQuality_China', 'cn_stn_code_lonlat_period_GOCI.csv'))
 stn_info_cn = stn_info_cn.values
 
 new_station = np.zeros((stn_info_cn.shape[0],4))
@@ -43,8 +40,7 @@ for i in range(stn_info_cn.shape[0]):
 new_station[:,1:3]=latlon_data[new_station[:,0].astype('int'),:]
 stn = np.hstack([stn_info_cn[:,[0,1,3,2]], new_station]) # scode1,scode2, lat_org, lon_org, pxid, lat_px, lon_px, dist_btw_org_px
 # new_station = stn
-# matlab.savemat(os.path.join(path_station,'Station_CN/cn_GOCI6km_new_station.mat'),{'new_station':new_station})
-
+# matlab.savemat(os.path.join(path_stn_cn,'cn_GOCI6km_new_station.mat'),{'new_station':new_station})
 
 stn_unq = np.unique(stn[:,4])
 unq_cnt = matlab.histogram_bin_center(stn[:,4], stn_unq)
@@ -69,7 +65,7 @@ cn_stn_GOCI6km_location = stn_GOCI6km
 cn_dup_scode2_GOCI6km = dup_scode2_GOCI6km
 header_cn_stn_GOCI6km_location = np.array(['scode1','scode2','lat_org','lon_org','pxid','lat_px','lon_px','dist','avgid'],
                                           dtype=h5py.string_dtype(encoding='utf-8'))
-matlab.savemat(os.path.join(path_station,'Station_CN/cn_stn_GOCI6km_location_weight.mat'),
+matlab.savemat(os.path.join(path_stn_cn,'cn_stn_GOCI6km_location_weight.mat'),
     {'cn_stn_GOCI6km_location':cn_stn_GOCI6km_location, 
      'cn_dup_scode2_GOCI6km':cn_dup_scode2_GOCI6km,
      'header_cn_stn_GOCI6km_location':header_cn_stn_GOCI6km_location})
