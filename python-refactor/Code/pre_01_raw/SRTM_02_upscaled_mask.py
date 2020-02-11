@@ -6,11 +6,10 @@ project_path = base_dir
 sys.path.insert(0, project_path)
 from Code.utils import matlab
 
-import json
 import rasterio as rio
 from rasterio import features
 from rasterio.mask import mask
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+from rasterio.warp import Resampling
 import time
 import fiona
 
@@ -26,7 +25,7 @@ with fiona.open(v_maskfile, "r") as shapefile:
 del v_maskfile, shapefile
 
 # Upscaling
-upscale_factor = 0.05
+upscale_factor = 0.1 #0.05
 fname = os.path.join(path_srtm_processed, 'SRTM_DEM_3Arc_Void_Filled_mosaic.tif')
 with rio.open(fname) as dataset:
     data = dataset.read(
@@ -58,7 +57,7 @@ with rio.open(up_fname) as dem:
                      "width": dem_data.shape[2],
                      "transform": dem_transform,
                      "compress":"LZW"})
-    dst_fname = os.path.join(path_srtm_processed, 'SRTM_DEM_{int(1/upscale_factor)}times_upscaled_masked.tif')
+    dst_fname = os.path.join(path_srtm_processed, f'SRTM_DEM_{int(1/upscale_factor)}times_upscaled_masked.tif')
     with rio.open(dst_fname, 'w', **out_meta) as dst:
         dst.write(dem_data)
 
